@@ -252,15 +252,14 @@ username or directory conventions.
    auxiliary files, and the permanent output directory (the `mv` line in `<command>` plus
    the `<output>` element). None of these can be guessed -- they depend on your own SDCC
    account and disk allocations.
-3. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021,
-   production=P23ic` part of the `<input URL="catalog:...">` line is copied verbatim
-   from `lightflavorspectra_etof`'s working O+O 200 GeV XML; `library=` has been changed
-   to `SL24y` per request. Note that in the original query, `production=P23ic` was paired
-   with `library=SL23c` -- production tags and library versions are normally paired by
-   STAR, so `P23ic` may not be the right production tag for `SL24y` data. This has not
-   been independently re-verified against the current StarCatalog, so confirm the
-   `production=`/`library=` pairing still resolves to the dataset you actually want
-   before submitting (an unverified pairing may just return zero files).
+3. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021`
+   part of the `<input URL="catalog:...">` line is copied verbatim from
+   `lightflavorspectra_etof`'s working O+O 200 GeV XML; `production=`/`library=` have
+   been changed to `P24iy`/`SL24y` per request (the original query paired
+   `production=P23ic` with `library=SL23c`). This `production=`/`library=` pairing has
+   not been independently re-verified against the current StarCatalog, so confirm it
+   still resolves to the dataset you actually want before submitting (an unverified
+   pairing may just return zero files).
 4. Make one copy of the template per species (PION/KAON/PROTON), editing the `PARTNAME`
    argument in the `run_picobinner_sdcc.bash` call, the job `name`, and the output paths
    in each copy so the three jobs don't collide.
