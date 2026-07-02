@@ -54,10 +54,23 @@ public:
   //model algorithm to find all the parameters of the gaussian
   //the result will be stored in a_parametersToFill
   //Note, this returns parameters as    Fraction Mean Variance, Fraction Mean Variance, ...
+  //
+  // SDCC/ROOT5-CINT BUILD FIX (2026-07-02, not in the original): a_initialMeans/
+  // a_initialAmps/a_initialSigmas' default values (all NULL) were removed here. This
+  // overload and the one below it (doGMM with a_avgSigma instead of a_initialSigmas)
+  // originally both had every parameter after the first defaulted, and both share the
+  // exact same first-3-parameter types (double*,double*,double*) -- when CINT's
+  // rootcint builds this class's dictionary, it generates interactive-call stubs for
+  // every "N arguments given, rest defaulted" arity, and for N=1,2,3 the two overloads'
+  // stubs become genuinely ambiguous (this only surfaces under ROOT5/CINT, not ROOT6/
+  // Cling, which is why it never showed up building on a Mac). This overload's only
+  // call site (inside GausMixModel.cxx, from the other overload's body) always passes
+  // all 7 arguments explicitly, so requiring the first 4 removes the ambiguous stub
+  // arities without changing any real call site's behavior.
   void doGMM(double* a_parametersToFill,
-             double* a_initialMeans = NULL,
-             double* a_initialAmps = NULL, //each are [0,1] fractions
-             double* a_initialSigmas = NULL,
+             double* a_initialMeans,
+             double* a_initialAmps, //each are [0,1] fractions
+             double* a_initialSigmas,
              int a_maxTrials = 300,
              double a_tolerance = 1e-7,
              double a_minBinContent = -1 // this will zero bins below the threshold if positive

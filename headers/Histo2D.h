@@ -28,8 +28,16 @@ using namespace std;
 class Histo2D : public TNamed{
 public:
   // if you don't supply y projections here, you have to do it later!
-  Histo2D(string a_name, string a_title, unsigned int a_num_x_bins, const double* a_x_bin_edges, vector<TH1D*> a_y_projections = {});
-  Histo2D(string a_name, string a_title, unsigned int a_num_x_bins, double a_x_min, double a_x_max, vector<TH1D*> a_y_projections = {});
+  //
+  // SDCC/ROOT5-CINT BUILD FIX (2026-07-02, not in the original): the default argument
+  // was `= {}` (C++11 empty-braced-init-list) in both constructors below. CINT (ROOT5's
+  // interpreter, used when this repo's build runs under an older starver like SL24y at
+  // SDCC) can't parse that syntax at all ("Symbol {} is not defined in current scope"),
+  // even though a real C++11 compiler front-end (Cling/ROOT6, used on a Mac build)
+  // accepts it fine. Replaced with the equivalent, CINT-safe `vector<TH1D*>()` --
+  // identical behavior (an empty vector), just older syntax.
+  Histo2D(string a_name, string a_title, unsigned int a_num_x_bins, const double* a_x_bin_edges, vector<TH1D*> a_y_projections = vector<TH1D*>());
+  Histo2D(string a_name, string a_title, unsigned int a_num_x_bins, double a_x_min, double a_x_max, vector<TH1D*> a_y_projections = vector<TH1D*>());
   Histo2D(TH2D* a_histo); // imports a TH2D to manipulate verticle slices independantly
   Histo2D(); // default constructor for ROOT I/O
   Histo2D(const Histo2D& other); // copy constructor

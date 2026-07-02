@@ -16,9 +16,12 @@ Histo2D::Histo2D() : TNamed("name", "title"){
   m_weak_construction = true;
   m_histogram_drawing_base = nullptr;
 
-  vector<TH1D*> temp = {};
+  // SDCC/ROOT5-CINT BUILD FIX (2026-07-02, not in the original): `= {}` -> `= vector<...>()`,
+  // same CINT-parsing issue as headers/Histo2D.h's constructor default args -- see that
+  // file's comment for the full explanation. Identical behavior either way (empty vector).
+  vector<TH1D*> temp = vector<TH1D*>();
   m_vertical_histogram_projections = temp;
-  vector<TH2D*> temp2D = {};
+  vector<TH2D*> temp2D = vector<TH2D*>();
   m_vertical_2D_drawing_projections = temp2D;
 }
 

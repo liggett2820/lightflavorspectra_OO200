@@ -241,8 +241,12 @@ namespace PhysMath{
   TMatrixD    reduceCovMatrix(TMatrixD a_covMatrix);
   TMatrixDSym reduceCovMatrix_keepPassedVector(TMatrixDSym a_covMatrix, vector< int > a_rowsToKeep); //a_rowsToKeep should contain indecies of rows from covariance matrix
   TMatrixDSym addZerosToCovMatrix(TMatrixDSym a_covMatrix, int a_numExtraZeroRows); // adds extra rows and coloumns
-  TH2D* makeCorrelationHistogram(string a_name, string a_title, TMatrixDSym a_covMatrix, vector< string > a_paramNames = {});
-  TH2D* makeCovarianceHistogram(string a_name, string a_title, TMatrixDSym a_covMatrix, vector< string > a_paramNames = {});
+  // SDCC/ROOT5-CINT BUILD FIX (2026-07-02, not in the original): default args below
+  // changed from `= {}` (C++11 empty-braced-init-list, unparseable by CINT under an
+  // older starver like SL24y -- see headers/Histo2D.h's identical fix for the full
+  // explanation) to the equivalent, CINT-safe `vector<string>()`.
+  TH2D* makeCorrelationHistogram(string a_name, string a_title, TMatrixDSym a_covMatrix, vector< string > a_paramNames = vector<string>());
+  TH2D* makeCovarianceHistogram(string a_name, string a_title, TMatrixDSym a_covMatrix, vector< string > a_paramNames = vector<string>());
 
 
   // when you take the ln of a histogram, you can fit with parabolas, this function changes those fit parameters into gaussian parameters

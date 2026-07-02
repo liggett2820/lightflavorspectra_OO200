@@ -3253,7 +3253,14 @@ void ZFitter::draw_ZVar_mTm0_data_with_fit_data(int a_partIndex, int a_detIndex,
       ampGraphs[partIndex]->GetPoint(pointIndex,x_val,y_val);
 
       int mainPointIndex = HistogramUtilities::getPointClosestToXVal(ampGraphs[a_partIndex], x_val);
-      double main_y_val = ampGraphs[a_partIndex]->GetPointY(mainPointIndex);
+      // SDCC/ROOT5 BUILD FIX (2026-07-02, not in the original): TGraphErrors::GetPointY()
+      // doesn't exist in ROOT 5.34.38 (added upstream well after this repo's original Mac
+      // build's ROOT 6) -- replaced with the classic GetPoint(index,x,y) form already used
+      // a few lines above in this same function, which has always been part of TGraph's
+      // API. Same value, just via the older accessor (the x output here is unused).
+      double main_x_val_unused = 0.0;
+      double main_y_val = 0.0;
+      ampGraphs[a_partIndex]->GetPoint(mainPointIndex, main_x_val_unused, main_y_val);
       double main_y_err = ampGraphs[a_partIndex]->GetErrorY(mainPointIndex);
 
       double ratio = y_val/main_y_val;
