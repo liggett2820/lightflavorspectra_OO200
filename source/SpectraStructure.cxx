@@ -180,6 +180,18 @@ void SpectraStructure::addEnergyLossCorrectionPoint(double a_mTm0, double a_ener
 void SpectraStructure::addFeedDownCorrectionPoint(double a_mTm0, double a_energyLoss, double a_error, bool a_integratedValue){
 }
 
+// SDCC/rootcint BUILD FIX (2026-07-02, not in the original): makeSpectraPDF and
+// makeSpectraTXT are declared in SpectraStructure.h but were never implemented anywhere
+// in this codebase (not even a commented-out body, unlike the 5 methods above) -- no
+// call site anywhere either, confirmed via grep. Same underlying issue as the block
+// above: SDCC's ROOT5 rootcint dictionary generation requires a real body for every
+// declared member. Added empty-body stubs -- if this "write results to PDF/txt" feature
+// is ever wanted, replace these with real implementations.
+void SpectraStructure::makeSpectraPDF(string a_imagePathAndName){
+}
+void SpectraStructure::makeSpectraTXT(string a_txtFileName){
+}
+
 
 
 
