@@ -52,7 +52,18 @@ public:
 
   void Fill(double a_x, double a_y, double a_weight = 1.0);
 
-  void Draw(string a_option = "", bool a_low_content_range_is_zero = true, string a_xaxis_title = "", string a_yaxis_title = "");
+  // SDCC/ROOT5-CINT BUILD FIX (2026-07-02, not in the original): a_option used to
+  // default to "", making this overload callable with zero arguments -- but so is the
+  // TObject-override Draw(Option_t*) right below it, making a bare `->Draw()` call
+  // genuinely ambiguous between the two (they even do different things: this one uses
+  // Draw()'s own defaults, the other hardcodes "colz",false). Nothing in this codebase
+  // actually calls Histo2D::Draw() with zero arguments (confirmed via grep) -- the only
+  // 0-arg caller was CINT's own auto-generated interactive-dispatch stub for this class,
+  // which is what surfaced the ambiguity as a hard compile error under ROOT5/CINT (ROOT6/
+  // Cling, used on a Mac, didn't generate/hit the same stub). Removing the default here
+  // makes a bare `->Draw()` call resolve unambiguously to the Option_t* overload, with no
+  // change to any real call site.
+  void Draw(string a_option, bool a_low_content_range_is_zero = true, string a_xaxis_title = "", string a_yaxis_title = "");
   void Draw(Option_t *option=""){Draw("colz",false);};
   void SetXDrawRange(double a_min, double a_max);
   void SetYDrawRange(double a_min, double a_max);

@@ -157,6 +157,29 @@ void SpectraStructure::addEnergyLossCorrectionPoint(double a_mTm0, double a_ener
 void SpectraStructure::addFeedDownCorrectionPoint(double a_mTm0, double a_energyLoss, double a_error, bool a_integratedValue);
 */
 
+// SDCC/rootcint BUILD FIX (2026-07-02, not in the original): the 5 methods above are
+// declared in SpectraStructure.h (with default `a_integratedValue = true`) but were
+// never implemented -- their bodies were left commented out above, presumably because
+// this feature (adding individual correction/efficiency points one at a time) was never
+// finished in the parent lightflavorspectra_etof repo. No call site anywhere in this
+// codebase actually calls any of these 5 methods (confirmed via grep; the only
+// references are the commented-out calls in RawSpectraModifier.cxx). This built fine on
+// a Mac (ROOT6/rootcling only generates a dictionary entry lazily / tolerates it), but
+// SDCC's ROOT5 rootcint dictionary for this class references every declared member
+// unconditionally, so linking fails with "undefined reference" for all 5 unless they
+// have real (even if empty) bodies. Added minimal empty-body implementations here --
+// this changes nothing observable since nothing calls them.
+void SpectraStructure::addTPCEffPoint(double a_mTm0, double a_efficiency, double a_effErr, bool a_integratedValue){
+}
+void SpectraStructure::addBTOFEffPoint(double a_mTm0, double a_efficiency, double a_effErr, bool a_integratedValue){
+}
+void SpectraStructure::addETOFEffPoint(double a_mTm0, double a_efficiency, double a_effErr, bool a_integratedValue){
+}
+void SpectraStructure::addEnergyLossCorrectionPoint(double a_mTm0, double a_energyLoss, double a_error, bool a_integratedValue){
+}
+void SpectraStructure::addFeedDownCorrectionPoint(double a_mTm0, double a_energyLoss, double a_error, bool a_integratedValue){
+}
+
 
 
 
