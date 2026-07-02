@@ -1,54 +1,58 @@
 <!--
-  runPicoBinner_OO200_SDCC_template.xml -- lightflavorspectra_OO200
+  runPicoBinner_OO200_SDCC_template.xml - lightflavorspectra_OO200
 
   SDCC/RCF star-submit job description for stage 1 (PicoBinner) only, against a real
-  production PicoDst dataset. This is the ONLY pipeline stage this repo runs on SDCC --
+  production PicoDst dataset. This is the ONLY pipeline stage this repo runs on SDCC -
   ZFitter/RawSpectraModifier/SpectraFitter are run locally on a laptop against
   PicoBinner's output (see "Moving output back to a laptop" in the README's SDCC
-  section). This template is adapted from lightflavorspectra_etof's own
-  runPicoBinner_OO_200GeV.xml (same catalog query -- see the note on that below), but
-  re-pointed at THIS repo's actual macro names/build layout (RunPicoBinner.C +
-  LoadPicoBinnerLibs.C, not RunPicoBinner_Liggett.cxx) and with the previous author's
-  ("harasty") hardcoded paths replaced with clearly marked placeholders.
+  section).
 
-  *** BEFORE SUBMITTING, YOU MUST EDIT EVERY "EDITME" BELOW ***
-  (your SDCC/RCF username, and where you want scratch/output/log files to land --
-  this repo has no way to know your actual BNL directory conventions).
+  Restructured to follow the format of a real, working O+O 200 GeV job
+  (lightflavorspectra_etof's pions_OO_200GeV job), including the <shell> singularity
+  container line SDCC now requires and the filesPerHour attribute. library=/production=
+  are kept at THIS repo's SL24y/P24iy port rather than reverting to that job's
+  SL23c/P23ic - see the CATALOG QUERY note below. Paths are filled in for
+  liggett2820's real SDCC/RCF username and scratch/pwg layout - if someone else runs
+  this, update every /liggett path below.
 
-  *** ALSO BEFORE SUBMITTING: rebuild this repo's libraries ON THE SDCC/RCF NODE ***
+  *** BEFORE SUBMITTING: rebuild this repo's libraries ON THE SDCC/RCF NODE ***
   The .so files this template packages (see <SandBox> below) are NOT committed to
-  git (see .gitignore) because the ones on a laptop are macOS/arm64 Mach-O binaries --
+  git (see .gitignore) because the ones on a laptop are macOS/arm64 Mach-O binaries -
   they will not load on BNL's Linux nodes. After cloning this repo onto SDCC, run the
   README's "One-time build setup" section THERE first (builds submodule/PicoDstReader_SL24y
   and runs macros/makeLibs.C) so bin/*.so are genuine Linux binaries before this XML's
   SandBox packages them.
 
-  *** SPECIES: this template runs ONE species per job, same convention the original
-  runPicoBinner_OO_200GeV.xml used. Make three copies of this file (or three separate
-  submissions), changing only the PARTNAME line inside <command> and the job name/output
-  paths, to cover PION / KAON / PROTON.
+  *** SPECIES: this template runs ONE species per job, same convention the reference
+  etof job used. Make three copies of this file (or three separate submissions),
+  changing only the PARTNAME line inside <command> and the job name/output paths, to
+  cover PION / KAON / PROTON.
 
-  *** CATALOG QUERY: trgsetupname copied verbatim from lightflavorspectra_etof's
-  runPicoBinner_OO_200GeV.xml; library= and production= changed to SL24y/P24iy per
-  explicit request (the original query paired library=SL23c with production=P23ic).
-  This production=/library= pairing has NOT been independently verified against the
-  current StarCatalog -- confirm it actually resolves to files before relying on it, or
-  the catalog lookup may simply return zero files.
+  *** CATALOG QUERY: trgsetupname copied verbatim from lightflavorspectra_etof's real,
+  working pions_OO_200GeV job; library= and production= kept at SL24y/P24iy to match
+  this repo's port (the reference job instead paired library=SL23c with
+  production=P23ic, and additionally restricted to an explicit runnumber whitelist).
+  This SL24y/P24iy pairing has NOT been independently verified against the current
+  StarCatalog - confirm it actually resolves to files before relying on it. If it
+  returns zero files, the reference job's runnumber whitelist may be a useful starting
+  point to intersect against once a valid P24iy run list is known.
 -->
 
-<job name="picoBinner_OO200_PION" maxFilesPerProcess="8" fileListSyntax="xrootd" simulateSubmission="false" copyInputLocally="true">
+<job name="picoBinner_OO200_PION" maxFilesPerProcess="12" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="true">
 
-  <!-- EDITME: your own scratch area for scheduler log files -->
-  <stdout URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.out" />
-  <stderr URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
 
-  <!-- O+O 200 GeV production catalog query -- see header note above about the
+  <!-- Scheduler log files -->
+  <stdout URL="file:/star/data03/scratch/liggett/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.out" />
+  <stderr URL="file:/star/data03/scratch/liggett/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
+
+  <!-- O+O 200 GeV production catalog query - see header note above about the
        production=/library= pairing before relying on this. -->
   <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst" nFiles="all" />
 
-  <!-- EDITME: where the scheduler writes its own auxiliary files -->
+  <!-- Scheduler's own auxiliary files -->
   <Generator><Location>
-    /star/data05/scratch/EDITME_USERNAME/schedFiles/picoBinner_OO200
+    /star/data03/scratch/liggett/schedFiles/picoBinner_OO200
   </Location></Generator>
 
   <!--
@@ -85,12 +89,16 @@
 
     pwd
     ls
+    echo LS TO BIN:
+    ls bin
 
     <!-- Defensive copy so ParticleInfo::ReadBichselFile()'s directory-probing logic
          (which tries cwd, cwd/.., and a couple of submodule-relative paths) is
-         guaranteed to find it regardless of the SandBox's unpacked layout -- matches
-         the same defensive step lightflavorspectra_etof's own working XML takes. -->
+         guaranteed to find it regardless of the SandBox's unpacked layout - matches
+         the same defensive step the reference etof job takes (it copies to both
+         macros/ and scripts/). -->
     cp ./submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root .
+    cp ./dev_BichselCurves.root macros/.
     cp ./dev_BichselCurves.root scripts/.
 
     cd scripts
@@ -105,12 +113,12 @@
     <!-- args: fileList outputDir PARTNAME makeBasicHistos correctT0 ignoreBTOFNonPOI doMassSquared -->
     ./run_picobinner_sdcc.bash $newList ${SCRATCH}/ PION true false false false
 
-    <!-- EDITME: your own permanent output area (SCRATCH is wiped after the job) -->
-    mv ${SCRATCH}/*_Processed.root /star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/output/
+    <!-- Permanent output area - SCRATCH is wiped after the job -->
+    mv ${SCRATCH}/*_Processed.root /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/
     rm ${SCRATCH}/*_Processed.root
 
   </command>
 
-  <!-- EDITME: same permanent output area as the mv above -->
-  <output fromScratch="*_Processed.root" toURL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/output/" />
+  <!-- Same permanent output area as the mv above -->
+  <output fromScratch="*_Processed.root" toURL="file:/star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/" />
 </job>
