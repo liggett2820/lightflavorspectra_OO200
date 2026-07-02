@@ -42,12 +42,12 @@
   #endif
 
   #ifdef _PICO_READER_SL23a_
-    #include "../submodule/PicoDstReader_SL23a/StPicoEvent.h"
-    #include "../submodule/PicoDstReader_SL23a/StPicoTrack.h"
-    #include "../submodule/PicoDstReader_SL23a/StPicoBTofHit.h"
-    #include "../submodule/PicoDstReader_SL23a/StPicoBTofPidTraits.h"
-    #include "../submodule/PicoDstReader_SL23a/StPicoETofPidTraits.h"
-    #include "../submodule/PicoDstReader_SL23a/StPicoETofHit.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoTrack.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoBTofHit.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoBTofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
   #endif
 
   #ifdef _PICO_READER_SL23d_
@@ -109,8 +109,8 @@
 // isGoodETof() declaration are pulled out from behind that gate -- gated only on
 // _HAS_ETOF_, matching how PicoBinner.cxx itself gates its ETOF code.
 #ifdef _HAS_ETOF_
-  #include "../submodule/PicoDstReader_SL23a/StPicoETofPidTraits.h"
-  #include "../submodule/PicoDstReader_SL23a/StPicoETofHit.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
 #endif
 
 #include "TH1D.h"

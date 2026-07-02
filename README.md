@@ -45,11 +45,46 @@ compatible and must be regenerated. `RunZFitter.C`'s `nCentToRun`, `RunRawSpectr
 scheme is actually configured here (currently 5) -- they're kept in sync manually, not
 read from `CutClass` automatically, so double-check all three if you change this again.
 
+## PicoDst reader version
+
+`submodule/PicoDstReader_SL24y/` vendors STAR's PicoDst class definitions (StPicoEvent,
+StPicoTrack, StPicoArrays, etc. -- the classes that define the actual branch layout
+written into `.picoDst.root` files) at STAR library version **SL24y** (as of
+2026-07-02, replacing an earlier SL23a-based submodule, to match the real production
+dataset's STAR library), re-vendored directly from STAR's own public source
+(`https://github.com/star-bnl/star-sw`, tag `SL24y_3`, path `StRoot/StPicoEvent/`) into
+this repo's existing standalone-package layout (Grigory Nigmatkulov's `StPicoEvent`
+packaging conventions -- Makefile, `picodst_env.sh`, `macros/`, README all unchanged).
+
+Diffing STAR's own SL23a vs SL24y source directly (not just trusting this repo's prior
+SL23a-vendored copy) found that almost every class is byte-for-byte identical --
+`StPicoTrack`, `StPicoBTofPidTraits`, `StPicoBEmcPidTraits`, `StPicoTrackCovMatrix`, and
+every hit/trigger/PID class carried over unchanged. Three things actually differ:
+
+- **`StPicoArrays`**: 4 new detector array types added (`StPicoFwdTrack`,
+  `StPicoFwdVertex`, `StPicoFcsHit`, `StPicoFcsCluster` -- STAR's newer Forward/FCS
+  detector upgrade), array count 20->24. These 4 new classes are vendored here too, for
+  schema completeness, even though this analysis never reads Forward/FCS branches.
+- **`StPicoMcTrack`**: 8 new MC-hit-count accessor methods added (unused by this
+  analysis).
+- **`StPicoEvent`**'s eTOF good-event-flag API: this one is NOT purely additive. The
+  flag array grew from 108 entries (per-counter) to 1728 (per-"Get4" subcounter, 16x
+  finer), and `eTofGoodEventFlag()` gained a required 4th argument (`iGet4`). This
+  repo's only call site (`source/PicoBinner.cxx`, in the eTOF good-event-flag fraction
+  loop) has been updated: a counter is now treated as "good" if ANY of its 16 Get4
+  sub-flags are good, per explicit instruction -- the closest match to the old, coarser
+  per-counter semantics. See that loop's inline comment and `PicoBinner.cxx`'s
+  top-of-file header comment (item 9) for the full writeup.
+
+All of `StPicoHelix`/`StPicoPhysicalHelix`/`PhysicalConstants.h`/`SystemOfUnits.h`/
+`StPicoMessMgr.h` (generic StarClassLibrary math/utility headers, not PicoDst-specific)
+were confirmed byte-identical between the two STAR tags and needed no changes.
+
 ## One-time build setup
 
 1. Build the PicoDst reader submodule and copy its library into `bin/`:
    ```
-   cd submodule/PicoDstReader_SL23a
+   cd submodule/PicoDstReader_SL24y
    make
    cp libStPicoDst.so ../../bin/
    cd ../..
@@ -244,7 +279,7 @@ username or directory conventions.
    repo (see `.gitignore`) because a laptop build produces macOS/arm64 binaries that
    will not load on BNL's Linux nodes. After cloning this repo onto an SDCC/RCF
    interactive node, run the "One-time build setup" steps above (build
-   `submodule/PicoDstReader_SL23a`, then `root -l -q -b macros/makeLibs.C`) there first --
+   `submodule/PicoDstReader_SL24y`, then `root -l -q -b macros/makeLibs.C`) there first --
    the `<SandBox>` packages whatever's actually in `bin/` at submission time, so it needs
    to already be genuine Linux binaries.
 2. **Fill in every `EDITME` in the XML template** -- your own scratch directory for

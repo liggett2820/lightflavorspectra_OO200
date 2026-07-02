@@ -16,10 +16,24 @@
 // _PICOBINNER_2D_DEDX_BTOF_, _PICO_BINNER_DEBUG_, _USE_CALIB_CLASS_, _MATTDST_MODE_,
 // FixedTarget-anything) have been removed rather than left commented out, since the
 // corresponding dead code branches were also removed from the ported source files.
+//
+// _PICO_READER_SL23a_ was changed to _PICO_READER_SL24y_ on 2026-07-02, to match the
+// production data's actual STAR library (SL24y). The PicoDst reader submodule itself
+// was re-vendored from STAR's real SL24y source (submodule/PicoDstReader_SL24y/,
+// replacing submodule/PicoDstReader_SL23a/) -- see that directory and
+// source/PicoBinner.cxx's own header comment for what actually changed between the two
+// versions (most classes are byte-identical; StPicoArrays/StPicoEvent/StPicoMcTrack
+// are not, and StPicoEvent's eTOF good-event-flag API changed in a way that required a
+// PicoBinner.cxx call-site update -- see PicoBinner.cxx). NOTE: unlike the toggles
+// above, this one is only read in dead code paths in headers/CutClass.h (guarded by
+// `#ifndef _MAC_OSX_`, which is always false here) -- every actual PicoDstReader
+// include elsewhere in this repo is a hardcoded literal path, not conditioned on this
+// macro. It's kept in sync anyway for clarity/consistency, not because anything
+// actually branches on it.
 // =====================================================================================
 
 #define _PICO_READER_
-#define _PICO_READER_SL23a_
+#define _PICO_READER_SL24y_
 #define _ETOF_GOOD_EVENT_FLAG_
 #define _HAS_ETOF_
 #define _PICO_READER_FINISH_BYPASS_

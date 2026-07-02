@@ -57,17 +57,6 @@ class StPicoDstReader : public TObject {
   /// Close files and finilize
   void Finish();
 
-  /// Reset the internal chain and point it at a single new file, reusing the SAME
-  /// StPicoDst/TClonesArray/branch-address setup this reader was constructed with --
-  /// does NOT construct a new TChain from scratch or reallocate mPicoArrays. Added for
-  /// callers that need to process many single files in sequence within one process
-  /// (e.g. one file at a time, never chaining multiple files together) without ever
-  /// constructing more than one StPicoDstReader: StPicoDst's picoArrays pointer is
-  /// process-wide static (see StPicoDst.h), so repeatedly `new`-ing/deleting
-  /// StPicoDstReader instances corrupts that shared state after a few cycles. Call
-  /// this instead of destroying and reconstructing the reader for each new file.
-  void SwitchToFile(const Char_t* newFileName);
-
  private:
 
   /// Name of the inputfile (or of the inputfiles.list)

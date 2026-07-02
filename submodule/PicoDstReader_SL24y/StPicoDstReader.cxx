@@ -30,6 +30,9 @@
 #include "StPicoBEmcSmdPHit.h"
 #include "StPicoETofHit.h"
 #include "StPicoETofPidTraits.h"
+#include "StPicoFwdTrack.h"
+#include "StPicoFcsHit.h"
+#include "StPicoFcsCluster.h"
 #include "StPicoMcVertex.h"
 #include "StPicoMcTrack.h"
 #include "StPicoArrays.h"
@@ -131,6 +134,9 @@ void StPicoDstReader::streamerOff() {
   StPicoBEmcSmdPHit::Class()->IgnoreTObjectStreamer();
   StPicoETofHit::Class()->IgnoreTObjectStreamer();
   StPicoETofPidTraits::Class()->IgnoreTObjectStreamer();
+  StPicoFwdTrack::Class()->IgnoreTObjectStreamer();
+  StPicoFcsHit::Class()->IgnoreTObjectStreamer();
+  StPicoFcsCluster::Class()->IgnoreTObjectStreamer();
   StPicoMcVertex::Class()->IgnoreTObjectStreamer();
   StPicoMcTrack::Class()->IgnoreTObjectStreamer();
 }
@@ -151,29 +157,6 @@ void StPicoDstReader::Finish() {
     delete mChain;
   }
   mChain = NULL;
-}
-
-//_________________
-void StPicoDstReader::SwitchToFile(const Char_t* newFileName) {
-  // Clear leftover contents/bookkeeping from the previous file's last-read entry
-  // before rebinding these same, long-lived TClonesArrays onto a brand new TTree (from
-  // Reset()+Add() below). Confirmed by isolated testing: without this, transitioning
-  // to a new file's very first entry segfaults inside TBranchElement::GetEntry --
-  // reading the exact same file completely fresh (new reader, no prior file) works
-  // perfectly, so the stale array state carried across the rebind was the culprit.
-  clearArrays();
-
-  if(!mChain) {
-    mChain = new TChain("PicoDst");
-  } else {
-    mChain->Reset();
-  }
-  mChain->Add(newFileName);
-  setBranchAddresses(mChain);
-  mChain->SetCacheSize(50e6);
-  mChain->AddBranchToCache("*");
-  mPicoDst->set(mPicoArrays);
-  mEventCounter = 0;
 }
 
 //_________________

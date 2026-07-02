@@ -19,7 +19,7 @@
   The .so files this template packages (see <SandBox> below) are NOT committed to
   git (see .gitignore) because the ones on a laptop are macOS/arm64 Mach-O binaries --
   they will not load on BNL's Linux nodes. After cloning this repo onto SDCC, run the
-  README's "One-time build setup" section THERE first (builds submodule/PicoDstReader_SL23a
+  README's "One-time build setup" section THERE first (builds submodule/PicoDstReader_SL24y
   and runs macros/makeLibs.C) so bin/*.so are genuine Linux binaries before this XML's
   SandBox packages them.
 

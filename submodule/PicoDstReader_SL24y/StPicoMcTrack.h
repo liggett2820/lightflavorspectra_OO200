@@ -24,8 +24,8 @@
 #include "SystemOfUnits.h"
 #include "PhysicalConstants.h"
 #else
-#include "./SystemOfUnits.h"
-#include "./PhysicalConstants.h"
+#include "StarClassLibrary/SystemOfUnits.h"
+#include "StarClassLibrary/PhysicalConstants.h"
 #endif
 
 //_________________
@@ -43,10 +43,11 @@ class StPicoMcTrack : public TObject {
   virtual void Print(const Char_t *option = "") const;
 
   /// Detector names
-  enum EHIT {ktpc, ksvt, kssd, kctb, keem, kemc, kesm, 
-             kftp, kgem, khpd, kist, kigt, kfst, kfgt, 
-             kfpd, kmwc, kpgc, kpmd, ksmd, kpix, ktof, 
-             kvpd, ktot};
+  enum EHIT {ktpc, ksvt, kssd, kctb, keem, kemc, kesm,
+             kftp, kgem, khpd, kist, kigt, kfst, kfgt,
+             kfpd, kmwc, kpgc, kpmd, ksmd, kpix, ktof,
+             kvpd, ketr, khca, kfts, keto, kstg, kwca,
+             kpre, kepd, ktot};
 
   //
   // Getters
@@ -67,7 +68,7 @@ class StPicoMcTrack : public TObject {
   /// Return track total momentum
   Float_t ptot() const                { return p().Mag(); }
   /// Return pseudorapidity of the track
-  Float_t eta() const                 { return p().PseudoRapidity(); }  
+  Float_t eta() const                 { return p().PseudoRapidity(); }
   /// Four-momentum of the track
   TLorentzVector fourMomentum() const { return TLorentzVector(mPx,mPy,mPz,mE); }
   /// Energy of the track
@@ -83,7 +84,7 @@ class StPicoMcTrack : public TObject {
   /// ID of intermediate MC vertex
   Int_t idVtxItrmd() const            { return mIdVtxItrmd; }
   /// Return total number of hits
-  Int_t nHits() const               
+  Int_t nHits() const
   { Int_t n=0; for (Int_t i=ktpc; i<ktot; i++) n+=nHits(i); return n; }
   /// Return number of hits in a given detector
   UChar_t nHits(Int_t k) const        { return mHits[k]; }
@@ -131,6 +132,22 @@ class StPicoMcTrack : public TObject {
   UChar_t nHitsTpc() const            { return mHits[ktpc]; }
   /// Return number of hits in VPD
   UChar_t nHitsVpd() const            { return mHits[kvpd]; }
+  /// Return number of hits in ETR
+  UChar_t nHitsEtr() const            { return mHits[ketr]; }
+  /// Return number of hits in HCA
+  UChar_t nHitsHca() const            { return mHits[khca]; }
+  /// Return number of hits in FTS
+  UChar_t nHitsFts() const            { return mHits[kfts]; }
+  /// Return number of hits in ETO
+  UChar_t nHitsEto() const            { return mHits[keto]; }
+  /// Return number of hits in STG
+  UChar_t nHitsStg() const            { return mHits[kstg]; }
+  /// Return number of hits in WCA
+  UChar_t nHitsWca() const            { return mHits[kwca]; }
+  /// Return number of hits in PRE
+  UChar_t nHitsPre() const            { return mHits[kpre]; }
+  /// Return number of hits in EPD
+  UChar_t nHitsEpd() const            { return mHits[kepd]; }
   /// Return particle names (GEANT ID according to GPART)
   const Char_t *geName();
   /// Return corrected GePid (to take embedding into account)
@@ -165,7 +182,7 @@ class StPicoMcTrack : public TObject {
 
 
  private:
-  
+
   /// Primary key (GEANT track ID)
   UShort_t mId;
   /// Particle ID according to GEANT (GPART and GPIONS) + STAR embedding values

@@ -12,9 +12,9 @@
 // Then, from the REPO ROOT:
 //   root -l -q -b macros/TestSingleFileViaList.C'("/tmp/onefile.list")'
 
-#include "../submodule/PicoDstReader_SL23a/StPicoDstReader.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoDst.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoEvent.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoDstReader.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoDst.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
 #include <iostream>
 #include <string>
 #include "TSystem.h"

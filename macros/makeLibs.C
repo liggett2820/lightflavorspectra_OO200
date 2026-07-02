@@ -15,7 +15,7 @@
 // Run this from the REPO ROOT (not from macros/), e.g.:
 //   root -l -q -b macros/makeLibs.C
 //
-// Prerequisite: submodule/PicoDstReader_SL23a/libStPicoDst.so must already be built
+// Prerequisite: submodule/PicoDstReader_SL24y/libStPicoDst.so must already be built
 // (see the README / chat instructions for the one-time `make` step in that directory)
 // and copied into ./bin/.
 
@@ -34,7 +34,7 @@ void makeLibs(TString opt = ""){
   gSystem->SetBuildDir("$PWD/bin/", true);
   gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers", gSystem->pwd()));
 
-  // Built by submodule/PicoDstReader_SL23a's own Makefile, then copied here.
+  // Built by submodule/PicoDstReader_SL24y's own Makefile, then copied here.
   gSystem->Load("./bin/libStPicoDst.so");
 
   // namespaces.cxx pulls in Helix.cxx, PhysMath.cxx, HistogramUtilities.cxx, and

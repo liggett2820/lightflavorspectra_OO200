@@ -8,10 +8,18 @@
 bin/*.so
 bin/*.d
 bin/*.pcm
-submodule/PicoDstReader_SL23a/*.o
-submodule/PicoDstReader_SL23a/libStPicoDst.so
-submodule/PicoDstReader_SL23a/*_rdict.pcm
+submodule/PicoDstReader_SL24y/*.o
+submodule/PicoDstReader_SL24y/libStPicoDst.so
+submodule/PicoDstReader_SL24y/*_rdict.pcm
+submodule/PicoDstReader_SL24y/StPicoDst_Dict.C
 *.d
+
+# Old SL23a-vendored PicoDst reader submodule, replaced 2026-07-02 by
+# PicoDstReader_SL24y (see README's "PicoDst reader version" section). This directory
+# is no longer tracked -- excluded entirely (not just its build artifacts) rather than
+# leaving stale source alongside the new submodule. If this directory still physically
+# exists in your checkout, it's safe to delete it (`rm -rf submodule/PicoDstReader_SL23a`).
+submodule/PicoDstReader_SL23a/
 
 # ROOT ACLiC intermediate artifacts that can show up alongside sources
 *_ACLiC_dict_rdict.pcm

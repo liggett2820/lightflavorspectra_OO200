@@ -50,12 +50,12 @@
 // In this repo, ROOT's interpreter (cling) carries symbols across ACLiC'd units
 // compiled in the same session, so once namespaces.cxx's copy of "micrometer" (etc)
 // was interpreted, PicoBinner.cxx's later pull-in of the submodule's
-// "using namespace units;" (in submodule/PicoDstReader_SL23a/SystemOfUnits.h) made
+// "using namespace units;" (in submodule/PicoDstReader_SL24y/SystemOfUnits.h) made
 // "micrometer" ambiguous. Since the values are identical either way, this now just
 // includes that same SystemOfUnits.h (guarded by its own HEP_SYSTEM_OF_UNITS_H,
 // so it's a no-op if already included) instead of redefining the constants --
 // same numbers, one definition.
-#include "../submodule/PicoDstReader_SL23a/SystemOfUnits.h"
+#include "../submodule/PicoDstReader_SL24y/SystemOfUnits.h"
 
 // c_light isn't defined in SystemOfUnits.h's units namespace, but Helix.cxx uses it
 // (setCurvature() and momentum()), so it stays here on its own -- no collision risk

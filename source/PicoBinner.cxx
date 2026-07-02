@@ -29,6 +29,16 @@
 //      have been a use-after-free on the already-deleted picoReader if it had run).
 //      That dead/dangerous second call has been deleted; only the first, correct
 //      Finish()+delete survives.
+//   9. (2026-07-02) PicoDst reader switched from SL23a to SL24y to match the real
+//      production data's STAR library. Most StPicoEvent-suite classes are byte-for-byte
+//      identical between the two versions (confirmed by diffing STAR's own SL23a_1 vs
+//      SL24y_3 source), but StPicoEvent's eTOF good-event-flag API is not: it gained a
+//      required 4th "iGet4" argument and its granularity changed from per-counter (108
+//      entries) to per-Get4-subcounter (1728 entries). The eTOF good-event-flag loop
+//      below was updated accordingly -- a counter is now treated as "good" if ANY of
+//      its 16 Get4 sub-flags are good, per explicit instruction, as the closest match
+//      to the old coarser per-counter semantics. See submodule/PicoDstReader_SL24y/'s
+//      StPicoEvent.h/.cxx and makefile_toggles.h for the full version-diff writeup.
 //
 // WHAT DID NOT CHANGE (deliberately preserved exactly, even though this build only
 // analyzes pi/K/p):
@@ -66,20 +76,21 @@
 
 #include "../makefile_toggles.h"
 
-// PicoDst headers -- SL23a only (the reader version _OO_200_COL_ always selected)
-#include "../submodule/PicoDstReader_SL23a/StPicoDstReader.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoDst.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoEvent.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoTrack.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoBTofHit.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoBTowHit.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoEmcTrigger.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoBTofPidTraits.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoETofPidTraits.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoTrackCovMatrix.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoEpdHit.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoBbcHit.h"
-#include "../submodule/PicoDstReader_SL23a/StPicoETofHit.h"
+// PicoDst headers -- SL24y only (matches the real production data's STAR library;
+// changed from SL23a on 2026-07-02, see makefile_toggles.h's header comment)
+#include "../submodule/PicoDstReader_SL24y/StPicoDstReader.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoDst.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoTrack.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoBTofHit.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoBTowHit.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoEmcTrigger.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoBTofPidTraits.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoTrackCovMatrix.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoEpdHit.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoBbcHit.h"
+#include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
 
 #include "../submodule/ParticleInfo/ParticleInfo/ParticleInfo.h"
 #include "../headers/HistogramUtilities.h"
@@ -1249,7 +1260,21 @@ void PicoBinner(string    a_filelist,
     int numETOFGoodEventFlags = 0;
     for(int sector_index = 13; sector_index < 25; sector_index++){
       for(int mod_index = 0; mod_index < 9; mod_index++){
-        if(event->eTofGoodEventFlag(sector_index,(mod_index/3)+1,(mod_index%3)+1)){
+        // SL24y change (2026-07-02): eTofGoodEventFlag() now requires a 4th "iGet4"
+        // argument (1-16) -- the flag went from per-counter (108 entries) granularity
+        // to per-Get4-subcounter (1728 entries) granularity between SL23a and SL24y
+        // (see makefile_toggles.h / submodule/PicoDstReader_SL24y/StPicoEvent.h).
+        // Per explicit instruction, a counter here is treated as "good" if ANY of its
+        // 16 Get4 sub-flags are good -- the closest match to the old coarser
+        // per-counter semantics this loop originally used.
+        bool anyGet4Good = false;
+        for(int iGet4 = 1; iGet4 <= 16; iGet4++){
+          if(event->eTofGoodEventFlag(sector_index,(mod_index/3)+1,(mod_index%3)+1,iGet4)){
+            anyGet4Good = true;
+            break;
+          }
+        }
+        if(anyGet4Good){
           numETOFGoodEventFlags++;
           etofGoodEventFlag->Fill(sector_index-13,mod_index);
         }
