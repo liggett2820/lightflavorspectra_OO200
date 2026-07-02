@@ -1,0 +1,28 @@
+# Compiled ACLiC/ROOT build products -- these are platform-specific (the ones
+# currently on disk here are macOS/arm64 Mach-O binaries) and must be rebuilt
+# fresh on whatever machine actually runs them (in particular: rebuilt on an
+# SDCC/RCF Linux node before submitting any batch job, per the "SDCC batch
+# submission" README section -- a macOS-built .so will not load on BNL's Linux
+# nodes). Only source is tracked; every clone (laptop or SDCC) runs its own
+# one-time build per the README's "One-time build setup" section.
+bin/*.so
+bin/*.d
+bin/*.pcm
+submodule/PicoDstReader_SL23a/*.o
+submodule/PicoDstReader_SL23a/libStPicoDst.so
+*.d
+
+# ROOT ACLiC intermediate artifacts that can show up alongside sources
+*_ACLiC_dict_rdict.pcm
+*.pcm.d
+
+# Local run outputs / scratch (yield files, spectra files, fit outputs, plots) --
+# these are analysis outputs, not code, and are typically large. Re-derive them by
+# re-running the pipeline rather than committing them.
+*.root
+!submodule/ParticleInfo/PidFunctions_Data/*.root
+spectra_plots/
+spectrafit_images/
+
+# OS cruft
+.DS_Store

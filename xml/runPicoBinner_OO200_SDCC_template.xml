@@ -1,0 +1,116 @@
+<!--
+  runPicoBinner_OO200_SDCC_template.xml -- lightflavorspectra_OO200
+
+  SDCC/RCF star-submit job description for stage 1 (PicoBinner) only, against a real
+  production PicoDst dataset. This is the ONLY pipeline stage this repo runs on SDCC --
+  ZFitter/RawSpectraModifier/SpectraFitter are run locally on a laptop against
+  PicoBinner's output (see "Moving output back to a laptop" in the README's SDCC
+  section). This template is adapted from lightflavorspectra_etof's own
+  runPicoBinner_OO_200GeV.xml (same catalog query -- see the note on that below), but
+  re-pointed at THIS repo's actual macro names/build layout (RunPicoBinner.C +
+  LoadPicoBinnerLibs.C, not RunPicoBinner_Liggett.cxx) and with the previous author's
+  ("harasty") hardcoded paths replaced with clearly marked placeholders.
+
+  *** BEFORE SUBMITTING, YOU MUST EDIT EVERY "EDITME" BELOW ***
+  (your SDCC/RCF username, and where you want scratch/output/log files to land --
+  this repo has no way to know your actual BNL directory conventions).
+
+  *** ALSO BEFORE SUBMITTING: rebuild this repo's libraries ON THE SDCC/RCF NODE ***
+  The .so files this template packages (see <SandBox> below) are NOT committed to
+  git (see .gitignore) because the ones on a laptop are macOS/arm64 Mach-O binaries --
+  they will not load on BNL's Linux nodes. After cloning this repo onto SDCC, run the
+  README's "One-time build setup" section THERE first (builds submodule/PicoDstReader_SL23a
+  and runs macros/makeLibs.C) so bin/*.so are genuine Linux binaries before this XML's
+  SandBox packages them.
+
+  *** SPECIES: this template runs ONE species per job, same convention the original
+  runPicoBinner_OO_200GeV.xml used. Make three copies of this file (or three separate
+  submissions), changing only the PARTNAME line inside <command> and the job name/output
+  paths, to cover PION / KAON / PROTON.
+
+  *** CATALOG QUERY: copied verbatim from lightflavorspectra_etof's
+  runPicoBinner_OO_200GeV.xml (trgsetupname=production_OO_200GeV_2021,production=P23ic,
+  library=SL23c). This was the real query used for O+O 200 GeV production data in that
+  repo as of when it was last touched -- it has NOT been independently re-verified
+  against the current StarCatalog here, so confirm it still resolves to the dataset you
+  actually want (production tags/libraries do get superseded) before relying on it.
+-->
+
+<job name="picoBinner_OO200_PION" maxFilesPerProcess="8" fileListSyntax="xrootd" simulateSubmission="false" copyInputLocally="true">
+
+  <!-- EDITME: your own scratch area for scheduler log files -->
+  <stdout URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.out" />
+  <stderr URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
+
+  <!-- Real O+O 200 GeV production catalog query -- see header note above about
+       double-checking this is still the dataset/production/library you want. -->
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P23ic,library=SL23c,storage=local,storage!=HPSS,filetype=daq_reco_picoDst" nFiles="all" />
+
+  <!-- EDITME: where the scheduler writes its own auxiliary files -->
+  <Generator><Location>
+    /star/data05/scratch/EDITME_USERNAME/schedFiles/picoBinner_OO200
+  </Location></Generator>
+
+  <!--
+  <ResourceUsage>
+    <Memory>
+      <MinMemory>2500</MinMemory>
+      <MaxMemory>3500</MaxMemory>
+    </Memory>
+  </ResourceUsage>
+  -->
+
+  <SandBox installer="ZIP">
+    <Package name="PicoBinner_OO200">
+      <File>file:./makefile_toggles.h</File>
+      <File>file:./bin/namespaces_cxx.so</File>
+      <File>file:./bin/ParticleInfo_cxx.so</File>
+      <File>file:./bin/CalibrationClass_cxx.so</File>
+      <File>file:./bin/CutClass_cxx.so</File>
+      <File>file:./bin/PicoBinner_cxx.so</File>
+      <File>file:./bin/SetCutClass_C.so</File>
+      <File>file:./bin/libStPicoDst.so</File>
+      <File>file:./bin/StPicoDst_Dict_rdict.pcm</File>
+      <File>file:./macros/RunPicoBinner.C</File>
+      <File>file:./macros/LoadPicoBinnerLibs.C</File>
+      <File>file:./submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
+      <File>file:./scripts/run_picobinner_sdcc.bash</File>
+    </Package>
+  </SandBox>
+
+  <!-- starver must match the catalog query's library= tag above (SL23c). -->
+  <command>
+
+    starver SL23c
+
+    pwd
+    ls
+
+    <!-- Defensive copy so ParticleInfo::ReadBichselFile()'s directory-probing logic
+         (which tries cwd, cwd/.., and a couple of submodule-relative paths) is
+         guaranteed to find it regardless of the SandBox's unpacked layout -- matches
+         the same defensive step lightflavorspectra_etof's own working XML takes. -->
+    cp ./submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root .
+    cp ./dev_BichselCurves.root scripts/.
+
+    cd scripts
+
+    echo starting awk command to remove numEvents after file name in list
+    set newList="$PWD"/"$JOBID".list
+    awk '{print $1}' ${FILELIST} > $newList
+
+    pwd
+    ls
+
+    <!-- args: fileList outputDir PARTNAME makeBasicHistos correctT0 ignoreBTOFNonPOI doMassSquared -->
+    ./run_picobinner_sdcc.bash $newList ${SCRATCH}/ PION true false false false
+
+    <!-- EDITME: your own permanent output area (SCRATCH is wiped after the job) -->
+    mv ${SCRATCH}/*_Processed.root /star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/output/
+    rm ${SCRATCH}/*_Processed.root
+
+  </command>
+
+  <!-- EDITME: same permanent output area as the mv above -->
+  <output fromScratch="*_Processed.root" toURL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/output/" />
+</job>
