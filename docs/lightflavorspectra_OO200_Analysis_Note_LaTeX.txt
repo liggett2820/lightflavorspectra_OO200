@@ -1,0 +1,334 @@
+\documentclass[11pt]{article}
+
+% ---------- Packages ----------
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{titlesec}
+\usepackage{parskip}
+
+% ---------- Colors ----------
+\definecolor{titleblue}{HTML}{1F3864}
+\definecolor{headblue}{HTML}{2E5395}
+\definecolor{notegray}{HTML}{555555}
+\definecolor{tblheadbg}{HTML}{1F3864}
+\definecolor{tblrowalt}{HTML}{EEF3F8}
+
+% ---------- Section styling ----------
+\titleformat{\section}{\Large\bfseries\color{titleblue}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries\color{headblue}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{headblue}}{\thesubsubsection}{0.5em}{}
+
+% ---------- Header/Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{\small\color{gray}\textit{lightflavorspectra\_OO200 --- Analysis Note (DRAFT)}}
+\fancyfoot[C]{\small\color{gray}Page \thepage}
+
+% ---------- Note box (left rule, small italic gray) ----------
+\newenvironment{notebox}
+  {\begin{quote}\itshape\small\color{notegray}}
+  {\end{quote}}
+
+% ---------- Convenience ----------
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+% ================= TITLE BLOCK =================
+\begin{flushleft}
+{\huge\bfseries\color{titleblue} STAR Analysis Note}\\[4pt]
+{\Large\bfseries\color{titleblue} Identified $\pi$/K/p Spectra in O+O Collisions at $\sqrt{s_{NN}} = 200$ GeV (ColliderCenter Geometry)}\\[6pt]
+{\itshape\color{gray} Repository: \code{lightflavorspectra\_OO200}}
+\end{flushleft}
+
+\noindent\rule{\linewidth}{1pt}
+
+\vspace{0.5em}
+\noindent\textbf{Status:} \textit{DRAFT --- framework, cuts, and build/software pipeline are documented and validated (SDCC build confirmed working as of 2026-07-02). No production data has been processed and no physics results (spectra, yields, dN/dy) exist yet. Sections 10--12 are placeholders to be completed once real output is available.}
+
+\vspace{0.3em}
+\noindent\textit{Document date: 2026-07-02}
+
+\vspace{1em}
+
+% ================= SECTION 1 =================
+\section{Introduction and Motivation}
+
+This note documents the analysis framework for measuring identified charged-pion, charged-kaon, and (anti)proton transverse-momentum spectra in O+O collisions at $\sqrt{s_{NN}} = 200$ GeV, recorded by STAR in the ColliderCenter geometry. The analysis targets bulk particle production observables --- invariant yields ($d^2N/(2\pi p_T\, dp_T\, dy)$) and rapidity densities ($dN/dy$) --- as a function of centrality, differentially for each of the three species and both charge signs.
+
+O+O collisions occupy an intermediate system-size regime between small (p+p, p+A) and large (Au+Au, Pb+Pb) collision systems. Comparing identified-particle spectra and yields in O+O to the existing large- and small-system baselines at the same energy helps probe how bulk particle production (radial flow, chemical freeze-out conditions, and any onset of collectivity) scales with system size. This is the first dedicated $\pi$/K/p spectra analysis for this specific O+O 200 GeV dataset within the lightflavorspectra analysis family.
+
+This repository, \code{lightflavorspectra\_OO200}, is a deliberately narrowed fork of an existing multi-energy, multi-geometry analysis codebase (\code{lightflavorspectra\_etof}), restricted to exactly one physics configuration --- O+O at 200 GeV, ColliderCenter geometry, pion/kaon/proton only --- so that the full local (laptop) run chain stays fast and simple, while an SDCC/RCF batch path is added for the one stage (raw-yield extraction from PicoDsts) that is too large to run locally against a full production dataset.
+
+% ================= SECTION 2 =================
+\section{Dataset}
+
+The analysis targets the O+O 200 GeV production dataset via the following STAR catalog query parameters:
+
+\begin{center}
+\begin{tabular}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Parameter}} & \textcolor{white}{\textbf{Value}} \\
+\midrule
+Collision system & O+O \\
+\rowcolor{tblrowalt} Energy & $\sqrt{s_{NN}} = 200$ GeV \\
+Trigger setup & \code{production\_OO\_200GeV\_2021} \\
+\rowcolor{tblrowalt} Production tag & \code{P24iy} \\
+STAR library & \code{SL24y} \\
+\rowcolor{tblrowalt} Geometry / event config & ColliderCenter \\
+File type & \code{daq\_reco\_picoDst} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{notebox}
+The \code{production=P24iy} / \code{library=SL24y} pairing was set to match this dataset's real production library, replacing an earlier placeholder pairing (\code{production=P23ic} / \code{library=SL23c}) copied from a different-energy analysis this repo was forked from. This pairing has not been independently re-verified against the live StarCatalog at the time of writing --- confirm it resolves to a non-empty file set before submitting a full production job, since an incorrect pairing fails silently (returns zero files) rather than erroring.
+\end{notebox}
+
+Event selection uses trigger ID 860001 with a Z-vertex range of $-70$ cm to $+70$ cm, a radial vertex cut of 2.0 cm, and requires a TOF-based T0 match (nToFT0 $\geq 3$, tofMatch $\geq 3$) for event-level timing calibration. Centrality is defined from the raw (uncorrected) reference multiplicity, refMult --- StRefMultCorr-based centrality is not used for this configuration (matching the parent analysis's convention for this dataset).
+
+% ================= SECTION 3 =================
+\section{Software Framework and Repository Structure}
+
+\code{lightflavorspectra\_OO200} is a fork of \code{lightflavorspectra\_etof}, narrowed to this single physics configuration. Physics and fit logic in every ported class (\code{PicoBinner}, \code{ZFitter}, \code{RawSpectraModifier}, \code{SpectraFitter}, and their shared utility dependencies) is carried over byte-for-byte from the parent repository wherever the original code had no energy- or species-specific branching to remove; every place a run macro needed to change (dropping the multi-energy scan, dropping unrelated SDCC paths, restricting to $\pi$/K/p) is documented in a header comment in that macro, including exactly which values were fixed verbatim versus exposed as new function arguments.
+
+The internal PID-contamination-modeling machinery (which tracks all 9 STAR-catalogued particle species, not just $\pi$/K/p, for cross-contamination corrections between adjacent dE/dx and time-of-flight bands) is left fully intact throughout the ported classes. Only the driver macros --- the \code{Run*.C} entry points actually invoked --- are restricted to $\pi$/K/p and to this one energy/geometry.
+
+\subsection{PicoDst Reader Version}
+
+The vendored PicoDst class definitions (\code{submodule/PicoDstReader\_SL24y/}) are STAR library version SL24y, re-vendored directly from STAR's own public source (\code{star-bnl/star-sw}, tag \code{SL24y\_3}) to match this dataset's real production library (replacing an earlier SL23a-based vendored copy carried over from the parent repository, which targeted a different dataset). The only functionally significant difference between STAR's SL23a and SL24y PicoDst schemas is the eTOF good-event-flag API: the flag array grew from 108 entries (per-counter) to 1728 (per-Get4-subcounter, 16$\times$ finer granularity), and the accessor gained a required 4th argument. PicoBinner's only call site for this flag now treats a counter as ``good'' if any of its 16 Get4 sub-flags are good, as the closest match to the coarser legacy semantics.
+
+% ================= SECTION 4 =================
+\section{Event and Track Selection}
+
+\subsection{Event-Level Cuts}
+
+\begin{center}
+\begin{tabular}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Cut}} & \textcolor{white}{\textbf{Value}} \\
+\midrule
+Vertex configuration & Center (ColliderCenter event config) \\
+\rowcolor{tblrowalt} $V_z$ range & $-70$ cm to $+70$ cm \\
+Radial vertex cut ($V_r$) & $< 2.0$ cm \\
+\rowcolor{tblrowalt} Trigger ID & 860001 \\
+TOF T0 requirement & nToFT0 $\geq 3$ (setUseT0 = true) \\
+\rowcolor{tblrowalt} TOF match requirement & tofMatch $\geq 3$ \\
+$y_{CM}$ (center-of-mass rapidity) & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Track Quality Cuts}
+
+\begin{center}
+\begin{tabular}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Cut}} & \textcolor{white}{\textbf{Value}} \\
+\midrule
+nHitsFit (TPC fit points) & $\geq 15$ \\
+\rowcolor{tblrowalt} nHitsDeDx (dE/dx points) & $\geq 10$ \\
+Fit-points / max-possible-points ratio & $\geq 0.505$ \\
+\rowcolor{tblrowalt} DCA to primary vertex & $< 1.0$ cm \\
+BTOF acceptance ($|\eta|$) & 1.6 to 2.8 (detector-region cut, not a track $\eta$ cut --- see \S4.3) \\
+\rowcolor{tblrowalt} ETOF max cluster size & $\leq 99$ (effectively unrestricted) \\
+ETOF match-flag cut & $-1$ (effectively unrestricted) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Kinematic Acceptance}
+
+Acceptance windows are defined separately per detector subsystem and per particle species:
+
+\begin{center}
+\begin{tabular}{@{}p{0.22\linewidth}p{0.26\linewidth}p{0.26\linewidth}p{0.26\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Particle}} & \textcolor{white}{\textbf{TPC $|\eta|$, $p_T$ range}} & \textcolor{white}{\textbf{BTOF $|\eta|$, $p_T$ range}} & \textcolor{white}{\textbf{ETOF $|\eta|$, $p_T$ range}} \\
+\midrule
+Pion & $\eta$: $\pm2.05$ / $p_T$: 0.05--2.5 GeV/c & $\eta$: $\pm1.25$ & $\eta$: 1.05--1.65 (ETOF-side) \\
+\rowcolor{tblrowalt} Kaon & same TPC window (shared eta/pT binning) & same BTOF window & same ETOF window \\
+Proton & same TPC window (shared eta/pT binning) & same BTOF window & same ETOF window \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{notebox}
+$p_T$ binning is 80 bins from 0.05 to 2.5 GeV/c (shared across species for the eta/pT cut-information histogram); the $m_T$--$m_0$ rapidity binning used for actual spectra extraction is species- and detector-specific and variable-width (see \S6 and \S7.1) --- the ranges above describe the coarse acceptance gate, not the final spectra binning.
+\end{notebox}
+
+% ================= SECTION 5 =================
+\section{Particle Identification}
+
+Particle identification combines two independent detector subsystems, matching the standard STAR light-flavor spectra approach:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{TPC dE/dx} (ionization energy loss): fit as a function of $\beta\gamma$ using a Gaussian-mixture-model-based peak decomposition (Bichsel-function-informed calibration via the \code{ParticleInfo}/\code{BichselFunctionCollector} utility) to separate overlapping species bands.
+\item \textbf{Barrel Time-of-Flight (BTOF)}, $1/\beta$ (equivalently $m^2/z^2$ or inverse-beta-gamma): used to extend PID to higher momentum where TPC dE/dx bands merge, and as a cross-check / veto against electron and muon contamination.
+\item \textbf{Endcap Time-of-Flight (ETOF)}: available in the underlying framework for the forward/backward rapidity extension, but ETOF fit drivers were not ported into this repository's run macros (see \S7.2) --- ETOF acceptance cuts and mass-window cuts exist in \code{CutClass}, but this analysis's driving macros currently only invoke the TPC and BTOF fit paths.
+\end{itemize}
+
+Species separation is aided by fixed mass-window cuts (per-species low/high invariant-mass windows, set in \code{macros/SetCutClass.C}) and by beta-gamma--dependent line cuts in both the BTOF $1/\beta$ plane and the BTOF/ETOF inverse-beta-gamma-squared plane, which reject electron contamination in the low-momentum band (\code{setBTOFElectronCut} / \code{setETOFElectronCut}) and apply a modified $n\sigma$ dE/dx cut (\code{setModNSigmaCuts\_bTOF} / \code{\_eTOF}) as an additional TPC-side discriminant.
+
+% ================= SECTION 6 =================
+\section{Centrality Definition}
+
+Centrality is defined from raw reference multiplicity (refMult), using a 5-bin scheme (replacing an earlier, more granular 9-bin scheme carried over from the parent repository). Centrality classes are defined by integrating the Glauber-model multiplicity distribution from most-central (highest multiplicity) to most-peripheral, so the refMult cut is set highest for the most central bin and decreases monotonically toward peripheral collisions.
+
+\begin{center}
+\begin{tabular}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Centrality bin}} & \textcolor{white}{\textbf{refMult cut ($\geq$)}} \\
+\midrule
+0--5\% & 300 \\
+\rowcolor{tblrowalt} 5--10\% & 150 \\
+10--20\% & 100 \\
+\rowcolor{tblrowalt} 20--40\% & 70 \\
+40--80\% & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{notebox}
+These refMult cut values are not newly derived for this analysis --- they are the same cut values used by the parent repository's 9-bin scheme at the percentile boundaries that survive merging (the 5/10/20/40/80\% edges were already 9-bin boundaries; the intermediate 30/50/60/70\% edges are simply dropped, merging what were previously the 20--30\%+30--40\% bins into one 20--40\% bin, and the 40--50\%+50--60\%+60--70\%+70--80\% bins into one 40--80\% bin). Centrality assignment happens once per event inside the raw-yield-extraction stage (\S7.1) and is baked into the output histograms, so any future change to this binning scheme requires re-processing the full dataset for all three species.
+\end{notebox}
+
+% ================= SECTION 7 =================
+\section{Analysis Pipeline}
+
+The analysis proceeds through four sequential stages, each a standalone ROOT/ACLiC-compiled class driven by a pair of macros (a \code{Load<Stage>Libs.C} macro that compiles/loads the stage's shared libraries, and a \code{Run<Stage>.C} macro that actually executes it). Every stage after the first consumes the previous stage's ROOT output file(s) directly; there is no shared in-memory state between stages, so the entire pipeline can be re-run from any intermediate stage without repeating earlier ones.
+
+\begin{center}
+\begin{tabular}{@{}p{0.16\linewidth}p{0.16\linewidth}p{0.32\linewidth}p{0.32\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Stage}} & \textcolor{white}{\textbf{Class}} & \textcolor{white}{\textbf{Input}} & \textcolor{white}{\textbf{Output}} \\
+\midrule
+1. Raw yield extraction & PicoBinner & PicoDst files (file list, per species) & Per-species raw yield histograms (\code{pionYield.root}, \code{kaonYield.root}, \code{protonYield.root}) \\
+\rowcolor{tblrowalt} 2. PID fitting & ZFitter & Stage 1 yield files & dE/dx (TPC) and $1/\beta$ (BTOF) fits $\rightarrow$ per-(particle,detector) spectra files, merged with \code{hadd} \\
+3. Spectra correction & RawSpectraModifier & Stage 1 + Stage 2 outputs, plus an externally supplied embedding-derived efficiency file & Efficiency-, energy-loss-, and feed-down--corrected spectra \\
+\rowcolor{tblrowalt} 4. Final fitting & SpectraFitter & Stage 3 output & Invariant-yield spectra fits, dN/dy, mean $p_T$/$m_T$ (Nominal + Systematic variants) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Stage 1 --- PicoBinner}
+
+\code{PicoBinner} reads PicoDst files (one file list per species, invoked three times --- once each for pion, kaon, and proton) and produces raw yield histograms binned in centrality, rapidity, $m_T$--$m_0$, charge, and detector subsystem (TPC/BTOF/ETOF), along with dE/dx-vs-$\beta\gamma$ and $1/\beta$-vs-momentum histograms that later stages fit. It enforces \code{eventConfig == "ColliderCenter"} and exits otherwise. Although only one species is analyzed per invocation, the full 9-species PID-contamination-modeling machinery (isolated dE/dx histograms, cross-contamination calibration arrays) runs internally regardless, unchanged from the parent repository, to preserve exact bit-for-bit fidelity with the original, validated physics logic.
+
+For a full production dataset, PicoBinner runs as an SDCC/RCF batch job (the only pipeline stage that does; see \S9) rather than as a single long-lived local process, since a full production file list is too large to process in one local ROOT session.
+
+\subsection{Stage 2 --- ZFitter}
+
+\code{ZFitter} performs the actual PID fits: TPC dE/dx as a function of $\beta\gamma$, and BTOF $1/\beta$, separately for each of the three species (six invocations total: 3 species $\times$ 2 detectors). Each invocation writes its own spectra output file; these six files are merged with ROOT's \code{hadd} utility before proceeding to Stage 3. ETOF fit drivers exist in the underlying ZFitter class but were not carried into this repository's run macro, so this analysis currently produces TPC- and BTOF-based spectra only.
+
+\subsection{Stage 3 --- RawSpectraModifier}
+
+\code{RawSpectraModifier} applies detector-response corrections to the raw yields extracted in Stages 1--2: tracking/PID efficiency (TPC and BTOF, from an externally supplied embedding-derived efficiency file), energy-loss correction, and feed-down correction (including an optional ``hybrid'' feed-down treatment). No efficiency file is bundled with this repository --- producing or sourcing one appropriate to this specific O+O 200 GeV dataset is an outstanding prerequisite before Stage 3 can be run on real data (see \S12).
+
+\subsection{Stage 4 --- SpectraFitter}
+
+\code{SpectraFitter} fits the corrected spectra from Stage 3 to extract final invariant yields, dN/dy, and mean $p_T$/$m_T$, differentially per particle, centrality, charge, and rapidity bin. Every bin is fit twice, with independent functional forms used for the ``Nominal'' and ``Systematic'' variants (see \S8), and results are written to a single output ROOT file consumed by the optional plotting macro (\S7.5) or by any downstream physics analysis (dN/dy vs. rapidity, particle ratios, radial-flow fits, etc. --- none of which are part of this repository).
+
+\subsection{Optional --- Plotting}
+
+A convenience macro reads Stage 4's output and produces two families of diagnostic plots: invariant spectra (one image per particle/charge/centrality bin, overlaying all filled rapidity bins) and dN/dy vs. rapidity (one image per particle/charge/fit-variant, overlaying all filled centrality bins). This step is for visual inspection only and is not part of the numerical analysis chain.
+
+% ================= SECTION 8 =================
+\section{Corrections}
+
+Stage 3 (RawSpectraModifier) applies the following corrections, each independently toggleable:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{TPC tracking/PID efficiency} --- from an embedding-derived efficiency file specific to this dataset.
+\item \textbf{BTOF matching/PID efficiency} --- from the same embedding-derived efficiency file.
+\item \textbf{Energy-loss correction} --- accounts for ionization energy loss shifting the reconstructed momentum relative to the true momentum, particularly significant for low-momentum, highly-ionizing species (protons).
+\item \textbf{Feed-down correction} --- accounts for daughter particles from weak decays (e.g. protons from $\Lambda$ decay) that pass track-quality cuts and are misidentified as primary particles; an optional ``hybrid'' treatment is available.
+\end{itemize}
+
+\begin{notebox}
+The specific momentum ranges, rapidity cuts, and hybrid feed-down toggle used for this dataset are not yet finalized --- the parent repository's per-energy values have no direct analog for a brand-new O+O 200 GeV configuration and must be chosen deliberately once real corrected spectra are available to sanity-check against (see \S12).
+\end{notebox}
+
+% ================= SECTION 9 =================
+\section{Spectra Fitting Functions}
+
+Every (particle, centrality, charge, rapidity-bin) combination is fit twice in Stage 4, using two independent functional forms per species --- a ``Nominal'' fit and a ``Systematic'' fit --- so that the spread between the two provides an initial estimate of the functional-form systematic uncertainty on the extrapolated (unmeasured $p_T$-range) yield.
+
+\begin{center}
+\begin{tabular}{@{}p{0.3\linewidth}p{0.33\linewidth}p{0.33\linewidth}@{}}
+\toprule
+\rowcolor{tblheadbg}
+\textcolor{white}{\textbf{Particle}} & \textcolor{white}{\textbf{Nominal fit function}} & \textcolor{white}{\textbf{Systematic fit function}} \\
+\midrule
+Pion & Tsallis & Bose-Einstein \\
+\rowcolor{tblrowalt} Kaon & Tsallis & $m_T$--$m_0$ exponential \\
+Proton & Blast-wave & Thermal (Boltzmann-like) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+dN/dy is obtained by integrating each fit function over the full $m_T$--$m_0$ range and summing with the fiducial (directly measured) yield within the detector acceptance. Mean $p_T$ and mean $m_T$ are computed analogously from the fit function.
+
+% ================= SECTION 10 =================
+\section{Systematic Uncertainties}
+
+\noindent\textbf{Status: not yet evaluated.}
+
+No systematic uncertainty study has been performed for this dataset. Once Stage 4 output exists, the following sources are the natural candidates for evaluation, based on what the framework already supports or what is standard for this class of measurement:
+
+\begin{itemize}[leftmargin=1.5em]
+\item Functional-form (extrapolation) uncertainty --- directly available from the Nominal vs. Systematic fit spread described in \S9.
+\item Tracking/PID efficiency uncertainty --- from the embedding-derived efficiency file's own uncertainty, once that file is produced (\S8).
+\item Energy-loss and feed-down correction uncertainty.
+\item Track-quality cut variation (nHitsFit, nHitsDeDx, DCA, fit-point ratio) --- standard STAR practice of re-running the analysis with tightened/loosened cuts and taking the spread.
+\item Centrality-definition sensitivity, given the 5-bin refMult scheme was chosen by merging bins from a finer scheme rather than re-deriving cut values for this specific scheme.
+\end{itemize}
+
+% ================= SECTION 11 =================
+\section{Results}
+
+\noindent\textbf{Status: pending.}
+
+No production PicoDsts have been processed through this pipeline yet. This section will hold invariant-yield spectra, dN/dy vs. rapidity, mean $p_T$/$m_T$, and particle-ratio results once Stage 1 (PicoBinner) has been run against the full O+O 200 GeV production dataset (via the SDCC batch path, \S9) and Stages 2--4 have been run locally on the result.
+
+% ================= SECTION 12 =================
+\section{Status and Outstanding Items}
+
+As of this writing, the following is confirmed working:
+
+\begin{itemize}[leftmargin=1.5em]
+\item The full local build (all four analysis stages' shared libraries) compiles and links successfully, including on an SDCC/RCF node under STAR library SL24y (ROOT 5.34.38 / CINT), after resolving a series of ROOT5/CINT-specific build incompatibilities that were latent in code inherited from the parent repository and never triggered under a local ROOT6/Cling build.
+\item The PicoDst reader submodule has been migrated from STAR library SL23a to SL24y, matching this dataset's real production library, using STAR's own public source directly.
+\item The SDCC batch-submission template for Stage 1 (PicoBinner) is in place and configured for this dataset's catalog query.
+\end{itemize}
+
+Outstanding before physics results can be produced:
+
+\begin{itemize}[leftmargin=1.5em]
+\item Independently verify the \code{production=P24iy} / \code{library=SL24y} catalog pairing resolves to a non-empty file set (\S2).
+\item Produce or source an embedding-derived TPC/BTOF efficiency file for this specific O+O 200 GeV dataset (\S8) --- Stage 3 cannot run on real data without one.
+\item Finalize Stage 3's dataset-specific arguments (momentum ranges, rapidity cuts, hybrid feed-down toggle) that have no valid default carried over from the parent repository's per-energy configurations (\S8).
+\item Run Stage 1 against the full production dataset via the SDCC batch path, then Stages 2--4 locally, to produce the first real spectra (\S7, \S11).
+\item Evaluate systematic uncertainties once real corrected spectra exist (\S10).
+\item A pre-existing bug in the track-quality-cut configuration macro (a trigger-array size mismatch, \{6\} declared vs. \{1\} used elsewhere in the parent repository's convention) was carried forward unchanged, flagged for review rather than silently ``fixed,'' per the fidelity-to-original-physics-logic approach this fork follows --- see \code{macros/SetCutClass.C}'s header comment.
+\end{itemize}
+
+% ================= SECTION 13 =================
+\section{Summary}
+
+\code{lightflavorspectra\_OO200} implements a complete, four-stage analysis pipeline for identified pion/kaon/proton spectra in O+O collisions at $\sqrt{s_{NN}} = 200$ GeV, ColliderCenter geometry, forked from and physics-verified against an existing multi-energy STAR analysis codebase. Event and track selection, centrality definition, PID methodology, and corrections are all configured and documented; the full software build (including the SDCC batch path for raw-yield extraction) is validated end-to-end. The immediate next milestone is producing an embedding-derived efficiency file and running the pipeline against real production data to obtain the first spectra, at which point this note will be updated with Sections 10--11 (systematic uncertainties and results) completed.
+
+\end{document}
