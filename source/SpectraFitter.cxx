@@ -13533,6 +13533,18 @@ void SpectraFitter::fitKaonSpectraSimultaneousSymmetric(bool saveFinalFits, bool
 //############################################################################################################
 //############################################################################################################
 
+// SDCC/rootcint BUILD FIX (2026-07-02, not in the original): fitProtonSpectraThermal is
+// declared in headers/SpectraFitter.h but was never implemented anywhere in this
+// codebase -- confirmed via grep, the only other references are comments in
+// macros/RunSpectraFitter.C listing it as an available-but-unused fitting option.
+// Same underlying issue as the earlier SpectraStructure/ZFitter gaps: SDCC's ROOT5
+// rootcint dictionary generation requires a real body for every declared member.
+// Added an empty stub -- if this "thermal-only proton fit" option is ever wanted,
+// replace this with a real implementation (likely modeled on
+// fitProtonSpectraIndivBlastWave just below, swapping in m_thermal for m_blastWave).
+void SpectraFitter::fitProtonSpectraThermal(bool a_constrainTemperature){
+}
+
 void SpectraFitter::fitProtonSpectraIndivBlastWave(bool a_constrainTemperature){
   cout << "Fitting Proton Spectra" << endl;
   m_currentPartIndex = 2;
