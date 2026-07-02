@@ -370,3 +370,43 @@ void StPicoEvent::setETofGoodEventFlag( std::vector<bool> flagVec ) {
 	    std::copy(flagVec.begin(), flagVec.end(), mETofGoodEventFlag);
 	}
 }
+
+// NOT PART OF STAR'S OWN SL24y_3 SOURCE: StPicoEvent.h (ported verbatim from
+// star-bnl/star-sw, tag SL24y_3) declares both eTofPulserStatus(iSector,iModule,
+// iCounter) and setETofHasPulsersFlag(vector<bool>), but STAR's own SL24y_3
+// StPicoEvent.cxx does not define either of them -- confirmed by direct fetch, not an
+// oversight in this port. That's harmless for pure analysis code that never calls
+// them, but this repo's build (rootcint + LinkDef, reflecting the WHOLE class) needs
+// every declared method to actually have a body to link libStPicoDst.so at all.
+// Added here, following the same index-formula convention as the neighboring
+// eTofGoodEventFlag()/setETofGoodEventFlag() pair, but indexing the 108-entry
+// mETofHasPulsersFlag array (per-counter, not per-Get4) rather than
+// mETofGoodEventFlag -- NOT verified against any real STAR reference implementation,
+// since none exists upstream to compare against. This analysis (PicoBinner.cxx) does
+// not call either of these, so their exact behavior has no bearing on any physics
+// result here; they exist purely so the dictionary links.
+//_________________
+bool StPicoEvent::eTofPulserStatus( UShort_t iSector, UShort_t iModule, UShort_t iCounter ) const {
+	if( iSector < 13 || iSector > 24 ){
+	    LOG_INFO << "StPicoEvent::eTofPulserStatus() - non-existing sector id " << iSector <<"  -> return false"<< endm;
+	    return false;
+	}
+	if( iModule < 1 || iModule > 3 ){
+	    LOG_INFO << "StPicoEvent::eTofPulserStatus() - non-existing module id " << iModule <<"  -> return false"<< endm;
+	    return false;
+	}
+	if( iCounter < 1 || iCounter > 3 ){
+	    LOG_INFO << "StPicoEvent::eTofPulserStatus() - non-existing counter id " << iCounter <<"  -> return false"<< endm;
+	    return false;
+	}
+	return (bool) mETofHasPulsersFlag[ 9*(iSector-13) + 3*(iModule-1) + (iCounter-1) ];
+}
+
+//_________________
+void StPicoEvent::setETofHasPulsersFlag( std::vector<bool> pulserVec ) {
+	if( pulserVec.size() != 108 ){
+	    LOG_INFO << "StPicoEvent::setETofHasPulsersFlag() - eTof pulser vector wrong size " << pulserVec.size() <<" / 108"<< endm;
+	}else{
+	    std::copy(pulserVec.begin(), pulserVec.end(), mETofHasPulsersFlag);
+	}
+}

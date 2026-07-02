@@ -80,6 +80,21 @@ All of `StPicoHelix`/`StPicoPhysicalHelix`/`PhysicalConstants.h`/`SystemOfUnits.
 `StPicoMessMgr.h` (generic StarClassLibrary math/utility headers, not PicoDst-specific)
 were confirmed byte-identical between the two STAR tags and needed no changes.
 
+**One gap had to be patched, not just ported.** STAR's own real SL24y_3 `StPicoEvent.h`
+declares `eTofPulserStatus(iSector,iModule,iCounter)` and
+`setETofHasPulsersFlag(vector<bool>)`, but STAR's own `StPicoEvent.cxx` never defines
+either of them (confirmed by direct fetch -- a genuine upstream gap, not something lost
+in this port). That's harmless for analysis code that never calls them, but this
+repo's build (`rootcint` + `StPicoDstLinkDef.h`, which reflects the *entire* class for
+ROOT's CINT dictionary) needs every declared method to have a real body just to link
+`libStPicoDst.so` -- this only surfaced when building on an actual SDCC node (a Mac
+build apparently never linked far enough to hit it). Minimal implementations were
+added in `StPicoEvent.cxx`, clearly marked as not-from-upstream, following the same
+index-formula convention as the neighboring `eTofGoodEventFlag()`/
+`setETofGoodEventFlag()` pair. `PicoBinner.cxx` doesn't call either one, so their exact
+behavior doesn't affect any physics result here -- they exist purely so the dictionary
+links.
+
 ## One-time build setup
 
 1. Build the PicoDst reader submodule and copy its library into `bin/`:
