@@ -10,6 +10,7 @@ bin/*.d
 bin/*.pcm
 submodule/PicoDstReader_SL23a/*.o
 submodule/PicoDstReader_SL23a/libStPicoDst.so
+submodule/PicoDstReader_SL23a/*_rdict.pcm
 *.d
 
 # ROOT ACLiC intermediate artifacts that can show up alongside sources
