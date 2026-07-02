@@ -31,11 +31,16 @@
   *** CATALOG QUERY: trgsetupname copied verbatim from lightflavorspectra_etof's real,
   working pions_OO_200GeV job; library= and production= kept at SL24y/P24iy to match
   this repo's port (the reference job instead paired library=SL23c with
-  production=P23ic, and additionally restricted to an explicit runnumber whitelist).
-  This SL24y/P24iy pairing has NOT been independently verified against the current
-  StarCatalog - confirm it actually resolves to files before relying on it. If it
-  returns zero files, the reference job's runnumber whitelist may be a useful starting
-  point to intersect against once a valid P24iy run list is known.
+  production=P23ic). The runnumber whitelist from that reference job is carried over
+  as-is below - runnumbers identify actual collision runs, not the reprocessing pass,
+  so the same runs should exist under P24iy/SL24y too, but this has NOT been
+  independently confirmed against the current StarCatalog. Also note two apparent
+  typos preserved verbatim from the reference job: a single "|" instead of "||" between
+  22131018 and 22131019, and a stray "||||" between 22131065 and 22130029 - fix these
+  if the query comes back short of files.
+  This SL24y/P24iy pairing (with or without the runnumber whitelist) has NOT been
+  independently verified against the current StarCatalog - confirm it actually
+  resolves to files before relying on it.
 -->
 
 <job name="picoBinner_OO200_PION" maxFilesPerProcess="12" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="true">
@@ -47,8 +52,8 @@
   <stderr URL="file:/star/data03/scratch/liggett/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
 
   <!-- O+O 200 GeV production catalog query - see header note above about the
-       production=/library= pairing before relying on this. -->
-  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst" nFiles="all" />
+       production=/library= pairing and the runnumber whitelist before relying on this. -->
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135039||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134014||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133005||22133007||22133009||22133010||22133011||22133013||22133014||22133015||22133016||22133024||22133025||22133026||22133027||22133028||22133029||22133031||22133032||22133037||22133038||22133039||22133040||22133042||22133043||22133044||22133045||22132001||22132002||22132003||22132004||22132008||22132010||22132014||22132015||22132024||22132025||22132026||22131011||22131012||22131013||22131014||22131015||22131016||22131017||22131018|22131019||22131020||22131021||22131022||22131036||22131039||22131040||22131042||22131043||22131044||22131045||22131050||22131053||22131054||22131056||22131057||22131058||22131062||22131063||22131064||22131065||||22130029||22130046||22130047" nFiles="all" />
 
   <!-- Scheduler's own auxiliary files -->
   <Generator><Location>
