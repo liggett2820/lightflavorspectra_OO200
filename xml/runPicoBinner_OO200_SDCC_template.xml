@@ -28,12 +28,15 @@
   submissions), changing only the PARTNAME line inside <command> and the job name/output
   paths, to cover PION / KAON / PROTON.
 
-  *** CATALOG QUERY: copied verbatim from lightflavorspectra_etof's
-  runPicoBinner_OO_200GeV.xml (trgsetupname=production_OO_200GeV_2021,production=P23ic,
-  library=SL23c). This was the real query used for O+O 200 GeV production data in that
-  repo as of when it was last touched -- it has NOT been independently re-verified
-  against the current StarCatalog here, so confirm it still resolves to the dataset you
-  actually want (production tags/libraries do get superseded) before relying on it.
+  *** CATALOG QUERY: base query (trgsetupname/production tag) copied verbatim from
+  lightflavorspectra_etof's runPicoBinner_OO_200GeV.xml, but library= changed to SL24y
+  per explicit request. NOTE: that repo's query paired library=SL23c with
+  production=P23ic -- production tags and library versions are normally paired by
+  STAR (a given production pass is built against one specific library), so
+  production=P23ic may not actually be the right production tag to pair with SL24y.
+  This has NOT been independently verified against the current StarCatalog -- confirm
+  the production= value is still correct for SL24y before relying on this query, or the
+  catalog lookup may simply return zero files.
 -->
 
 <job name="picoBinner_OO200_PION" maxFilesPerProcess="8" fileListSyntax="xrootd" simulateSubmission="false" copyInputLocally="true">
@@ -42,9 +45,9 @@
   <stdout URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.out" />
   <stderr URL="file:/star/data05/scratch/EDITME_USERNAME/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
 
-  <!-- Real O+O 200 GeV production catalog query -- see header note above about
-       double-checking this is still the dataset/production/library you want. -->
-  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P23ic,library=SL23c,storage=local,storage!=HPSS,filetype=daq_reco_picoDst" nFiles="all" />
+  <!-- O+O 200 GeV production catalog query -- see header note above about the
+       production=/library= pairing before relying on this. -->
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P23ic,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst" nFiles="all" />
 
   <!-- EDITME: where the scheduler writes its own auxiliary files -->
   <Generator><Location>
@@ -78,10 +81,10 @@
     </Package>
   </SandBox>
 
-  <!-- starver must match the catalog query's library= tag above (SL23c). -->
+  <!-- starver must match the catalog query's library= tag above (SL24y). -->
   <command>
 
-    starver SL23c
+    starver SL24y
 
     pwd
     ls
