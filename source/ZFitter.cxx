@@ -2896,6 +2896,43 @@ double ZFitter::chiSquared_TOF(const double* a_params){
   return chiSqrd;
 }
 
+// SDCC/rootcint BUILD FIX (2026-07-02, not in the original): the 7 methods below are
+// declared in headers/ZFitter.h (inside the same #ifdef _MAC_OSX_ block as
+// chiSquared_TPC/chiSquared_TOF above -- note _MAC_OSX_ is unconditionally #defined in
+// makefile_toggles.h for this repo, so this block compiles on SDCC too, not just a Mac)
+// but were never implemented anywhere in this codebase. Confirmed via grep: no call
+// site anywhere (commented-out or otherwise) actually invokes any of these 7 except one
+// commented-out reference to simultaneous_centrality_ZTPC_skewNormalAndTwoGaus_sigmaLinked_chisqr
+// in ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx. Their sibling functions with the same
+// naming pattern (e.g. simultaneous_centrality_ZTPC_skewNormalAndTwoGaus_Proton_chisqr,
+// simultaneous_centrality_ZTOF_chisqr, simultaneous_centrality_ZTPC_chisqr_E_K_Ratio_Linked)
+// ARE implemented -- these 7 look like an earlier, superseded/abandoned parameterization
+// that was never finished. This built fine on a Mac (ROOT6/rootcling), but SDCC's ROOT5
+// rootcint dictionary for this class requires every declared member to have a real body
+// to link. Added minimal empty-body/zero-return stub implementations -- this changes
+// nothing observable since nothing calls them; if any of these are needed for a real fit
+// in the future, replace the stub body with the actual chi-squared calculation.
+void ZFitter::fitIsolatedElectronsByRapidity(int a_partIndex){
+}
+double ZFitter::simultaneous_centrality_ZTPC_chisqr(const double* a_param){
+  return 0.0;
+}
+double ZFitter::simultaneous_centrality_ZTPC_chisqr_tof_ratio_constrain(const double* a_param){
+  return 0.0;
+}
+double ZFitter::simultaneous_centrality_ZTPC_OneSkewNormal_chisqr(const double* a_param){
+  return 0.0;
+}
+double ZFitter::simultaneous_centrality_ZTPC_TwoSkewNormal_chisqr(const double* a_param){
+  return 0.0;
+}
+double ZFitter::simultaneous_centrality_ZTPC_skewNormalAndTwoGaus_chisqr(const double* a_param){
+  return 0.0;
+}
+double ZFitter::simultaneous_centrality_ZTPC_skewNormalAndTwoGaus_sigmaLinked_chisqr(const double* a_param){
+  return 0.0;
+}
+
 #endif
 
 //=========================================================================================================================================================================
