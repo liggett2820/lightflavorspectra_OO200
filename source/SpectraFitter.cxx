@@ -8,6 +8,20 @@ SpectraFitter::SpectraFitter(){
   #ifdef _SPECTRA_FITTER_DEBUG_
     cout << "Constructing SpectraFitter" << endl;
   #endif
+  // SDCC/rootcint BUILD FIX (2026-07-02, not in the original): these 4 arrays used to
+  // be initialized via C++11 NSDMI directly in headers/SpectraFitter.h -- see the
+  // comment there. Moved here unchanged (same literal values, same order) since CINT
+  // can't parse a brace-init default member initializer for an array field.
+  double m_nPart_init[7]    = {334.432,287.019,224.183,159.5835,101.4045,59.1425,20.184};
+  double m_nPartErr_init[7] = {6.533,10.048,11.374192,8.6947497,6.3299037,5.707869,2.0499263};
+  double m_Tpro_amp_init[7] = {0.252297,0.23596,0.20449,0.188534,0.163917,0.13915,0.127722};
+  double m_Tpro_sig_init[7] = {1.57028,1.44414,1.37874,1.43276,1.37272,1.35113,1.46965};
+  for(int iii = 0; iii < 7; iii++){
+    m_nPart[iii]    = m_nPart_init[iii];
+    m_nPartErr[iii] = m_nPartErr_init[iii];
+    m_Tpro_amp[iii] = m_Tpro_amp_init[iii];
+    m_Tpro_sig[iii] = m_Tpro_sig_init[iii];
+  }
   m_currentSpectra = NULL;
   m_imageDir = "";
 

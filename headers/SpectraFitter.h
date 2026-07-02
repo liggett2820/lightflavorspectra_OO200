@@ -172,11 +172,21 @@ private:
 
   //TF1* m_fitFunctions[9][3]; // particle // nominal;systematic;...
 
-  double m_nPart[7]    = {334.432,287.019,224.183,159.5835,101.4045,59.1425,20.184};
-  double m_nPartErr[7] = {6.533,10.048,11.374192,8.6947497,6.3299037,5.707869,2.0499263};
+  // SDCC/rootcint BUILD FIX (2026-07-02, not in the original): these 4 arrays used to
+  // be initialized right here via C++11 non-static data member initializers (NSDMI),
+  // e.g. `double m_nPart[7] = {334.432,...};`. g++ (any version this repo targets)
+  // accepts that fine, which is why it built OK on a Mac. But CINT (ROOT5's
+  // interpreter, used under SDCC's SL24y) predates NSDMI entirely and segfaults
+  // ("Dictionary generation failed with a core dump!") trying to parse a brace-init
+  // list as a default member initializer for an array field. Declarations only here;
+  // the actual values moved into the SpectraFitter() constructor body in
+  // source/SpectraFitter.cxx, which is the standard C++03-safe way to do this and
+  // behaves identically.
+  double m_nPart[7];
+  double m_nPartErr[7];
 
-  double m_Tpro_amp[7] = {0.252297,0.23596,0.20449,0.188534,0.163917,0.13915,0.127722};
-  double m_Tpro_sig[7] = {1.57028,1.44414,1.37874,1.43276,1.37272,1.35113,1.46965};
+  double m_Tpro_amp[7];
+  double m_Tpro_sig[7];
 
   bool m_useDoubleBoseForPions;
 
