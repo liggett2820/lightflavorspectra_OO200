@@ -280,13 +280,19 @@ based on where PicoBinner ran.
   it just resolves paths and calls this repo's own `LoadPicoBinnerLibs.C` +
   `RunPicoBinner.C` pair with the arguments the scheduler passes through, naming its
   output the way the XML's `<output fromScratch="*_Processed.root">` glob expects.
+- `scripts/cleanup_sdcc_scratch.sh` -- housekeeping for the scratch-area log/scheduler
+  clutter that piles up from repeated submissions (see "Cleaning up scratch/logs"
+  below). Does not touch permanent output.
 
-Both files are adapted from `lightflavorspectra_etof`'s own working
-`runPicoBinner_OO_200GeV.xml`/`scripts/runPicoBinner.bash` (same real catalog query,
-same overall `<SandBox>`/`<command>` shape), re-pointed at this repo's actual macro names
-and file layout, with the previous author's hardcoded BNL paths replaced by placeholders
-you have to fill in yourself (see below) -- this repo has no way to know your SDCC
-username or directory conventions.
+The XML template was restructured (2026-07) around the format of
+`lightflavorspectra_etof`'s own real, working `pions_OO_200GeV` job -- including a
+`<shell>` line that runs the job inside SDCC's required singularity container
+(`/cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif`) and a `filesPerHour` throttle -- with
+`library=`/`production=` kept at this repo's `SL24y`/`P24iy` port rather than reverting to
+that job's `SL23c`/`P23ic`. Paths are filled in for `liggett2820`'s real SDCC account
+(`/star/data03/scratch/liggett/...` for scratch logs, `/star/data03/pwg/liggett/...` for
+permanent output) rather than left as `EDITME` placeholders. If someone else runs this
+template, every `/liggett` path needs updating to their own account first.
 
 ### Before you can submit
 
@@ -297,19 +303,20 @@ username or directory conventions.
    `submodule/PicoDstReader_SL24y`, then `root -l -q -b macros/makeLibs.C`) there first --
    the `<SandBox>` packages whatever's actually in `bin/` at submission time, so it needs
    to already be genuine Linux binaries.
-2. **Fill in every `EDITME` in the XML template** -- your own scratch directory for
-   scheduler logs (`<stdout>`/`<stderr>`), the `<Generator><Location>` for scheduler
-   auxiliary files, and the permanent output directory (the `mv` line in `<command>` plus
-   the `<output>` element). None of these can be guessed -- they depend on your own SDCC
-   account and disk allocations.
-3. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021`
-   part of the `<input URL="catalog:...">` line is copied verbatim from
-   `lightflavorspectra_etof`'s working O+O 200 GeV XML; `production=`/`library=` have
-   been changed to `P24iy`/`SL24y` per request (the original query paired
-   `production=P23ic` with `library=SL23c`). This `production=`/`library=` pairing has
-   not been independently re-verified against the current StarCatalog, so confirm it
-   still resolves to the dataset you actually want before submitting (an unverified
-   pairing may just return zero files).
+2. **If you're not liggett2820, update every `/liggett` path in the XML** -- the scratch
+   log directory (`<stdout>`/`<stderr>`), the `<Generator><Location>`, and the permanent
+   output directory (the `mv` line in `<command>` plus the `<output>` element). These are
+   filled in for one specific SDCC account and disk allocation; they won't resolve for
+   anyone else as-is.
+3. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021` part
+   of the `<input URL="catalog:...">` line, and its runnumber whitelist, are copied from
+   `lightflavorspectra_etof`'s working O+O 200 GeV XML job; `production=`/`library=` have
+   been changed to `P24iy`/`SL24y` per this repo's port (the reference job instead paired
+   `production=P23ic` with `library=SL23c`). This `production=`/`library=` pairing -- with
+   or without the runnumber whitelist carried over from the SL23c/P23ic job -- has not
+   been independently re-verified against the current StarCatalog, so confirm it still
+   resolves to files before relying on it (an unverified pairing may just return zero
+   files).
 4. Make one copy of the template per species (PION/KAON/PROTON), editing the `PARTNAME`
    argument in the `run_picobinner_sdcc.bash` call, the job `name`, and the output paths
    in each copy so the three jobs don't collide.
@@ -323,3 +330,17 @@ star-submit xml/runPicoBinner_OO200_SDCC_template.xml
 (or whatever you renamed your per-species copies to). Once all three species' jobs
 finish, copy the merged `*_Processed.root` output files back to your laptop and continue
 with stage 2 (ZFitter) exactly as documented above.
+
+### Cleaning up scratch/logs
+
+Repeated submissions pile up `.out`/`.err` logs under
+`/star/data03/scratch/liggett/picoBinner_OO200/` and scheduler auxiliary files under
+`/star/data03/scratch/liggett/schedFiles/picoBinner_OO200/`.
+`scripts/cleanup_sdcc_scratch.sh` clears both (with a confirmation prompt), without
+touching the permanent `pwg` output directory:
+
+```
+./scripts/cleanup_sdcc_scratch.sh --dry-run   # see what would be removed, delete nothing
+./scripts/cleanup_sdcc_scratch.sh             # prompts before deleting
+./scripts/cleanup_sdcc_scratch.sh -y          # skip the confirmation prompt
+```
