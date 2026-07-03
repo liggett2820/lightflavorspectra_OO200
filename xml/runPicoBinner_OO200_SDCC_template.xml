@@ -47,8 +47,8 @@
   <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
 
   <!-- Scheduler log files -->
-  <stdout URL="file:/star/data03/scratch/liggett/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.out" />
-  <stderr URL="file:/star/data03/scratch/liggett/picoBinner_OO200/picoBinner_OO200_PION_$JOBINDEX.err" />
+  <stdout URL="file:/star/data03/scratch/liggett/picoBinner_OO200/stdout_stderr/" />
+  <stderr URL="file:/star/data03/scratch/liggett/picoBinner_OO200/stdout_stderr/" />
 
   <!-- O+O 200 GeV production catalog query - see header note above about the
        production=/library= pairing and the runnumber whitelist before relying on this. -->
