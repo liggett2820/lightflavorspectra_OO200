@@ -8,16 +8,24 @@
 // NOT gated by any energy toggle in the original -- those numbers are copied verbatim,
 // unchanged, digit for digit.
 //
-// NOTE (please double check against your own notes): the original's _OO_200_COL_ block
-// had "unsigned int trigs[6] = {860001};" then "cuts->setTriggers(6, &trigs[0]);" --
-// declaring/passing 6 triggers while only initializing the first (the other 5 are
-// zero-initialized by C++). Every other energy's block in the original declares an
-// array sized to match its actual trigger count, so this looks like it could be a
-// copy-paste slip in the original rather than an intentional 6-trigger cut. Ported
-// here EXACTLY as it was (bug included) since I can't tell from the code alone whether
-// it's deliberate -- flag this to yourself before trusting centrality/event-selection
-// results, and change the "6" to "1" here if you confirm it should match the other
-// energies' single-trigger pattern.
+// UPDATED 2026-07-03: reconciled against the actual macros/SetCutClass.C used on SDCC
+// (starsub03) to produce yieldHistos_OOGeV_proton_2026_07_01.root. That file was pasted
+// in full and is the ground truth for what cuts were really applied when the data was
+// produced -- several values below had drifted from it (this repo's own port history
+// vs. what was actually run). Every value changed below is called out at the point of
+// change; nothing was re-derived or guessed, all copied verbatim from the SDCC file.
+//
+// The former note about "unsigned int trigs[6] = {860001}; setTriggers(6,...)" being a
+// possible copy-paste bug is now resolved: the SDCC file uses a single trigger,
+// "unsigned int trigs[1] = {860002}; setTriggers(1,...)" -- both the array size AND the
+// trigger ID were wrong here. Fixed below to match SDCC exactly.
+//
+// One open item NOT resolved by this pass: this file still calls setInvBetaWidth_bTOF/
+// setInvBetaWidth_eTOF (0/1/2, 0.03 and 0.015) for all three species. The SDCC file has
+// no calls to either method at all. Left in place since removing them wasn't confirmed
+// -- if CutClass has sane defaults these may be redundant/harmless, but flag this to
+// yourself and confirm with the SDCC file's actual defaults before trusting the BTOF/ETOF
+// PID width behavior matches exactly.
 
 #include "../headers/CutClass.h"
 #include <iostream>
@@ -33,33 +41,42 @@ void SetCutClass(CutClass *cuts){
 
   string mode = "Center"; // O+O 200 GeV is always run in Center mode in the original
   cuts->setVertexConfig(mode);
-  cuts->setZRange(-70,70);
+  cuts->setZRange(-2,2); // was (-70,70) -- corrected 2026-07-03 to match the SDCC file actually used
 
   // ---- _OO_200_COL_ specific values (from the original's #ifdef _OO_200_COL_ block) ----
-  cuts->setStarver("dev");
+  cuts->setStarver("SL23c"); // was "dev" -- corrected 2026-07-03 to match SDCC
   cuts->setSqrts_NN(200);
   cuts->setBeamEnergy(100);
   cuts->setBeamLocation(0.0,0.0);
-  unsigned int trigs[6] = {860001}; // see note at top of file
-  cuts->setTriggers(6, &trigs[0]);
+  cuts->setPileUpCut(260); // added 2026-07-03 -- absent here before, present in the SDCC file
+  unsigned int trigs[1] = {860002}; // was trigs[6]={860001} -- both size and ID were wrong, fixed 2026-07-03
+  cuts->setTriggers(1, &trigs[0]);
 
   //cut on nToFT0, number of ToF tracks used for T0 Calibration
-  cuts->setUseT0(true);
-  cuts->setTofT0Cut(3);
+  cuts->setUseT0(false); // was true -- corrected 2026-07-03; SDCC has setTofT0Cut commented out entirely so it's dropped here too
   cuts->setEventConfig("ColliderCenter");
   cuts->setYCM(0.0);
   cuts->setRadialCut(2.0);
-  cuts->setTofMatch(3);
+  cuts->setTofMatch(0); // was 3 -- corrected 2026-07-03 to match SDCC
   cuts->setTrigToggle(true);
 
   //###############    TRACK QUALITY CUTS ###################
-  cuts->setNHitsFit(15);
+  cuts->setNHitsFit(20); // was 15 -- corrected 2026-07-03 to match SDCC
   cuts->setNHitsDeDx(10);
-  cuts->setFitMaxRatio(0.505);
+  cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
   cuts->setBTOF(1.6, 2.8);
-  cuts->setDCA(1.0);
+  cuts->setDCA(3); // was 1.0 -- corrected 2026-07-03 to match SDCC
   cuts->setETOFMaxClusterSize(99);
   cuts->setETOFMatchFlagCut(-1);
+  // added 2026-07-03 -- absent here before, present in the SDCC file (4-arg: meanDeltaX, meanDeltaY, widthDeltaX, widthDeltaY)
+  cuts->setETOF(-0.4409,0.08343, 50, 50);
+  // added 2026-07-03 -- absent here before, present in the SDCC file
+  vector<double> momStops_TPC_Plus  = {2.71,2.0,4.0,1.0,4.0};
+  vector<double> momStops_TPC_Minus = {4.0,1.56,0.0,2.0,0.0};
+  vector<double> momStops_bToF_Plus  = {2.71,2.0,4.0,1.0,4.0};
+  vector<double> momStops_bToF_Minus = {4.0,1.56,0.0,2.0,0.0};
+  cuts->setMomStops_TPC(momStops_TPC_Plus, momStops_TPC_Minus);
+  cuts->setMomStops_bToF(momStops_bToF_Plus, momStops_bToF_Minus);
 
   // _STREFMULTCORR_ was never defined for this build -- raw refMult centrality bins,
   // exactly the values the original's _OO_200_COL_ branch used.
@@ -83,7 +100,12 @@ void SetCutClass(CutClass *cuts){
   // ascending edges, essentially every event with refMult>=0 would satisfy the very
   // first real threshold check and get labeled centIndex 0. Fixed here by reversing the
   // edge order (same magnitudes, not re-derived) relative to the 9-bin array's values.
-  double centCutsArray[5] = {300,150,100,70,0};
+  // Corrected 2026-07-03: {300,150,100,70,0} was this repo's own value, but the SDCC
+  // file that actually produced the yields file being analyzed uses {44,37,28,17,5} --
+  // same percentile labels, different multiplicity thresholds (likely a different
+  // vertex/pile-up/track-cut configuration upstream). PicoBinner bakes centIndex into
+  // the raw yield histograms at production time, so THIS is the scheme that matters.
+  double centCutsArray[5] = {44,37,28,17,5};
   int percents[5] = {5,10,20,40,80};
   cuts->setCentralities(5, &centCutsArray[0], &percents[0]);
 
@@ -99,23 +121,25 @@ void SetCutClass(CutClass *cuts){
   vector<double> lowMassCut;
   vector<double> highMassCut;
   //loose no overlap mass cuts
+  // indices 4-7 corrected 2026-07-03 to match the SDCC file (was 1.65/2.4/1.23/1.65 low,
+  // 2.4/3.16/1.58/2.4 high -- now 1.38/2.7/2.7/2.9 low, 2.7/2.9/2.9/3.8 high)
   lowMassCut.push_back(0.0);
   lowMassCut.push_back(0.367);
   lowMassCut.push_back(0.726);
   lowMassCut.push_back(0.0);
-  lowMassCut.push_back(1.65);
-  lowMassCut.push_back(2.4);
-  lowMassCut.push_back(1.23);
-  lowMassCut.push_back(1.65);
+  lowMassCut.push_back(1.38);
+  lowMassCut.push_back(2.7);
+  lowMassCut.push_back(2.7);
+  lowMassCut.push_back(2.9);
   lowMassCut.push_back(0.97);
   highMassCut.push_back(0.367);
   highMassCut.push_back(0.726);
   highMassCut.push_back(1.38);
   highMassCut.push_back(0.065);
-  highMassCut.push_back(2.4);
-  highMassCut.push_back(3.16);
-  highMassCut.push_back(1.58);
-  highMassCut.push_back(2.4);
+  highMassCut.push_back(2.7);
+  highMassCut.push_back(2.9);
+  highMassCut.push_back(2.9);
+  highMassCut.push_back(3.8);
   highMassCut.push_back(0.121);
   cuts->setMassCuts(lowMassCut,highMassCut);
 
@@ -126,26 +150,41 @@ void SetCutClass(CutClass *cuts){
   cuts->setInvBetaWidth_eTOF(1,0.015);
   cuts->setInvBetaWidth_eTOF(2,0.015);
 
+  // Corrected 2026-07-03 to match the SDCC file's line points exactly (was a different
+  // set of points entirely -- {0.212698,...}/{0.276361,...} etc. -- this repo's own
+  // values, not what was actually used to produce the yields file).
   vector<double> lowLineXPts;
   vector<double> lowLineYPts;
   vector<double> highLineXPts;
   vector<double> highLineYPts;
-  lowLineXPts.push_back(0.212698);
-  lowLineYPts.push_back(24.669);
-  lowLineXPts.push_back(1.29935);
-  lowLineYPts.push_back(2.37017);
-  highLineXPts.push_back(0.276361);
-  highLineYPts.push_back(38.4743);
-  highLineXPts.push_back(1.17626);
-  highLineYPts.push_back(5.1769);
-  highLineXPts.push_back(1.17626);
-  highLineYPts.push_back(5.1769);
-  highLineXPts.push_back(2.4);
-  highLineYPts.push_back(3.7);
-  highLineXPts.push_back(2.4);
-  highLineYPts.push_back(3.7);
+  lowLineXPts.push_back(0.2);
+  lowLineYPts.push_back(30.0);
+  lowLineXPts.push_back(0.65);
+  lowLineYPts.push_back(4.5);
+  lowLineXPts.push_back(0.65);
+  lowLineYPts.push_back(4.5);
+  lowLineXPts.push_back(3.73);
+  lowLineYPts.push_back(1.0);
+  highLineXPts.push_back(0.25);
+  highLineYPts.push_back(40.0);
+  highLineXPts.push_back(0.65);
+  highLineYPts.push_back(10.0);
+  highLineXPts.push_back(0.65);
+  highLineYPts.push_back(10.0);
+  highLineXPts.push_back(1.3);
+  highLineYPts.push_back(5.0);
+  highLineXPts.push_back(1.3);
+  highLineYPts.push_back(5.0);
+  highLineXPts.push_back(2.0);
+  highLineYPts.push_back(4.0);
+  highLineXPts.push_back(2.0);
+  highLineYPts.push_back(4.0);
+  highLineXPts.push_back(5.0);
+  highLineYPts.push_back(3.5);
+  highLineXPts.push_back(5.0);
+  highLineYPts.push_back(3.5);
   highLineXPts.push_back(50);
-  highLineYPts.push_back(3.7);
+  highLineYPts.push_back(3.5);
   cuts->setBTOFBetaGammaCuts(false, lowLineXPts, lowLineYPts, highLineXPts, highLineYPts);
 
   vector<double> lowLineXPts2;
@@ -178,7 +217,10 @@ void SetCutClass(CutClass *cuts){
   highLineXPts3.push_back(0.15);
   highLineYPts3.push_back(4.8); //3.58 to electron bottom
 
-  cuts->setETOFInvBetaGammaSqrCuts(true, lowLineXPts3, lowLineYPts3, highLineXPts3, highLineYPts3);
+  // toggle changed true -> false 2026-07-03 to match SDCC (its own comment there notes
+  // "need to change back to true" -- so this may flip again later, but for now this
+  // matches what was actually run to produce the yields file)
+  cuts->setETOFInvBetaGammaSqrCuts(false, lowLineXPts3, lowLineYPts3, highLineXPts3, highLineYPts3);
   cuts->setBTOFElectronCut(true);
   cuts->setETOFElectronCut(false);
   cuts->setModNSigmaCuts_bTOF(true ,0.05, -5.5, 5.0,-0.08);
@@ -194,39 +236,46 @@ void SetCutClass(CutClass *cuts){
   double pionETOFArray[101]={0,0.00561879,0.021302,0.0444946,0.07275,0.104315,0.138062,0.173287,0.209543,0.246539,0.284081,0.322036,0.36031,0.398835,0.437561,0.476449,0.515472,0.554606,0.593833,0.633139,0.672514,0.711946,0.751429,0.790957,0.830523,0.870123,0.909753,0.949411,0.989093,1.0288,1.06852,1.10826,1.14802,1.18779,1.22757,1.26737,1.30718,1.347,1.38682,1.42666,1.46651,1.50636,1.54622,1.58608,1.62596,1.66583,1.70572,1.7456,1.7855,1.82539,1.86529,1.9052,1.94511,1.98502,2.02493,2.06485,2.10477,2.1447,2.18462,2.22455,2.26448,2.30442,2.34435,2.38429,2.42423,2.46417,2.50412,2.54406,2.58401,2.62396,2.66391,2.70386,2.74381,2.78376,2.82372,2.86367,2.90363,2.94359,2.98355,3.02351,3.06347,3.10343,3.1434,3.18336,3.22333,3.26329,3.30326,3.34323,3.3832,3.42316,3.46313,3.5031,3.54308,3.58305,3.62302,3.66299,3.70297,3.74294,3.78291,3.82289,3.86286};
   double kaonETOFArray[101]={0,0.00161786,0.00644006,0.0143753,0.0252809,0.0389744,0.0552472,0.0738774,0.0946412,0.117321,0.141712,0.167624,0.194887,0.223345,0.252862,0.283318,0.314606,0.346634,0.379319,0.412592,0.446389,0.480655,0.515344,0.550413,0.585825,0.621547,0.657551,0.693811,0.730303,0.767008,0.803909,0.840987,0.87823,0.915624,0.953158,0.99082,1.0286,1.06649,1.10449,1.14258,1.18076,1.21902,1.25736,1.29577,1.33426,1.3728,1.4114,1.45007,1.48878,1.52754,1.56636,1.60521,1.64411,1.68305,1.72203,1.76104,1.80008,1.83916,1.87827,1.91741,1.95658,1.99577,2.03499,2.07423,2.1135,2.15278,2.19209,2.23142,2.27077,2.31013,2.34952,2.38892,2.42833,2.46777,2.50721,2.54668,2.58615,2.62564,2.66514,2.70466,2.74419,2.78372,2.82327,2.86283,2.9024,2.94198,2.98157,3.02117,3.06078,3.1004,3.14002,3.17965,3.2193,3.25894,3.2986,3.33826,3.37793,3.41761,3.45729,3.49698,3.53668};
   double protonETOFArray[126]={0,0.000852246,0.00340436,0.00764257,0.0135444,0.021079,0.0302085,0.0408881,0.0530678,0.066693,0.0817058,0.0980459,0.115652,0.13446,0.15441,0.17544,0.19749,0.220501,0.244418,0.269186,0.294755,0.321075,0.348101,0.375789,0.404098,0.432989,0.462426,0.492377,0.522809,0.553692,0.585,0.616706,0.648787,0.681221,0.713986,0.747064,0.780436,0.814086,0.847997,0.882156,0.916548,0.951161,0.985983,1.021,1.05621,1.09159,1.12715,1.16286,1.19873,1.23473,1.27088,1.30716,1.34356,1.38008,1.41671,1.45346,1.4903,1.52724,1.56428,1.60141,1.63862,1.67591,1.71329,1.75074,1.78826,1.82585,1.86351,1.90123,1.93901,1.97685,2.01475,2.05271,2.09072,2.12877,2.16688,2.20503,2.24323,2.28147,2.31976,2.35808,2.39645,2.43485,2.47329,2.51177,2.55028,2.58882,2.62739,2.666,2.70463,2.7433,2.78199,2.82071,2.85946,2.89823,2.93703,2.97585,3.0147,3.05357,3.09246,3.13137,3.1703,3.20925,3.24823,3.28722,3.32623,3.36526,3.4043,3.44337,3.48245,3.52155,3.56066,3.59979,3.63893,3.67809,3.71726,3.75645,3.79564,3.83486,3.87408,3.91332,3.95257,3.99184,4.03111,4.0704,4.10969,4.149};
-  double blankEdgesArray[2] = {0,1.0};
-  cuts->setVariableRapMtM0BinningInfo(0,36,-2.05,1.55,100, pionArray,
-                                        27,-1.35,1.35, 200, pionBTOFArray,
-                                        15,-2.05,-0.55, 100, pionETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(1,33,-1.95,1.35,100, kaonArray,
-                                        27,-1.35,1.35, 200, kaonBTOFArray,
-                                        16,-1.95,-0.35, 100, kaonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(2,36,-2.05,1.55,150, protonArray,
-                                        27,-1.35,1.35, 250, protonBTOFArray,
-                                        17,-2.05,-0.35, 125, protonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(3,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
-  cuts->setVariableRapMtM0BinningInfo(4,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
-  cuts->setVariableRapMtM0BinningInfo(5,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
-  cuts->setVariableRapMtM0BinningInfo(6,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
-  cuts->setVariableRapMtM0BinningInfo(7,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
-  cuts->setVariableRapMtM0BinningInfo(8,1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray,
-                                        1,-1.0,1.0,  1, blankEdgesArray);
+  // All 9 calls below corrected 2026-07-03 to match the literal bin-count/range
+  // arguments actually passed in the SDCC file's setVariableRapMtM0BinningInfo() calls.
+  // (The SDCC file also contains an earlier loop that computes rapidity ranges via
+  // PhysMath::rapFromEtaPt into vectors like numRapBins_tpc/RapMins_tpc -- but those
+  // vectors are never actually used below; the real calls use hardcoded literals, which
+  // is what's copied here. Also note: SDCC's indices 3-8 are NOT blank/dummy like this
+  // repo's previous version -- they use real pion/kaon/proton arrays, same as 0-2.)
+  cuts->setVariableRapMtM0BinningInfo(0,31,-3.03,.07,100, pionArray,
+                                        31,-3.03,.07, 200, pionBTOFArray,
+                                        31,-3.05,.05, 100, pionETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(1,31,-3.03,.07,100, kaonArray,
+                                        31,-3.03,.07, 200, kaonBTOFArray,
+                                        31,-3.05,.05, 100, kaonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(2,31,-3.03,.07,150, protonArray,
+                                        31,-3.03,.07, 250, protonBTOFArray,
+                                        31,-3.05,.05, 125, protonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(3,31,-3.05,.05,100, pionArray,
+                                        31,-3.05,.05, 200, pionBTOFArray,
+                                        31,-3.05,.05, 100, pionETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(4,31,-3.05,.05,150, protonArray,
+                                        31,-3.05,.05, 250, protonBTOFArray,
+                                        31,-3.05,.05, 125, protonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(5,31,-3.05,.05,150, protonArray,
+                                        31,-3.05,.05, 250, protonBTOFArray,
+                                        31,-3.05,.05, 125, protonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(6,31,-3.05,.05,100, pionArray,
+                                        31,-3.05,.05, 200, pionBTOFArray,
+                                        31,-3.05,.05, 100, pionETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(7,31,-3.05,.05,100, kaonArray,
+                                        31,-3.05,.05, 200, kaonBTOFArray,
+                                        31,-3.05,.05, 100, kaonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(8,31,-3.05,.05,150, protonArray,
+                                        31,-3.05,.05, 250, protonBTOFArray,
+                                        31,-3.05,.05, 125, protonETOFArray);
 
+  // corrected 2026-07-03 to match SDCC (was 41,-2.05,2.05 / 25,-1.25,1.25 / 6,-1.65,-1.05)
   cuts->setEtaPtBinningInfo(80,0.05,2.5, //pT: n bins, low, high
-                       41,-2.05,2.05,  //eta_TPC: n bins, low, high
-                       25,-1.25,1.25,  //eta bToF: nBins, low, high
-                       6,-1.65,-1.05);  //eta eToF: nBins, low, high
+                       21,-2.05,0.05,  //eta_TPC: n bins, low, high
+                       16,-1.55,0.05,  //eta bToF: nBins, low, high
+                       7,-2.05,-1.35);  //eta eToF: nBins, low, high
 
   cuts->makeCutInformationHistogram();
 
