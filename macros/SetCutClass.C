@@ -20,12 +20,8 @@
 // "unsigned int trigs[1] = {860002}; setTriggers(1,...)" -- both the array size AND the
 // trigger ID were wrong here. Fixed below to match SDCC exactly.
 //
-// One open item NOT resolved by this pass: this file still calls setInvBetaWidth_bTOF/
-// setInvBetaWidth_eTOF (0/1/2, 0.03 and 0.015) for all three species. The SDCC file has
-// no calls to either method at all. Left in place since removing them wasn't confirmed
-// -- if CutClass has sane defaults these may be redundant/harmless, but flag this to
-// yourself and confirm with the SDCC file's actual defaults before trusting the BTOF/ETOF
-// PID width behavior matches exactly.
+// setInvBetaWidth_bTOF/eTOF calls (previously present here, absent from the SDCC file)
+// were dropped 2026-07-03 to match SDCC exactly.
 
 #include "../headers/CutClass.h"
 #include <iostream>
@@ -143,12 +139,8 @@ void SetCutClass(CutClass *cuts){
   highMassCut.push_back(0.121);
   cuts->setMassCuts(lowMassCut,highMassCut);
 
-  cuts->setInvBetaWidth_bTOF(0,0.03);
-  cuts->setInvBetaWidth_bTOF(1,0.03);
-  cuts->setInvBetaWidth_bTOF(2,0.03);
-  cuts->setInvBetaWidth_eTOF(0,0.015);
-  cuts->setInvBetaWidth_eTOF(1,0.015);
-  cuts->setInvBetaWidth_eTOF(2,0.015);
+  // Dropped 2026-07-03: setInvBetaWidth_bTOF/eTOF (0.03 / 0.015 for all three species)
+  // had no equivalent call at all in the SDCC file, so removed here to match exactly.
 
   // Corrected 2026-07-03 to match the SDCC file's line points exactly (was a different
   // set of points entirely -- {0.212698,...}/{0.276361,...} etc. -- this repo's own
