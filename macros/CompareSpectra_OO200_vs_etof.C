@@ -12,21 +12,21 @@
 // needed, so this can be run directly with no LoadZFitterLibs.C step, from any
 // directory:
 //
-//   root -l -q 'CompareSpectra_OO200_vs_etof.C(\
-//       "/Users/aliggett/data/OO/etof_compare/spectra_200GeV_2024_09_12_000_Proton_TPC_RapBin_-1_-1_-1_-1_-1_-1.root",\
-//       "/Users/aliggett/data/OO/etof_compare/spectra_200GeV_2024_09_12_000_Proton_BTOF_RapBin_-1_-1_-1_-1_-1_-1.root",\
-//       "/Users/aliggett/data/OO/etof_compare/spectra_OO200_Proton_TPC_RapBin_-1_-1_-1_-1_-1_-1.root",\
-//       "/Users/aliggett/data/OO/etof_compare/spectra_OO200_Proton_BTOF_RapBin_-1_-1_-1_-1_-1_-1.root")'
+//   root -l -q 'CompareSpectra_OO200_vs_etof.C("/Users/aliggett/data/OO/etof_compare/spectra_200GeV_2024_09_12_000_Proton_TPC_RapBin_-1_-1_-1_-1_-1_-1.root","/Users/aliggett/data/OO/etof_compare/spectra_200GeV_2024_09_12_000_Proton_BTOF_RapBin_-1_-1_-1_-1_-1_-1.root","/Users/aliggett/data/OO/etof_compare/spectra_OO200_Proton_TPC_RapBin_-1_-1_-1_-1_-1_-1.root","/Users/aliggett/data/OO/etof_compare/spectra_OO200_Proton_BTOF_RapBin_-1_-1_-1_-1_-1_-1.root")'
+//
+// (keep it all on one line -- ROOT's ACLiC arg parser chokes on line-continuation
+// backslashes inside a quoted macro invocation)
 //
 // Check the actual filenames with `ls` first -- currentDate/rap-bin fields embedded
 // in the names must match exactly what your two RunZFitter runs actually produced.
 // Pass "" for either the TPC or BTOF pair to skip that comparison.
 //
-// For every (charge, centrality) bin pair it finds in both files, this:
-//   1. numerically compares every populated 2D bin and reports the fraction outside
-//      a_relTolerance (default 5%), plus the worst single-bin deviation
-//   2. draws + saves a dN/dy-style overlay (rapidity axis, integrated over mT-m0)
-//      with a ratio panel underneath, to a_outDir
+// For every (charge, centrality) bin pair it finds in both files, this numerically
+// compares every populated 2D bin and reports the fraction outside a_relTolerance
+// (default 5%), plus the worst single-bin deviation. All of a stage's rapidity-
+// integrated ratio curves (one per charge x centrality) are then overlaid onto a
+// SINGLE combined plot per stage -- two plots total, TPC and BTOF -- rather than one
+// plot per bin.
 //
 // Ends by printing a single PASS/FAIL summary line across everything compared.
 
@@ -59,10 +59,14 @@ TH2D* getHisto2D(TFile* f, string a_dirPath, string a_histoName){
   return h;
 }
 
-// Compares one pair of same-named 2D histograms bin-by-bin, prints a numeric
-// summary, and saves a 1D rapidity-projection overlay+ratio plot. Returns true if
-// every populated bin agreed within a_relTolerance.
-bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_relTolerance, string a_outDir){
+// Compares one pair of same-named 2D histograms bin-by-bin and prints a numeric
+// summary. On success, fills a_outRatio with the rapidity-integrated (summed over
+// mT-m0) ratio histogram (etof/OO200) for the caller to collect and overlay later;
+// leaves it null if there was nothing to compare. Returns true if every populated
+// bin agreed within a_relTolerance.
+bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_relTolerance, TH1D*& a_outRatio){
+  a_outRatio = nullptr;
+
   if(!a_hEtof || !a_hOO200){
     cout << "  SKIP (missing on one side): " << a_label << endl;
     return true; // don't fail the whole run over a bin/charge that wasn't fit
@@ -112,8 +116,9 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
     return true;
   }
 
-  double meanRatio = sumRatio / (nComparedBins - nOneSidedBins > 0 ? nComparedBins - nOneSidedBins : 1);
-  double rmsRatio  = sqrt(max(0.0, sumRatio2/(nComparedBins - nOneSidedBins > 0 ? nComparedBins - nOneSidedBins : 1) - meanRatio*meanRatio));
+  int nTwoSidedBins = nComparedBins - nOneSidedBins;
+  double meanRatio = sumRatio / (nTwoSidedBins > 0 ? nTwoSidedBins : 1);
+  double rmsRatio  = sqrt(max(0.0, sumRatio2/(nTwoSidedBins > 0 ? nTwoSidedBins : 1) - meanRatio*meanRatio));
 
   bool pass = (nBadBins == 0);
 
@@ -124,59 +129,20 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
        << ", worst bin (" << worstX << "," << worstY << ") dev=" << worstDev
        << "  -> " << (pass ? "PASS" : "FAIL") << endl;
 
-  // dN/dy-style overlay: project onto rapidity axis (sum over mT-m0), plus ratio panel
+  // rapidity-integrated (summed over mT-m0) ratio, to be overlaid with the other
+  // bins for this stage on one combined plot
   TH1D* pEtof  = a_hEtof->ProjectionX(Form("px_etof_%s",  a_label.c_str()));
   TH1D* pOO200 = a_hOO200->ProjectionX(Form("px_oo200_%s", a_label.c_str()));
-
-  TCanvas* c = new TCanvas(Form("c_%s", a_label.c_str()), a_label.c_str(), 900, 800);
-  TPad* padTop = new TPad(Form("padTop_%s",a_label.c_str()),"",0,0.3,1,1);
-  TPad* padBot = new TPad(Form("padBot_%s",a_label.c_str()),"",0,0,1,0.3);
-  padTop->SetBottomMargin(0.02);
-  padBot->SetTopMargin(0.02);
-  padBot->SetBottomMargin(0.3);
-  padTop->Draw();
-  padBot->Draw();
-
-  padTop->cd();
-  pEtof->SetLineColor(kBlack);
-  pEtof->SetMarkerColor(kBlack);
-  pEtof->SetMarkerStyle(20);
-  pEtof->SetTitle(Form("%s  (rapidity-integrated yield)", a_label.c_str()));
-  pEtof->GetXaxis()->SetLabelSize(0);
-  pEtof->Draw("P");
-  pOO200->SetLineColor(kRed);
-  pOO200->SetMarkerColor(kRed);
-  pOO200->SetMarkerStyle(24);
-  pOO200->Draw("P SAME");
-  TLegend* leg = new TLegend(0.65,0.7,0.88,0.88);
-  leg->AddEntry(pEtof,  "etof repo",  "p");
-  leg->AddEntry(pOO200, "OO200 repo", "p");
-  leg->Draw();
-
-  padBot->cd();
   TH1D* pRatio = (TH1D*) pEtof->Clone(Form("ratio1D_%s", a_label.c_str()));
   pRatio->Divide(pOO200);
-  pRatio->SetTitle("");
-  pRatio->GetYaxis()->SetTitle("etof / OO200");
-  pRatio->GetYaxis()->SetRangeUser(0.5,1.5);
-  pRatio->GetYaxis()->SetLabelSize(0.09);
-  pRatio->GetYaxis()->SetTitleSize(0.1);
-  pRatio->GetYaxis()->SetTitleOffset(0.4);
-  pRatio->GetXaxis()->SetLabelSize(0.09);
-  pRatio->GetXaxis()->SetTitleSize(0.1);
-  pRatio->SetLineColor(kBlue);
-  pRatio->SetMarkerColor(kBlue);
-  pRatio->SetMarkerStyle(21);
-  pRatio->Draw("P");
-  TLine* line = new TLine(pRatio->GetXaxis()->GetXmin(),1,pRatio->GetXaxis()->GetXmax(),1);
-  line->SetLineStyle(2);
-  line->Draw();
-
-  gSystem->mkdir(a_outDir.c_str(), true);
-  c->SaveAs(Form("%s/compare_%s.png", a_outDir.c_str(), a_label.c_str()));
+  pRatio->SetDirectory(0);
+  a_outRatio = pRatio;
 
   return pass;
 }
+
+// Colors/markers for up to 10 (charge x centrality) combinations on one combined plot
+int stylePalette[10] = {kBlack, kRed, kBlue, kGreen+2, kMagenta+1, kOrange+7, kCyan+2, kViolet+1, kAzure+2, kSpring+4};
 
 void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_histoPrefix,
               string a_fitDataDirName, string a_particleName, vector<int> a_centralities,
@@ -187,16 +153,61 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
   string dirPath = Form("%s/%s", a_fitDataDirName.c_str(), a_particleName.c_str());
   vector<string> charges = {"Plus","Minus"};
 
+  vector<TH1D*> ratios;
+  vector<string> ratioLabels;
+
   for(auto& charge : charges){
     for(int cent : a_centralities){
       string histoName = Form("%s_%s%s_Cent%02d", a_histoPrefix.c_str(), a_particleName.c_str(), charge.c_str(), cent);
       TH2D* hEtof  = getHisto2D(a_fEtof,  dirPath, histoName);
       TH2D* hOO200 = getHisto2D(a_fOO200, dirPath, histoName);
       string label = Form("%s_%s_%s_Cent%02d", a_stageLabel.c_str(), a_particleName.c_str(), charge.c_str(), cent);
-      bool pass = compareOneHisto(hEtof, hOO200, label, a_relTolerance, a_outDir + "/" + a_stageLabel + "/");
+
+      TH1D* ratio = nullptr;
+      bool pass = compareOneHisto(hEtof, hOO200, label, a_relTolerance, ratio);
       if(!pass) a_allPass = false;
+
+      if(ratio){
+        ratios.push_back(ratio);
+        ratioLabels.push_back(Form("%s %s", charge.c_str(), Form("Cent%02d", cent)));
+      }
     }
   }
+
+  if(ratios.empty()){
+    cout << "  (nothing to plot for " << a_stageLabel << ")" << endl;
+    return;
+  }
+
+  gSystem->mkdir(a_outDir.c_str(), true);
+
+  TCanvas* c = new TCanvas(Form("c_%s_combined", a_stageLabel.c_str()),
+                            Form("%s ratio summary", a_stageLabel.c_str()), 900, 700);
+  c->SetGridy();
+
+  double yMin = 0.5, yMax = 1.5;
+  ratios[0]->SetTitle(Form("%s: etof / OO200  (%s, all charges/centralities)", a_stageLabel.c_str(), a_particleName.c_str()));
+  ratios[0]->GetYaxis()->SetTitle("etof / OO200");
+  ratios[0]->GetYaxis()->SetRangeUser(yMin, yMax);
+
+  TLegend* leg = new TLegend(0.72, 0.15, 0.97, 0.9);
+  leg->SetTextSize(0.025);
+
+  for(size_t i = 0; i < ratios.size(); i++){
+    int color = stylePalette[i % 10];
+    ratios[i]->SetLineColor(color);
+    ratios[i]->SetMarkerColor(color);
+    ratios[i]->SetMarkerStyle(20 + (i / 10)); // cycle marker shape if ever >10 curves
+    ratios[i]->Draw(i == 0 ? "P" : "P SAME");
+    leg->AddEntry(ratios[i], ratioLabels[i].c_str(), "p");
+  }
+
+  TLine* line = new TLine(ratios[0]->GetXaxis()->GetXmin(), 1, ratios[0]->GetXaxis()->GetXmax(), 1);
+  line->SetLineStyle(2);
+  line->Draw();
+  leg->Draw();
+
+  c->SaveAs(Form("%s/%s_ratio_summary.png", a_outDir.c_str(), a_stageLabel.c_str()));
 }
 
 void CompareSpectra_OO200_vs_etof(
@@ -230,5 +241,7 @@ void CompareSpectra_OO200_vs_etof(
   cout << endl << "=================================================" << endl;
   cout << (allPass ? "ALL COMPARISONS PASSED within tolerance." : "SOME COMPARISONS FAILED -- see FAIL/MISSING/MISMATCH lines above.") << endl;
   cout << "Plots written to: " << a_outDir << endl;
+  cout << "  " << a_outDir << "/TPC_ratio_summary.png" << endl;
+  cout << "  " << a_outDir << "/BTOF_ratio_summary.png" << endl;
   cout << "=================================================" << endl;
 }
