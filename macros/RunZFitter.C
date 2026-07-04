@@ -420,7 +420,16 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   for(int iii = 0; iii < 9; iii++) loaded[iii] = false;
 
   if(!a_useQuickLoad){
-    if(a_pionYieldFile != ""){
+    // Guard added 2026-07: if you only have a Proton yields file, a_pionYieldFile
+    // still has to be set to that same file (dual-purposed) just so
+    // loadBasicDataHistograms() above -- which reads species-agnostic shared
+    // histograms and always uses whatever's in a_pionYieldFile -- has a valid file to
+    // open. But a per-species PicoBinner output only has centEvents<ThatSpecies>
+    // (e.g. centEventsProton, not centEventsPion), so calling
+    // loadDataHistograms(file,0/*Pion*/,...) on a Proton-only file segfaults
+    // (null histogram -> reBinVar3D). Skip the Pion species load in that case.
+    // (Hit and fixed identically in the original repo's RunZFitter_Collider.C.)
+    if(a_pionYieldFile != "" && a_pionYieldFile != a_protonYieldFile){
       fitter->loadDataHistograms(a_pionYieldFile,0,nCentToRun,rapidityRebin,mTm0Rebin_byParticle[0],1,1,convert16to9,combine5and10Cent,false,1,dynamicRebinInfo_Plus,dynamicRebinInfo_Minus);
       loaded[0] = true;
     }
