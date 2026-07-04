@@ -99,7 +99,7 @@
        The local (macOS) build of submodule/PicoDstReader_SL24y produces this pcm
        sidecar alongside StPicoDst_Dict.C/.h, but SDCC's ROOT/rootcling (via
        `starver SL24y`) does not generate one at all when building the same
-       submodule there -- confirmed empirically (ls of a real SDCC build directory
+       submodule there; confirmed empirically (ls of a real SDCC build directory
        showed every .o file plus StPicoDst_Dict.C/.h, but no _rdict.pcm), and
        confirmed unnecessary by checking lightflavorspectra_etof's own real, working
        production job (runPicoBinner_27GeV2018.xml), which packages only
