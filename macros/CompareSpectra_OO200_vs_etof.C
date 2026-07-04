@@ -21,28 +21,32 @@
 // in the names must match exactly what your two RunZFitter runs actually produced.
 // Pass "" for either the TPC or BTOF pair to skip that comparison.
 //
-// For every (charge, centrality) bin pair it finds in both files, this numerically
-// compares every populated 2D bin and reports the fraction outside a_relTolerance
-// (default 5%), plus the worst single-bin deviation. All of a stage's rapidity-
-// integrated ratio curves (one per charge x centrality) are then overlaid onto a
-// SINGLE combined plot per stage -- two plots total, TPC and BTOF -- rather than one
-// plot per bin.
+// NOTE ON WHAT'S PLOTTED: both runs were done with combineImageDirectories=true and
+// all a_rapBin_* args left at -1 ("AllRap" mode), meaning rapidity was NOT split into
+// differential bins -- every populated 2D (rapidity x mT-m0) bin collapses onto a
+// SINGLE rapidity slice. So there is no real rapidity axis to plot a curve against;
+// the only real degree of freedom across these runs is centrality. This plots, per
+// stage (TPC, BTOF), one point per (charge, centrality) -- 2 x 5 = 10 points -- at
+// x=centrality bin, y=etof/OO200 (mean ratio across that bin's populated 2D cells),
+// with the RMS-based spread as the error bar. Two plots total.
 //
 // Ends by printing a single PASS/FAIL summary line across everything compared.
 
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TH2D.h"
-#include "TH1D.h"
+#include "TGraphErrors.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "TMultiGraph.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 using namespace std;
 
 TH2D* getHisto2D(TFile* f, string a_dirPath, string a_histoName){
@@ -60,16 +64,17 @@ TH2D* getHisto2D(TFile* f, string a_dirPath, string a_histoName){
 }
 
 // Compares one pair of same-named 2D histograms bin-by-bin and prints a numeric
-// summary. On success, fills a_outRatio with the rapidity-integrated (summed over
-// mT-m0) ratio histogram (etof/OO200) for the caller to collect and overlay later;
-// leaves it null if there was nothing to compare. Returns true if every populated
-// bin agreed within a_relTolerance.
-bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_relTolerance, TH1D*& a_outRatio){
-  a_outRatio = nullptr;
+// summary. Fills a_outMeanRatio/a_outMeanRatioErr (standard error of the mean, across
+// all populated 2D bins) for the caller to turn into one plotted point; returns false
+// if there was nothing usable to compare (missing histos, binning mismatch, or no
+// populated bins), true otherwise (including a real PASS/FAIL verdict via a_outPass).
+bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_relTolerance,
+                     double& a_outMeanRatio, double& a_outMeanRatioErr, bool& a_outPass){
+  a_outPass = true;
 
   if(!a_hEtof || !a_hOO200){
     cout << "  SKIP (missing on one side): " << a_label << endl;
-    return true; // don't fail the whole run over a bin/charge that wasn't fit
+    return false;
   }
 
   int nx = a_hEtof->GetNbinsX();
@@ -78,11 +83,12 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
     cout << "  [BINNING MISMATCH] " << a_label << ": etof(" << nx << "x" << ny
          << ") vs OO200(" << a_hOO200->GetNbinsX() << "x" << a_hOO200->GetNbinsY()
          << ") -- can't compare bin-by-bin, check SetCutClass binning matches" << endl;
+    a_outPass = false;
     return false;
   }
 
   int nComparedBins = 0, nBadBins = 0, nOneSidedBins = 0;
-  double worstDev = 0;
+  double worstDev = -1;
   int worstX = -1, worstY = -1;
   double sumRatio = 0, sumRatio2 = 0;
 
@@ -113,36 +119,28 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
 
   if(nComparedBins == 0){
     cout << "  " << a_label << ": no populated bins in either file -- nothing to compare" << endl;
-    return true;
+    return false;
   }
 
   int nTwoSidedBins = nComparedBins - nOneSidedBins;
   double meanRatio = sumRatio / (nTwoSidedBins > 0 ? nTwoSidedBins : 1);
   double rmsRatio  = sqrt(max(0.0, sumRatio2/(nTwoSidedBins > 0 ? nTwoSidedBins : 1) - meanRatio*meanRatio));
+  double semRatio  = rmsRatio / sqrt((double) max(1, nTwoSidedBins));
 
   bool pass = (nBadBins == 0);
+  a_outPass = pass;
 
   cout << "  " << a_label << ": " << nComparedBins << " populated bins, "
        << nOneSidedBins << " one-sided-only, "
        << nBadBins << " outside " << (a_relTolerance*100) << "% tol, "
        << "mean ratio=" << meanRatio << ", RMS=" << rmsRatio
-       << ", worst bin (" << worstX << "," << worstY << ") dev=" << worstDev
+       << ", worst bin (" << worstX << "," << worstY << ") dev=" << (worstDev < 0 ? 0 : worstDev)
        << "  -> " << (pass ? "PASS" : "FAIL") << endl;
 
-  // rapidity-integrated (summed over mT-m0) ratio, to be overlaid with the other
-  // bins for this stage on one combined plot
-  TH1D* pEtof  = a_hEtof->ProjectionX(Form("px_etof_%s",  a_label.c_str()));
-  TH1D* pOO200 = a_hOO200->ProjectionX(Form("px_oo200_%s", a_label.c_str()));
-  TH1D* pRatio = (TH1D*) pEtof->Clone(Form("ratio1D_%s", a_label.c_str()));
-  pRatio->Divide(pOO200);
-  pRatio->SetDirectory(0);
-  a_outRatio = pRatio;
-
-  return pass;
+  a_outMeanRatio    = meanRatio;
+  a_outMeanRatioErr = semRatio;
+  return true;
 }
-
-// Colors/markers for up to 10 (charge x centrality) combinations on one combined plot
-int stylePalette[10] = {kBlack, kRed, kBlue, kGreen+2, kMagenta+1, kOrange+7, kCyan+2, kViolet+1, kAzure+2, kSpring+4};
 
 void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_histoPrefix,
               string a_fitDataDirName, string a_particleName, vector<int> a_centralities,
@@ -152,29 +150,46 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
   cout << "=== " << a_stageLabel << " spectra (" << a_particleName << ") ===" << endl;
   string dirPath = Form("%s/%s", a_fitDataDirName.c_str(), a_particleName.c_str());
   vector<string> charges = {"Plus","Minus"};
+  int chargeColors[2] = {kRed, kBlue};
+  int chargeMarkers[2] = {20, 21}; // filled circle, filled square
+  double chargeXOffset[2] = {-0.08, 0.08}; // nudge apart so same-centrality points don't overlap
 
-  vector<TH1D*> ratios;
-  vector<string> ratioLabels;
+  vector<TGraphErrors*> graphs;
 
-  for(auto& charge : charges){
+  for(int chargeIdx = 0; chargeIdx < (int) charges.size(); chargeIdx++){
+    string charge = charges[chargeIdx];
+    vector<double> xVals, yVals, yErrs;
+
     for(int cent : a_centralities){
       string histoName = Form("%s_%s%s_Cent%02d", a_histoPrefix.c_str(), a_particleName.c_str(), charge.c_str(), cent);
       TH2D* hEtof  = getHisto2D(a_fEtof,  dirPath, histoName);
       TH2D* hOO200 = getHisto2D(a_fOO200, dirPath, histoName);
       string label = Form("%s_%s_%s_Cent%02d", a_stageLabel.c_str(), a_particleName.c_str(), charge.c_str(), cent);
 
-      TH1D* ratio = nullptr;
-      bool pass = compareOneHisto(hEtof, hOO200, label, a_relTolerance, ratio);
+      double meanRatio = 0, meanRatioErr = 0;
+      bool havePoint = false, pass = true;
+      havePoint = compareOneHisto(hEtof, hOO200, label, a_relTolerance, meanRatio, meanRatioErr, pass);
       if(!pass) a_allPass = false;
 
-      if(ratio){
-        ratios.push_back(ratio);
-        ratioLabels.push_back(Form("%s %s", charge.c_str(), Form("Cent%02d", cent)));
+      if(havePoint){
+        xVals.push_back(cent + chargeXOffset[chargeIdx]);
+        yVals.push_back(meanRatio);
+        yErrs.push_back(meanRatioErr);
       }
+    }
+
+    if(!xVals.empty()){
+      TGraphErrors* g = new TGraphErrors((int) xVals.size(), xVals.data(), yVals.data(), nullptr, yErrs.data());
+      g->SetName(Form("g_%s_%s", a_stageLabel.c_str(), charge.c_str()));
+      g->SetLineColor(chargeColors[chargeIdx]);
+      g->SetMarkerColor(chargeColors[chargeIdx]);
+      g->SetMarkerStyle(chargeMarkers[chargeIdx]);
+      g->SetMarkerSize(1.8);
+      graphs.push_back(g);
     }
   }
 
-  if(ratios.empty()){
+  if(graphs.empty()){
     cout << "  (nothing to plot for " << a_stageLabel << ")" << endl;
     return;
   }
@@ -185,47 +200,23 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
                             Form("%s ratio summary", a_stageLabel.c_str()), 900, 700);
   c->SetGridy();
 
-  double yMin = 0.5, yMax = 1.5;
+  TMultiGraph* mg = new TMultiGraph();
+  mg->SetTitle(Form("%s: etof / OO200 (%s);Centrality bin;etof / OO200", a_stageLabel.c_str(), a_particleName.c_str()));
 
-  // The rapidity axis is the full ~31-bin SetCutClass binning, but only a narrow
-  // slice of it actually has real yield (the rest is empty/clipped, since a ratio
-  // of 0/0 falls outside [yMin,yMax]). Auto-zoom the x-axis to just the populated
-  // range (padded by 1 bin) across ALL curves, so the real points fill the plot
-  // instead of hiding as a tiny cluster in a mostly-blank frame.
-  int firstPopulatedBin = -1, lastPopulatedBin = -1;
-  for(auto* r : ratios){
-    for(int ix = 1; ix <= r->GetNbinsX(); ix++){
-      if(r->GetBinContent(ix) != 0){
-        if(firstPopulatedBin == -1 || ix < firstPopulatedBin) firstPopulatedBin = ix;
-        if(ix > lastPopulatedBin) lastPopulatedBin = ix;
-      }
-    }
-  }
-  if(firstPopulatedBin != -1){
-    int loBin = max(1, firstPopulatedBin - 1);
-    int hiBin = min(ratios[0]->GetNbinsX(), lastPopulatedBin + 1);
-    ratios[0]->GetXaxis()->SetRange(loBin, hiBin);
+  TLegend* leg = new TLegend(0.72, 0.78, 0.97, 0.9);
+  vector<string> chargeLabels = {"Proton+", "Proton-"};
+  for(size_t i = 0; i < graphs.size(); i++){
+    mg->Add(graphs[i], "P");
+    leg->AddEntry(graphs[i], chargeLabels[i].c_str(), "p");
   }
 
-  ratios[0]->SetTitle(Form("%s: etof / OO200  (%s, all charges/centralities)", a_stageLabel.c_str(), a_particleName.c_str()));
-  ratios[0]->GetYaxis()->SetTitle("etof / OO200");
-  ratios[0]->GetYaxis()->SetRangeUser(yMin, yMax);
+  mg->Draw("A");
+  mg->GetYaxis()->SetRangeUser(0.5, 1.5);
+  mg->GetXaxis()->SetLimits(-0.5, (double) *max_element(a_centralities.begin(), a_centralities.end()) + 0.5);
+  gPad->Modified();
+  gPad->Update();
 
-  TLegend* leg = new TLegend(0.72, 0.15, 0.97, 0.9);
-  leg->SetTextSize(0.025);
-
-  for(size_t i = 0; i < ratios.size(); i++){
-    int color = stylePalette[i % 10];
-    ratios[i]->SetLineColor(color);
-    ratios[i]->SetMarkerColor(color);
-    ratios[i]->SetMarkerStyle(20 + (i / 10)); // cycle marker shape if ever >10 curves
-    ratios[i]->SetMarkerSize(1.6);
-    ratios[i]->Draw(i == 0 ? "PE" : "PE SAME");
-    leg->AddEntry(ratios[i], ratioLabels[i].c_str(), "p");
-  }
-
-  TLine* line = new TLine(ratios[0]->GetXaxis()->GetBinLowEdge(ratios[0]->GetXaxis()->GetFirst()), 1,
-                           ratios[0]->GetXaxis()->GetBinUpEdge(ratios[0]->GetXaxis()->GetLast()), 1);
+  TLine* line = new TLine(mg->GetXaxis()->GetXmin(), 1, mg->GetXaxis()->GetXmax(), 1);
   line->SetLineStyle(2);
   line->Draw();
   leg->Draw();
