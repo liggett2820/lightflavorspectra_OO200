@@ -70,7 +70,7 @@
 
   <!-- 2026-07-04: <File> paths switched from relative ("file:./...") to fully
        absolute. Relative paths turned out to be resolved by star-submit against
-       whatever directory it's invoked from -- when run from xml/ instead of the repo
+       whatever directory it's invoked from; when run from xml/ instead of the repo
        root, every single relative path silently failed to resolve, producing a
        SandBox zip with only empty directory entries and zero actual file content
        (confirmed via `unzip -l`: 8 entries, all 0 bytes). Absolute paths make this
@@ -91,7 +91,7 @@
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/LoadPicoBinnerLibs.C</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
       <!-- Needed so Cling knows CutClass/CalibrationClass's declared interface when
-           interpreting RunPicoBinner.C -- the .so files only provide the compiled
+           interpreting RunPicoBinner.C; the .so files only provide the compiled
            implementation, not the declarations the interpreter needs at parse time
            (same reasoning as LoadZFitterLibs.C's equivalent comment). Added 2026-07:
            these were missing entirely before, causing "cannot open file
