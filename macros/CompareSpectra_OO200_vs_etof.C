@@ -199,7 +199,7 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
     ratios[i]->SetMarkerColor(color);
     ratios[i]->SetMarkerStyle(20 + (i / 10)); // cycle marker shape if ever >10 curves
     ratios[i]->SetMarkerSize(1.6);
-    ratios[i]->Draw(i == 0 ? "P" : "P SAME");
+    ratios[i]->Draw(i == 0 ? "PE" : "PE SAME");
     leg->AddEntry(ratios[i], ratioLabels[i].c_str(), "p");
   }
 
