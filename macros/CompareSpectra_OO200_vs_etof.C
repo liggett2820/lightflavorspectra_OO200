@@ -186,6 +186,27 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
   c->SetGridy();
 
   double yMin = 0.5, yMax = 1.5;
+
+  // The rapidity axis is the full ~31-bin SetCutClass binning, but only a narrow
+  // slice of it actually has real yield (the rest is empty/clipped, since a ratio
+  // of 0/0 falls outside [yMin,yMax]). Auto-zoom the x-axis to just the populated
+  // range (padded by 1 bin) across ALL curves, so the real points fill the plot
+  // instead of hiding as a tiny cluster in a mostly-blank frame.
+  int firstPopulatedBin = -1, lastPopulatedBin = -1;
+  for(auto* r : ratios){
+    for(int ix = 1; ix <= r->GetNbinsX(); ix++){
+      if(r->GetBinContent(ix) != 0){
+        if(firstPopulatedBin == -1 || ix < firstPopulatedBin) firstPopulatedBin = ix;
+        if(ix > lastPopulatedBin) lastPopulatedBin = ix;
+      }
+    }
+  }
+  if(firstPopulatedBin != -1){
+    int loBin = max(1, firstPopulatedBin - 1);
+    int hiBin = min(ratios[0]->GetNbinsX(), lastPopulatedBin + 1);
+    ratios[0]->GetXaxis()->SetRange(loBin, hiBin);
+  }
+
   ratios[0]->SetTitle(Form("%s: etof / OO200  (%s, all charges/centralities)", a_stageLabel.c_str(), a_particleName.c_str()));
   ratios[0]->GetYaxis()->SetTitle("etof / OO200");
   ratios[0]->GetYaxis()->SetRangeUser(yMin, yMax);
@@ -203,7 +224,8 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
     leg->AddEntry(ratios[i], ratioLabels[i].c_str(), "p");
   }
 
-  TLine* line = new TLine(ratios[0]->GetXaxis()->GetXmin(), 1, ratios[0]->GetXaxis()->GetXmax(), 1);
+  TLine* line = new TLine(ratios[0]->GetXaxis()->GetBinLowEdge(ratios[0]->GetXaxis()->GetFirst()), 1,
+                           ratios[0]->GetXaxis()->GetBinUpEdge(ratios[0]->GetXaxis()->GetLast()), 1);
   line->SetLineStyle(2);
   line->Draw();
   leg->Draw();
