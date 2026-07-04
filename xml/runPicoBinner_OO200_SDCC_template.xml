@@ -93,7 +93,17 @@
        <File> lines inside <Package>, and every File entry right after it was
        missing from the packaged zip, even though the files themselves existed on
        disk with normal permissions). Keep all explanatory comments outside
-       <SandBox> entirely. -->
+       <SandBox> entirely.
+
+       2026-07-04: removed bin/StPicoDst_Dict_rdict.pcm from the file list below.
+       The local (macOS) build of submodule/PicoDstReader_SL24y produces this pcm
+       sidecar alongside StPicoDst_Dict.C/.h, but SDCC's ROOT/rootcling (via
+       `starver SL24y`) does not generate one at all when building the same
+       submodule there -- confirmed empirically (ls of a real SDCC build directory
+       showed every .o file plus StPicoDst_Dict.C/.h, but no _rdict.pcm), and
+       confirmed unnecessary by checking lightflavorspectra_etof's own real, working
+       production job (runPicoBinner_27GeV2018.xml), which packages only
+       libStPicoDst.so and never references a .pcm file at all. -->
   <SandBox installer="ZIP">
     <Package name="PicoBinner_OO200">
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/makefile_toggles.h</File>
@@ -104,7 +114,6 @@
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/PicoBinner_cxx.so</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/SetCutClass_C.so</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/libStPicoDst.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/StPicoDst_Dict_rdict.pcm</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/RunPicoBinner.C</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/LoadPicoBinnerLibs.C</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
