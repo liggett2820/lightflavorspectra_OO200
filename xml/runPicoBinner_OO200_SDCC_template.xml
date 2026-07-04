@@ -68,21 +68,40 @@
   </ResourceUsage>
   -->
 
+  <!-- 2026-07-04: <File> paths switched from relative ("file:./...") to fully
+       absolute. Relative paths turned out to be resolved by star-submit against
+       whatever directory it's invoked from -- when run from xml/ instead of the repo
+       root, every single relative path silently failed to resolve, producing a
+       SandBox zip with only empty directory entries and zero actual file content
+       (confirmed via `unzip -l`: 8 entries, all 0 bytes). Absolute paths make this
+       submittable from any directory. If someone else runs this, update every
+       /star/u/liggett2820/lightflavorspectra_OO200 path below to their own checkout. -->
   <SandBox installer="ZIP">
     <Package name="PicoBinner_OO200">
-      <File>file:./makefile_toggles.h</File>
-      <File>file:./bin/namespaces_cxx.so</File>
-      <File>file:./bin/ParticleInfo_cxx.so</File>
-      <File>file:./bin/CalibrationClass_cxx.so</File>
-      <File>file:./bin/CutClass_cxx.so</File>
-      <File>file:./bin/PicoBinner_cxx.so</File>
-      <File>file:./bin/SetCutClass_C.so</File>
-      <File>file:./bin/libStPicoDst.so</File>
-      <File>file:./bin/StPicoDst_Dict_rdict.pcm</File>
-      <File>file:./macros/RunPicoBinner.C</File>
-      <File>file:./macros/LoadPicoBinnerLibs.C</File>
-      <File>file:./submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
-      <File>file:./scripts/run_picobinner_sdcc.bash</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/makefile_toggles.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/namespaces_cxx.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/ParticleInfo_cxx.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/CalibrationClass_cxx.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/CutClass_cxx.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/PicoBinner_cxx.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/SetCutClass_C.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/libStPicoDst.so</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/StPicoDst_Dict_rdict.pcm</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/RunPicoBinner.C</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/LoadPicoBinnerLibs.C</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
+      <!-- Needed so Cling knows CutClass/CalibrationClass's declared interface when
+           interpreting RunPicoBinner.C -- the .so files only provide the compiled
+           implementation, not the declarations the interpreter needs at parse time
+           (same reasoning as LoadZFitterLibs.C's equivalent comment). Added 2026-07:
+           these were missing entirely before, causing "cannot open file
+           ../headers/CutClass.h" at RunPicoBinner.C's own #include line. -->
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CutClass.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CalibrationClass.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/HistogramUtilities.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/PhysMath.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/ParticleInfo/ParticleInfo.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts/run_picobinner_sdcc.bash</File>
     </Package>
   </SandBox>
 
