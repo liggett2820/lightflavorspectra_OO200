@@ -68,61 +68,47 @@
   </ResourceUsage>
   -->
 
-  <!-- 2026-07-04: <File> paths switched from relative ("file:./...") to fully
-       absolute. Relative paths turned out to be resolved by star-submit against
-       whatever directory it's invoked from; when run from xml/ instead of the repo
-       root, every single relative path silently failed to resolve, producing a
-       SandBox zip with only empty directory entries and zero actual file content
-       (confirmed via `unzip -l`: 8 entries, all 0 bytes). Absolute paths make this
-       submittable from any directory. If someone else runs this, update every
+  <!-- 2026-07-04: rewritten to package whole DIRECTORIES rather than an
+       individually-enumerated <File> list, matching the pattern
+       lightflavorspectra_etof's own real, working production job
+       (runPicoBinner_27GeV2018.xml) actually uses. The per-file approach hit two
+       separate, serious bugs in a row:
+         1. Relative "file:./..." paths are resolved by star-submit against
+            whatever directory it's invoked from, not the XML's own location or the
+            repo root reliably; submitting from xml/ instead of the repo root
+            silently produced a SandBox zip with only empty directory entries and
+            zero actual file content (confirmed via `unzip -l`: all entries 0 bytes).
+         2. Switching individual <File> entries to absolute paths fixed that, but
+            absolute paths get flattened to their basename in the packaged zip;
+            confirmed via `unzip -l` showing every file present with real, correct
+            sizes, but with NO bin/, headers/, macros/, scripts/, submodule/
+            subdirectories at all, breaking the <command> block's `cd scripts`,
+            `ls bin`, and nested `cp` calls.
+       Packaging whole directories (as below) sidesteps both problems: a directory
+       entry preserves its own internal structure when zipped regardless of whether
+       the top-level path given is absolute or relative, so this uses absolute paths
+       (immune to invocation-directory ambiguity) while still producing the correct
+       nested layout. If someone else runs this, update every
        /star/u/liggett2820/lightflavorspectra_OO200 path below to their own checkout.
 
-       Also added: headers/CutClass.h, headers/CalibrationClass.h,
-       headers/HistogramUtilities.h, headers/PhysMath.h, and
-       submodule/ParticleInfo/ParticleInfo/ParticleInfo.h. These are needed so Cling
-       knows CutClass/CalibrationClass's declared interface when interpreting
-       RunPicoBinner.C; the .so files only provide the compiled implementation, not
-       the declarations the interpreter needs at parse time (same reasoning as
-       LoadZFitterLibs.C's equivalent comment). Without them, RunPicoBinner.C's own
-       #include line fails with "cannot open file ../headers/CutClass.h".
-
-       IMPORTANT: do not put a comment INSIDE <Package>...</Package> between <File>
-       entries. star-submit's SandBox packager appears to silently drop whatever
-       <File> entries immediately follow an embedded comment (confirmed empirically:
-       an earlier version of this file had the paragraph above placed between two
-       <File> lines inside <Package>, and every File entry right after it was
-       missing from the packaged zip, even though the files themselves existed on
-       disk with normal permissions). Keep all explanatory comments outside
-       <SandBox> entirely.
-
-       2026-07-04: removed bin/StPicoDst_Dict_rdict.pcm from the file list below.
-       The local (macOS) build of submodule/PicoDstReader_SL24y produces this pcm
-       sidecar alongside StPicoDst_Dict.C/.h, but SDCC's ROOT/rootcling (via
-       `starver SL24y`) does not generate one at all when building the same
-       submodule there; confirmed empirically (ls of a real SDCC build directory
-       showed every .o file plus StPicoDst_Dict.C/.h, but no _rdict.pcm), and
-       confirmed unnecessary by checking lightflavorspectra_etof's own real, working
-       production job (runPicoBinner_27GeV2018.xml), which packages only
-       libStPicoDst.so and never references a .pcm file at all. -->
+       Note bin/StPicoDst_Dict_rdict.pcm: the local (macOS) build of
+       submodule/PicoDstReader_SL24y produces this pcm sidecar, but SDCC's
+       ROOT/rootcling (via `starver SL24y`) does not generate one at all when
+       building the same submodule there (confirmed via a real SDCC build directory
+       listing: every .o file plus StPicoDst_Dict.C/.h present, no pcm); and it's
+       not needed there either, confirmed by etof's own job above, which packages
+       only libStPicoDst.so and never references a .pcm file. Packaging the whole
+       bin/ directory here is harmless either way: if the pcm exists locally it gets
+       included, if not (as on a fresh SDCC build) nothing breaks. -->
   <SandBox installer="ZIP">
     <Package name="PicoBinner_OO200">
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/makefile_toggles.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/namespaces_cxx.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/ParticleInfo_cxx.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/CalibrationClass_cxx.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/CutClass_cxx.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/PicoBinner_cxx.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/SetCutClass_C.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin/libStPicoDst.so</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/RunPicoBinner.C</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/LoadPicoBinnerLibs.C</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CutClass.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CalibrationClass.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/HistogramUtilities.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/PhysMath.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/ParticleInfo/ParticleInfo.h</File>
-      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts/run_picobinner_sdcc.bash</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/source</File>
     </Package>
   </SandBox>
 
