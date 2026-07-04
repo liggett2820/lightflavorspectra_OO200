@@ -75,7 +75,25 @@
        SandBox zip with only empty directory entries and zero actual file content
        (confirmed via `unzip -l`: 8 entries, all 0 bytes). Absolute paths make this
        submittable from any directory. If someone else runs this, update every
-       /star/u/liggett2820/lightflavorspectra_OO200 path below to their own checkout. -->
+       /star/u/liggett2820/lightflavorspectra_OO200 path below to their own checkout.
+
+       Also added: headers/CutClass.h, headers/CalibrationClass.h,
+       headers/HistogramUtilities.h, headers/PhysMath.h, and
+       submodule/ParticleInfo/ParticleInfo/ParticleInfo.h. These are needed so Cling
+       knows CutClass/CalibrationClass's declared interface when interpreting
+       RunPicoBinner.C; the .so files only provide the compiled implementation, not
+       the declarations the interpreter needs at parse time (same reasoning as
+       LoadZFitterLibs.C's equivalent comment). Without them, RunPicoBinner.C's own
+       #include line fails with "cannot open file ../headers/CutClass.h".
+
+       IMPORTANT: do not put a comment INSIDE <Package>...</Package> between <File>
+       entries. star-submit's SandBox packager appears to silently drop whatever
+       <File> entries immediately follow an embedded comment (confirmed empirically:
+       an earlier version of this file had the paragraph above placed between two
+       <File> lines inside <Package>, and every File entry right after it was
+       missing from the packaged zip, even though the files themselves existed on
+       disk with normal permissions). Keep all explanatory comments outside
+       <SandBox> entirely. -->
   <SandBox installer="ZIP">
     <Package name="PicoBinner_OO200">
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/makefile_toggles.h</File>
@@ -90,12 +108,6 @@
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/RunPicoBinner.C</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros/LoadPicoBinnerLibs.C</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root</File>
-      <!-- Needed so Cling knows CutClass/CalibrationClass's declared interface when
-           interpreting RunPicoBinner.C; the .so files only provide the compiled
-           implementation, not the declarations the interpreter needs at parse time
-           (same reasoning as LoadZFitterLibs.C's equivalent comment). Added 2026-07:
-           these were missing entirely before, causing "cannot open file
-           ../headers/CutClass.h" at RunPicoBinner.C's own #include line. -->
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CutClass.h</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/CalibrationClass.h</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers/HistogramUtilities.h</File>

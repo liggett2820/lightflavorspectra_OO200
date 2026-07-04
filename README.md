@@ -97,11 +97,16 @@ links.
 
 ## One-time build setup
 
-1. Build the PicoDst reader submodule and copy its library into `bin/`:
+1. Build the PicoDst reader submodule and copy its library and dictionary pcm into
+   `bin/` (2026-07-04: this step used to only copy `libStPicoDst.so`, missing
+   `StPicoDst_Dict_rdict.pcm` -- that's a separate file `make` also produces, and
+   without it in `bin/`, RunPicoBinner.C's SDCC SandBox packaging silently ends up
+   missing it, since the XML references `bin/StPicoDst_Dict_rdict.pcm` directly):
    ```
    cd submodule/PicoDstReader_SL24y
    make
    cp libStPicoDst.so ../../bin/
+   cp StPicoDst_Dict_rdict.pcm ../../bin/
    cd ../..
    ```
 2. Compile everything else via ACLiC (run from the repo root):
