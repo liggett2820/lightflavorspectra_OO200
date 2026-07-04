@@ -21,14 +21,14 @@
 // in the names must match exactly what your two RunZFitter runs actually produced.
 // Pass "" for either the TPC or BTOF pair to skip that comparison.
 //
-// NOTE ON WHAT'S PLOTTED: both runs were done with combineImageDirectories=true and
-// all a_rapBin_* args left at -1 ("AllRap" mode), meaning rapidity was NOT split into
-// differential bins -- every populated 2D (rapidity x mT-m0) bin collapses onto a
-// SINGLE rapidity slice. So there is no real rapidity axis to plot a curve against;
-// the only real degree of freedom across these runs is centrality. This plots, per
-// stage (TPC, BTOF), one point per (charge, centrality) -- 2 x 5 = 10 points -- at
-// x=centrality bin, y=etof/OO200 (mean ratio across that bin's populated 2D cells),
-// with the RMS-based spread as the error bar. Two plots total.
+// PLOT LAYOUT: one plot per (stage, populated rapidity bin), Proton+ only. Each plot
+// has one point per centrality bin (etof/OO200 mean ratio, RMS-based error bar),
+// restricted to that single rapidity row of the 2D (rapidity x mT-m0) histogram.
+// "Populated rapidity bin" is auto-detected from the data (union, across all
+// centralities and both files, of rapidity bins with any nonzero content) -- both
+// runs so far were done with combineImageDirectories=true / all rapBin args at -1
+// ("AllRap" mode), so there is currently only one such bin, but this generalizes
+// cleanly to a real differential-rapidity run later.
 //
 // Ends by printing a single PASS/FAIL summary line across everything compared.
 
@@ -37,16 +37,14 @@
 #include "TH2D.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
-#include "TLegend.h"
 #include "TLine.h"
-#include "TMultiGraph.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include <iostream>
 #include <vector>
 #include <string>
+#include <set>
 #include <cmath>
-#include <algorithm>
 using namespace std;
 
 TH2D* getHisto2D(TFile* f, string a_dirPath, string a_histoName){
@@ -63,62 +61,45 @@ TH2D* getHisto2D(TFile* f, string a_dirPath, string a_histoName){
   return h;
 }
 
-// Compares one pair of same-named 2D histograms bin-by-bin and prints a numeric
-// summary. Fills a_outMeanRatio/a_outMeanRatioErr (standard error of the mean, across
-// all populated 2D bins) for the caller to turn into one plotted point; returns false
-// if there was nothing usable to compare (missing histos, binning mismatch, or no
-// populated bins), true otherwise (including a real PASS/FAIL verdict via a_outPass).
-bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_relTolerance,
+// Compares bin content along the mT-m0 axis at a single fixed rapidity bin
+// (a_ixFixed) between two same-binned 2D histograms, prints a numeric summary, and
+// fills a_outMeanRatio/a_outMeanRatioErr (standard error of the mean across that
+// row's populated cells). Returns false if there was nothing usable to compare.
+bool compareRowStats(TH2D* a_hEtof, TH2D* a_hOO200, int a_ixFixed, string a_label, double a_relTolerance,
                      double& a_outMeanRatio, double& a_outMeanRatioErr, bool& a_outPass){
   a_outPass = true;
 
-  if(!a_hEtof || !a_hOO200){
-    cout << "  SKIP (missing on one side): " << a_label << endl;
-    return false;
-  }
+  if(!a_hEtof || !a_hOO200) return false;
 
-  int nx = a_hEtof->GetNbinsX();
   int ny = a_hEtof->GetNbinsY();
-  if(nx != a_hOO200->GetNbinsX() || ny != a_hOO200->GetNbinsY()){
-    cout << "  [BINNING MISMATCH] " << a_label << ": etof(" << nx << "x" << ny
-         << ") vs OO200(" << a_hOO200->GetNbinsX() << "x" << a_hOO200->GetNbinsY()
-         << ") -- can't compare bin-by-bin, check SetCutClass binning matches" << endl;
-    a_outPass = false;
-    return false;
-  }
-
   int nComparedBins = 0, nBadBins = 0, nOneSidedBins = 0;
   double worstDev = -1;
-  int worstX = -1, worstY = -1;
   double sumRatio = 0, sumRatio2 = 0;
 
-  for(int ix = 1; ix <= nx; ix++){
-    for(int iy = 1; iy <= ny; iy++){
-      double vEtof  = a_hEtof->GetBinContent(ix,iy);
-      double vOO200 = a_hOO200->GetBinContent(ix,iy);
-      if(vEtof == 0 && vOO200 == 0) continue; // both empty -- not a meaningful bin
+  for(int iy = 1; iy <= ny; iy++){
+    double vEtof  = a_hEtof->GetBinContent(a_ixFixed,iy);
+    double vOO200 = a_hOO200->GetBinContent(a_ixFixed,iy);
+    if(vEtof == 0 && vOO200 == 0) continue; // both empty -- not a meaningful bin
 
-      if(vEtof == 0 || vOO200 == 0){
-        // one side has content, the other doesn't -- always a mismatch
-        nOneSidedBins++;
-        nComparedBins++;
-        continue;
-      }
-
-      double ratio = vEtof / vOO200;
+    if(vEtof == 0 || vOO200 == 0){
+      nOneSidedBins++;
       nComparedBins++;
-      sumRatio  += ratio;
-      sumRatio2 += ratio*ratio;
-      double dev = fabs(ratio - 1.0);
-      if(dev > a_relTolerance) nBadBins++;
-      if(dev > worstDev){ worstDev = dev; worstX = ix; worstY = iy; }
+      continue;
     }
+
+    double ratio = vEtof / vOO200;
+    nComparedBins++;
+    sumRatio  += ratio;
+    sumRatio2 += ratio*ratio;
+    double dev = fabs(ratio - 1.0);
+    if(dev > a_relTolerance) nBadBins++;
+    if(dev > worstDev) worstDev = dev;
   }
 
   nBadBins += nOneSidedBins;
 
   if(nComparedBins == 0){
-    cout << "  " << a_label << ": no populated bins in either file -- nothing to compare" << endl;
+    cout << "  " << a_label << ": no populated mT-m0 bins at this rapidity bin -- nothing to compare" << endl;
     return false;
   }
 
@@ -134,7 +115,7 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
        << nOneSidedBins << " one-sided-only, "
        << nBadBins << " outside " << (a_relTolerance*100) << "% tol, "
        << "mean ratio=" << meanRatio << ", RMS=" << rmsRatio
-       << ", worst bin (" << worstX << "," << worstY << ") dev=" << (worstDev < 0 ? 0 : worstDev)
+       << ", worst dev=" << (worstDev < 0 ? 0 : worstDev)
        << "  -> " << (pass ? "PASS" : "FAIL") << endl;
 
   a_outMeanRatio    = meanRatio;
@@ -143,85 +124,108 @@ bool compareOneHisto(TH2D* a_hEtof, TH2D* a_hOO200, string a_label, double a_rel
 }
 
 void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_histoPrefix,
-              string a_fitDataDirName, string a_particleName, vector<int> a_centralities,
-              double a_relTolerance, string a_outDir, bool& a_allPass){
+              string a_fitDataDirName, string a_particleName, string a_charge,
+              vector<int> a_centralities, double a_relTolerance, string a_outDir, bool& a_allPass){
   if(!a_fEtof || !a_fOO200) return;
 
-  cout << "=== " << a_stageLabel << " spectra (" << a_particleName << ") ===" << endl;
+  cout << "=== " << a_stageLabel << " spectra (" << a_particleName << a_charge << ") ===" << endl;
   string dirPath = Form("%s/%s", a_fitDataDirName.c_str(), a_particleName.c_str());
-  vector<string> charges = {"Plus","Minus"};
-  int chargeColors[2] = {kRed, kBlue};
-  int chargeMarkers[2] = {20, 21}; // filled circle, filled square
-  double chargeXOffset[2] = {-0.08, 0.08}; // nudge apart so same-centrality points don't overlap
 
-  vector<TGraphErrors*> graphs;
+  // Grab all centralities' histograms once, and auto-detect which rapidity (x) bins
+  // actually have any content in either file, at any centrality.
+  vector<TH2D*> etofHistos(a_centralities.size(), nullptr);
+  vector<TH2D*> oo200Histos(a_centralities.size(), nullptr);
+  set<int> populatedRapBins;
+  int nx = -1;
 
-  for(int chargeIdx = 0; chargeIdx < (int) charges.size(); chargeIdx++){
-    string charge = charges[chargeIdx];
-    vector<double> xVals, yVals, yErrs;
+  for(size_t i = 0; i < a_centralities.size(); i++){
+    int cent = a_centralities[i];
+    string histoName = Form("%s_%s%s_Cent%02d", a_histoPrefix.c_str(), a_particleName.c_str(), a_charge.c_str(), cent);
+    TH2D* hEtof  = getHisto2D(a_fEtof,  dirPath, histoName);
+    TH2D* hOO200 = getHisto2D(a_fOO200, dirPath, histoName);
+    etofHistos[i]  = hEtof;
+    oo200Histos[i] = hOO200;
+    if(!hEtof || !hOO200) continue;
 
-    for(int cent : a_centralities){
-      string histoName = Form("%s_%s%s_Cent%02d", a_histoPrefix.c_str(), a_particleName.c_str(), charge.c_str(), cent);
-      TH2D* hEtof  = getHisto2D(a_fEtof,  dirPath, histoName);
-      TH2D* hOO200 = getHisto2D(a_fOO200, dirPath, histoName);
-      string label = Form("%s_%s_%s_Cent%02d", a_stageLabel.c_str(), a_particleName.c_str(), charge.c_str(), cent);
-
-      double meanRatio = 0, meanRatioErr = 0;
-      bool havePoint = false, pass = true;
-      havePoint = compareOneHisto(hEtof, hOO200, label, a_relTolerance, meanRatio, meanRatioErr, pass);
-      if(!pass) a_allPass = false;
-
-      if(havePoint){
-        xVals.push_back(cent + chargeXOffset[chargeIdx]);
-        yVals.push_back(meanRatio);
-        yErrs.push_back(meanRatioErr);
-      }
+    if(nx == -1) nx = hEtof->GetNbinsX();
+    if(hEtof->GetNbinsX() != hOO200->GetNbinsX() || hEtof->GetNbinsY() != hOO200->GetNbinsY()){
+      cout << "  [BINNING MISMATCH] Cent" << Form("%02d",cent) << ": etof(" << hEtof->GetNbinsX() << "x" << hEtof->GetNbinsY()
+           << ") vs OO200(" << hOO200->GetNbinsX() << "x" << hOO200->GetNbinsY() << ")" << endl;
+      a_allPass = false;
+      continue;
     }
 
-    if(!xVals.empty()){
-      TGraphErrors* g = new TGraphErrors((int) xVals.size(), xVals.data(), yVals.data(), nullptr, yErrs.data());
-      g->SetName(Form("g_%s_%s", a_stageLabel.c_str(), charge.c_str()));
-      g->SetLineColor(chargeColors[chargeIdx]);
-      g->SetMarkerColor(chargeColors[chargeIdx]);
-      g->SetMarkerStyle(chargeMarkers[chargeIdx]);
-      g->SetMarkerSize(1.8);
-      graphs.push_back(g);
+    for(int ix = 1; ix <= hEtof->GetNbinsX(); ix++){
+      for(int iy = 1; iy <= hEtof->GetNbinsY(); iy++){
+        if(hEtof->GetBinContent(ix,iy) != 0 || hOO200->GetBinContent(ix,iy) != 0){
+          populatedRapBins.insert(ix);
+          break;
+        }
+      }
     }
   }
 
-  if(graphs.empty()){
-    cout << "  (nothing to plot for " << a_stageLabel << ")" << endl;
+  if(populatedRapBins.empty()){
+    cout << "  (no populated rapidity bins found -- nothing to plot for " << a_stageLabel << ")" << endl;
     return;
   }
 
   gSystem->mkdir(a_outDir.c_str(), true);
 
-  TCanvas* c = new TCanvas(Form("c_%s_combined", a_stageLabel.c_str()),
-                            Form("%s ratio summary", a_stageLabel.c_str()), 900, 700);
-  c->SetGridy();
+  for(int ixRap : populatedRapBins){
+    vector<double> xVals, yVals, yErrs;
 
-  TMultiGraph* mg = new TMultiGraph();
-  mg->SetTitle(Form("%s: etof / OO200 (%s);Centrality bin;etof / OO200", a_stageLabel.c_str(), a_particleName.c_str()));
+    for(size_t i = 0; i < a_centralities.size(); i++){
+      int cent = a_centralities[i];
+      string label = Form("%s_%s%s_RapBin%02d_Cent%02d", a_stageLabel.c_str(), a_particleName.c_str(), a_charge.c_str(), ixRap, cent);
 
-  TLegend* leg = new TLegend(0.72, 0.78, 0.97, 0.9);
-  vector<string> chargeLabels = {"Proton+", "Proton-"};
-  for(size_t i = 0; i < graphs.size(); i++){
-    mg->Add(graphs[i], "P");
-    leg->AddEntry(graphs[i], chargeLabels[i].c_str(), "p");
+      double meanRatio = 0, meanRatioErr = 0;
+      bool pass = true;
+      bool havePoint = compareRowStats(etofHistos[i], oo200Histos[i], ixRap, label, a_relTolerance, meanRatio, meanRatioErr, pass);
+      if(!pass) a_allPass = false;
+
+      if(havePoint){
+        xVals.push_back(cent);
+        yVals.push_back(meanRatio);
+        yErrs.push_back(meanRatioErr);
+      }
+    }
+
+    if(xVals.empty()) continue;
+
+    // find a representative histogram to pull rapidity-bin edges from, for the title
+    TH2D* refHisto = nullptr;
+    for(auto* h : etofHistos) if(h){ refHisto = h; break; }
+    double yLo = refHisto ? refHisto->GetXaxis()->GetBinLowEdge(ixRap) : 0;
+    double yHi = refHisto ? refHisto->GetXaxis()->GetBinUpEdge(ixRap) : 0;
+
+    TGraphErrors* g = new TGraphErrors((int) xVals.size(), xVals.data(), yVals.data(), nullptr, yErrs.data());
+    g->SetName(Form("g_%s_RapBin%02d", a_stageLabel.c_str(), ixRap));
+    g->SetTitle(Form("%s: etof / OO200, %s%s, RapBin %02d (y #in [%.2f, %.2f]);Centrality bin;etof / OO200",
+                      a_stageLabel.c_str(), a_particleName.c_str(), a_charge.c_str(), ixRap, yLo, yHi));
+    g->SetLineColor(kRed);
+    g->SetMarkerColor(kRed);
+    g->SetMarkerStyle(20);
+    g->SetMarkerSize(1.8);
+
+    TCanvas* c = new TCanvas(Form("c_%s_RapBin%02d", a_stageLabel.c_str(), ixRap),
+                              Form("%s RapBin %02d ratio summary", a_stageLabel.c_str(), ixRap), 900, 700);
+    c->SetGridy();
+
+    g->Draw("AP");
+    g->GetYaxis()->SetRangeUser(0.5, 1.5);
+    g->GetXaxis()->SetLimits(a_centralities.front() - 0.5, a_centralities.back() + 0.5);
+    gPad->Modified();
+    gPad->Update();
+
+    TLine* line = new TLine(g->GetXaxis()->GetXmin(), 1, g->GetXaxis()->GetXmax(), 1);
+    line->SetLineStyle(2);
+    line->Draw();
+
+    string outName = Form("%s/%s_%s%s_RapBin%02d_ratio_summary.png", a_outDir.c_str(),
+                           a_stageLabel.c_str(), a_particleName.c_str(), a_charge.c_str(), ixRap);
+    c->SaveAs(outName.c_str());
   }
-
-  mg->Draw("A");
-  mg->GetYaxis()->SetRangeUser(0.5, 1.5);
-  mg->GetXaxis()->SetLimits(-0.5, (double) *max_element(a_centralities.begin(), a_centralities.end()) + 0.5);
-  gPad->Modified();
-  gPad->Update();
-
-  TLine* line = new TLine(mg->GetXaxis()->GetXmin(), 1, mg->GetXaxis()->GetXmax(), 1);
-  line->SetLineStyle(2);
-  line->Draw();
-  leg->Draw();
-
-  c->SaveAs(Form("%s/%s_ratio_summary.png", a_outDir.c_str(), a_stageLabel.c_str()));
 }
 
 void CompareSpectra_OO200_vs_etof(
@@ -230,6 +234,7 @@ void CompareSpectra_OO200_vs_etof(
     string a_oo200File_TPC  = "",
     string a_oo200File_BTOF = "",
     string a_particleName   = "Proton",
+    string a_charge         = "Plus",
     vector<int> a_centralities = {0,1,2,3,4},
     string a_outDir         = "./spectraComparison_OO200_vs_etof/",
     double a_relTolerance   = 0.05){
@@ -249,13 +254,11 @@ void CompareSpectra_OO200_vs_etof(
 
   gSystem->mkdir(a_outDir.c_str(), true);
 
-  runStage(fEtofTPC,  fOO200TPC,  "TPC",  "dEdxSpectra",         "DeDx_FitData", a_particleName, a_centralities, a_relTolerance, a_outDir, allPass);
-  runStage(fEtofBTOF, fOO200BTOF, "BTOF", "InvBetaBTOFSpectra",  "BTOF_FitData", a_particleName, a_centralities, a_relTolerance, a_outDir, allPass);
+  runStage(fEtofTPC,  fOO200TPC,  "TPC",  "dEdxSpectra",        "DeDx_FitData", a_particleName, a_charge, a_centralities, a_relTolerance, a_outDir, allPass);
+  runStage(fEtofBTOF, fOO200BTOF, "BTOF", "InvBetaBTOFSpectra", "BTOF_FitData", a_particleName, a_charge, a_centralities, a_relTolerance, a_outDir, allPass);
 
   cout << endl << "=================================================" << endl;
   cout << (allPass ? "ALL COMPARISONS PASSED within tolerance." : "SOME COMPARISONS FAILED -- see FAIL/MISSING/MISMATCH lines above.") << endl;
-  cout << "Plots written to: " << a_outDir << endl;
-  cout << "  " << a_outDir << "/TPC_ratio_summary.png" << endl;
-  cout << "  " << a_outDir << "/BTOF_ratio_summary.png" << endl;
+  cout << "Plots written to: " << a_outDir << " (one PNG per stage x populated rapidity bin)" << endl;
   cout << "=================================================" << endl;
 }
