@@ -133,8 +133,17 @@ void RunRawSpectraModifier(string a_pionYieldFile, string a_kaonYieldFile, strin
   mod->setPtEnergyLossMode(pTLossMode);
 
   //########## DO NOT CHANGE THE ORDER OF THESE FUNCTIONS!!! ###############
-  mod->loadDataFile(a_pionYieldFile,   0, nCentBins, converted16CentBinsTo9CentBins);
-  mod->loadDataFile(a_kaonYieldFile,   1, nCentBins, converted16CentBinsTo9CentBins);
+  // Guard added 2026-07 (same class of fix already applied in RunZFitter.C -- see
+  // that macro's own 2026-07 comment): RawSpectraModifier::loadDataFile has no
+  // null-check around its "dca" histogram lookup when a file doesn't have the
+  // species-specific centEvents<Species> histogram it's looking for (a per-species
+  // PicoBinner yield file only has e.g. centEventsProton, not centEventsPion) --
+  // calling it on a file that doesn't actually contain that species segfaults. If you
+  // only have a Proton yields file, leave a_pionYieldFile/a_kaonYieldFile empty ("")
+  // rather than passing the Proton file in for them -- this skips those species'
+  // loads entirely instead of crashing on them.
+  if(a_pionYieldFile != "") mod->loadDataFile(a_pionYieldFile, 0, nCentBins, converted16CentBinsTo9CentBins);
+  if(a_kaonYieldFile != "") mod->loadDataFile(a_kaonYieldFile, 1, nCentBins, converted16CentBinsTo9CentBins);
   mod->loadDataFile(a_protonYieldFile, 2, nCentBins, converted16CentBinsTo9CentBins);
 
   mod->loadSpectraFile(a_spectraFile.c_str());

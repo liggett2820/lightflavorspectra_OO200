@@ -95,7 +95,14 @@ void ZFitter::fitTPCPionKaon_SimulCent_RapidityLooper(int a_partIndexSpace, int 
   #endif
 
   //###########################   RAPIDITY BIN LOOP   #######################################
-  for(int HorBinCounter = 0; rightBinExists && leftBinExists; HorBinCounter++){
+  // Fixed 2026-07: was `rightBinExists && leftBinExists` (AND) -- same bug and fix as
+  // ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx (see that file's comment for the full
+  // explanation): if rapidity-zero lands adjacent to the edge of the loaded data
+  // histogram's actual axis, AND-based termination kills the whole walk after the
+  // first failed step on the exhausted side, even with many populated bins left
+  // unexplored on the other side. OR lets each side walk independently until it alone
+  // runs out.
+  for(int HorBinCounter = 0; rightBinExists || leftBinExists; HorBinCounter++){
     if(HorBinCounter % 2 == 0){
       m_currentRapBin = rapZeroBin - (HorBinCounter/2);
       if(m_currentRapBin < 1){

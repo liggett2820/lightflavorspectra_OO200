@@ -86,8 +86,27 @@ void ZFitter::fitTPCProton_SimulCent_RapidityLooper(int a_charge){
     cout << "using zero bin: " << rapZeroBin << endl;
   #endif
 
-  //###########################   RAPIDITY BIN LOOP   ####################################### 
-  for(int HorBinCounter = 0; rightBinExists && leftBinExists; HorBinCounter++){
+  //###########################   RAPIDITY BIN LOOP   #######################################
+  // Fixed 2026-07: was `rightBinExists && leftBinExists` (AND). rapZeroBin is
+  // FindBin(0.0) on the ACTUAL loaded data histogram's axis (immutable, baked in by
+  // etof's PicoBinner at yield-file creation time) -- for this O+O 200 GeV proton yield
+  // file, y=0 lands in the LAST bin of a 31-bin axis (-3.03 to 0.07), i.e. right at the
+  // edge. With AND, the very first step in the direction with no room (right, in this
+  // case) sets that side's *Exists flag false, and the very next loop-condition check
+  // kills the ENTIRE loop -- even though the other direction (left) still has ~14 more
+  // populated, unexplored bins (confirmed via InspectRawYieldRapBins.C: 15 populated
+  // bins total in the raw yield data, y=-1.38 to 0.02). OR lets the loop keep walking
+  // whichever side still has room; the side that ran out just keeps re-setting its own
+  // (already-false) flag every other iteration, a harmless no-op, until the other side
+  // also exhausts itself and the loop ends naturally. Confirmed byte-identical to
+  // etof's copy of this file before this fix (0 diff lines) -- this is a real,
+  // pre-existing ZFitter algorithm bug, not something introduced by porting. It never
+  // manifested in etof's own collider-mode analyses because their rapidity-zero bin
+  // was never adjacent to an axis edge; etof's BTOF equivalent even has a special-cased
+  // `if(getEventConfig()=="FixedTarget") rapZeroBin = GetNbinsX()/2;` workaround for a
+  // different manifestation of this same edge case in fixed-target mode -- confirming
+  // this exact problem was known before, just never fixed at the loop-logic level.
+  for(int HorBinCounter = 0; rightBinExists || leftBinExists; HorBinCounter++){
     if(HorBinCounter % 2 == 0){
       m_currentRapBin = rapZeroBin - (HorBinCounter/2);
       if(m_currentRapBin < 1){

@@ -906,7 +906,14 @@ void ZFitter::fitBTOF_SimulCent(int a_partIndexSpace, int a_charge){
 
 
   //###########################   RAPIDITY BIN LOOP   #######################################
-  for(int HorBinCounter = 0; rightBinExists && leftBinExists; HorBinCounter++){
+  // Fixed 2026-07: was `rightBinExists && leftBinExists` (AND) -- same bug and fix as
+  // ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx (see that file's comment for the full
+  // explanation). Note the `FixedTarget` special case just above (forcing rapZeroBin to
+  // the middle bin) is a workaround for a DIFFERENT manifestation of this same
+  // underlying edge-case problem in fixed-target mode -- it doesn't apply here (this
+  // repo runs "ColliderCenter" mode) and doesn't fix the loop-logic bug itself, which is
+  // what this OR change addresses generally.
+  for(int HorBinCounter = 0; rightBinExists || leftBinExists; HorBinCounter++){
     if(HorBinCounter % 2 == 0){
       m_currentRapBin = rapZeroBin - (HorBinCounter/2);
       if(m_currentRapBin < 1){
