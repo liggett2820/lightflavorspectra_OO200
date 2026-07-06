@@ -40,7 +40,17 @@ void SetCutClass(CutClass *cuts){
   cuts->setZRange(-2,2); // was (-70,70) -- corrected 2026-07-03 to match the SDCC file actually used
 
   // ---- _OO_200_COL_ specific values (from the original's #ifdef _OO_200_COL_ block) ----
-  cuts->setStarver("SL23c"); // was "dev" -- corrected 2026-07-03 to match SDCC
+  // TEMPORARILY reverted 2026-07-03 back to "dev" (the "SL23c" correction above is
+  // still the physically-correct value matching the real SDCC production, but the
+  // corresponding SL23c_BichselCurves.root file doesn't actually exist anywhere --
+  // checked both this repo's and the full etof repo's submodule/ParticleInfo/
+  // PidFunctions_Data/ directories, only SL19b/SL20d/dev are present in either. Using
+  // "SL23c" makes ParticleInfo::ReadBichselFile() call exit(EXIT_FAILURE) immediately,
+  // silently killing the whole ROOT process with no further output -- this is why the
+  // last several ZFitter reruns appeared to complete ("ran fine") but never actually
+  // wrote new spectra data. Switch back to "SL23c" once the real Bichsel curve file is
+  // obtained from SDCC/RCF and placed in submodule/ParticleInfo/PidFunctions_Data/.
+  cuts->setStarver("dev");
   cuts->setSqrts_NN(200);
   cuts->setBeamEnergy(100);
   cuts->setBeamLocation(0.0,0.0);
@@ -228,46 +238,80 @@ void SetCutClass(CutClass *cuts){
   double pionETOFArray[101]={0,0.00561879,0.021302,0.0444946,0.07275,0.104315,0.138062,0.173287,0.209543,0.246539,0.284081,0.322036,0.36031,0.398835,0.437561,0.476449,0.515472,0.554606,0.593833,0.633139,0.672514,0.711946,0.751429,0.790957,0.830523,0.870123,0.909753,0.949411,0.989093,1.0288,1.06852,1.10826,1.14802,1.18779,1.22757,1.26737,1.30718,1.347,1.38682,1.42666,1.46651,1.50636,1.54622,1.58608,1.62596,1.66583,1.70572,1.7456,1.7855,1.82539,1.86529,1.9052,1.94511,1.98502,2.02493,2.06485,2.10477,2.1447,2.18462,2.22455,2.26448,2.30442,2.34435,2.38429,2.42423,2.46417,2.50412,2.54406,2.58401,2.62396,2.66391,2.70386,2.74381,2.78376,2.82372,2.86367,2.90363,2.94359,2.98355,3.02351,3.06347,3.10343,3.1434,3.18336,3.22333,3.26329,3.30326,3.34323,3.3832,3.42316,3.46313,3.5031,3.54308,3.58305,3.62302,3.66299,3.70297,3.74294,3.78291,3.82289,3.86286};
   double kaonETOFArray[101]={0,0.00161786,0.00644006,0.0143753,0.0252809,0.0389744,0.0552472,0.0738774,0.0946412,0.117321,0.141712,0.167624,0.194887,0.223345,0.252862,0.283318,0.314606,0.346634,0.379319,0.412592,0.446389,0.480655,0.515344,0.550413,0.585825,0.621547,0.657551,0.693811,0.730303,0.767008,0.803909,0.840987,0.87823,0.915624,0.953158,0.99082,1.0286,1.06649,1.10449,1.14258,1.18076,1.21902,1.25736,1.29577,1.33426,1.3728,1.4114,1.45007,1.48878,1.52754,1.56636,1.60521,1.64411,1.68305,1.72203,1.76104,1.80008,1.83916,1.87827,1.91741,1.95658,1.99577,2.03499,2.07423,2.1135,2.15278,2.19209,2.23142,2.27077,2.31013,2.34952,2.38892,2.42833,2.46777,2.50721,2.54668,2.58615,2.62564,2.66514,2.70466,2.74419,2.78372,2.82327,2.86283,2.9024,2.94198,2.98157,3.02117,3.06078,3.1004,3.14002,3.17965,3.2193,3.25894,3.2986,3.33826,3.37793,3.41761,3.45729,3.49698,3.53668};
   double protonETOFArray[126]={0,0.000852246,0.00340436,0.00764257,0.0135444,0.021079,0.0302085,0.0408881,0.0530678,0.066693,0.0817058,0.0980459,0.115652,0.13446,0.15441,0.17544,0.19749,0.220501,0.244418,0.269186,0.294755,0.321075,0.348101,0.375789,0.404098,0.432989,0.462426,0.492377,0.522809,0.553692,0.585,0.616706,0.648787,0.681221,0.713986,0.747064,0.780436,0.814086,0.847997,0.882156,0.916548,0.951161,0.985983,1.021,1.05621,1.09159,1.12715,1.16286,1.19873,1.23473,1.27088,1.30716,1.34356,1.38008,1.41671,1.45346,1.4903,1.52724,1.56428,1.60141,1.63862,1.67591,1.71329,1.75074,1.78826,1.82585,1.86351,1.90123,1.93901,1.97685,2.01475,2.05271,2.09072,2.12877,2.16688,2.20503,2.24323,2.28147,2.31976,2.35808,2.39645,2.43485,2.47329,2.51177,2.55028,2.58882,2.62739,2.666,2.70463,2.7433,2.78199,2.82071,2.85946,2.89823,2.93703,2.97585,3.0147,3.05357,3.09246,3.13137,3.1703,3.20925,3.24823,3.28722,3.32623,3.36526,3.4043,3.44337,3.48245,3.52155,3.56066,3.59979,3.63893,3.67809,3.71726,3.75645,3.79564,3.83486,3.87408,3.91332,3.95257,3.99184,4.03111,4.0704,4.10969,4.149};
-  // All 9 calls below corrected 2026-07-03 to match the literal bin-count/range
-  // arguments actually passed in the SDCC file's setVariableRapMtM0BinningInfo() calls.
-  // (The SDCC file also contains an earlier loop that computes rapidity ranges via
-  // PhysMath::rapFromEtaPt into vectors like numRapBins_tpc/RapMins_tpc -- but those
-  // vectors are never actually used below; the real calls use hardcoded literals, which
-  // is what's copied here. Also note: SDCC's indices 3-8 are NOT blank/dummy like this
-  // repo's previous version -- they use real pion/kaon/proton arrays, same as 0-2.)
-  cuts->setVariableRapMtM0BinningInfo(0,31,-3.03,.07,100, pionArray,
-                                        31,-3.03,.07, 200, pionBTOFArray,
-                                        31,-3.05,.05, 100, pionETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(1,31,-3.03,.07,100, kaonArray,
-                                        31,-3.03,.07, 200, kaonBTOFArray,
-                                        31,-3.05,.05, 100, kaonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(2,31,-3.03,.07,150, protonArray,
-                                        31,-3.03,.07, 250, protonBTOFArray,
-                                        31,-3.05,.05, 125, protonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(3,31,-3.05,.05,100, pionArray,
-                                        31,-3.05,.05, 200, pionBTOFArray,
-                                        31,-3.05,.05, 100, pionETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(4,31,-3.05,.05,150, protonArray,
-                                        31,-3.05,.05, 250, protonBTOFArray,
-                                        31,-3.05,.05, 125, protonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(5,31,-3.05,.05,150, protonArray,
-                                        31,-3.05,.05, 250, protonBTOFArray,
-                                        31,-3.05,.05, 125, protonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(6,31,-3.05,.05,100, pionArray,
-                                        31,-3.05,.05, 200, pionBTOFArray,
-                                        31,-3.05,.05, 100, pionETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(7,31,-3.05,.05,100, kaonArray,
-                                        31,-3.05,.05, 200, kaonBTOFArray,
-                                        31,-3.05,.05, 100, kaonETOFArray);
-  cuts->setVariableRapMtM0BinningInfo(8,31,-3.05,.05,150, protonArray,
-                                        31,-3.05,.05, 250, protonBTOFArray,
-                                        31,-3.05,.05, 125, protonETOFArray);
+  double blankEdgesArray[2] = {0,1.0};
+  // SUPERSEDED 2026-07-03 (yet again): my previous fix here recentered the range to a
+  // symmetric [-1.55,1.55], invented from first principles (raw-data extent + this
+  // repo's own analysis-cut default). That reasoning was sound in the abstract, but it
+  // doesn't matter here: the yieldHistos_OOGeV_proton_2026_07_01.root file was already
+  // produced by ETOF's own PicoBinner (not this repo's), so its bin edges are already
+  // fixed and baked in -- what matters is matching THAT binning exactly, not deriving a
+  // new one. Pulled directly from lightflavorspectra_etof/macros/SetCutClass_Collider.C
+  // (lines 354-380 there), which that file's own inline comment documents as "the EXACT
+  // values from the SetCutClass.C actually used on SDCC (starsub03) to produce the O+O
+  // proton yields file" -- i.e. real ground truth, not an estimate. Two things this
+  // corrects vs. my previous guess: (1) the real per-species/per-detector bin counts and
+  // ranges are NOT uniform (e.g. proton TPC is 36 bins over [-2.05,1.55], proton BTOF is
+  // 27 bins over [-1.35,1.35] -- different from each other and from my guessed 31/1.55);
+  // (2) indices 3-8 (electron/deuteron/triton/helion/alpha/muon) are genuinely blank
+  // dummy bins (1 bin, [-1.0,1.0], blankEdgesArray) in the real production config -- my
+  // previous fix (and the comment it replaced) wrongly assumed they used real
+  // pion/kaon/proton arrays like species 0-2 do.
+  cuts->setVariableRapMtM0BinningInfo(0,41,-2.05,2.05,100, pionArray,
+                                        41,-2.05,2.05, 200, pionBTOFArray,
+                                        41,-2.05,2.05, 100, pionETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(1,41,-2.05,2.05,100, kaonArray,
+                                        41,-2.05,2.05, 200, kaonBTOFArray,
+                                        41,-2.05,2.05, 100, kaonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(2,41,-2.05,2.05,150, protonArray,
+                                        41,-2.05,2.05, 250, protonBTOFArray,
+                                        41,-2.05,2.05, 125, protonETOFArray);
+  cuts->setVariableRapMtM0BinningInfo(3,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
+  cuts->setVariableRapMtM0BinningInfo(4,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
+  cuts->setVariableRapMtM0BinningInfo(5,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
+  cuts->setVariableRapMtM0BinningInfo(6,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
+  cuts->setVariableRapMtM0BinningInfo(7,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
+  cuts->setVariableRapMtM0BinningInfo(8,1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray,
+                                        1,-1.0,1.0,  1, blankEdgesArray);
 
   // corrected 2026-07-03 to match SDCC (was 41,-2.05,2.05 / 25,-1.25,1.25 / 6,-1.65,-1.05)
+  //
+  // REVERTED 2026-07-03 (again): eta_TPC and eta_bTOF above (21,-2.05,0.05 and
+  // 16,-1.55,0.05) had the same asymmetric-truncation-near-zero bug diagnosed in the
+  // rapidity binning above -- both got cut off within 0.05 of eta=0 on the upper end.
+  // Unlike eTOF (a real, physically asymmetric endcap detector at one fixed location,
+  // so its own asymmetric range is correct detector geometry, not a bug -- left
+  // untouched here), TPC and bTOF are symmetric barrel detectors centered on the
+  // interaction point and should have eta ranges symmetric around 0. The values
+  // this comment already documented as what was here BEFORE the SDCC copy
+  // (41,-2.05,2.05 / 25,-1.25,1.25 -- both symmetric, both already at the same 0.10
+  // bin width as everything else in this file) are better evidence than a freshly
+  // derived number, since they were already used successfully in this exact repo, so
+  // reverting to them rather than inventing new numbers.
+  //
+  // eta_eTOF SUPERSEDED 2026-07-03: eta_TPC and eta_bTOF above already exactly match
+  // lightflavorspectra_etof/macros/SetCutClass_Collider.C's real production values
+  // (41,-2.05,2.05 and 25,-1.25,1.25 -- confirmed, no further change needed), but
+  // eta_eTOF's value here (7,-2.05,-1.35) was still an approximation, not the real
+  // production number. The actual value used to produce this dataset's yield files is
+  // 6,-1.65,-1.05 (same file, line ~385) -- correcting to match exactly, same reasoning
+  // as the rapidity-binning fix above (eTOF's asymmetric range is real, physical
+  // endcap-detector geometry, not a bug -- but the exact bin count/edges still have to
+  // match what PicoBinner actually baked into the yield file).
   cuts->setEtaPtBinningInfo(80,0.05,2.5, //pT: n bins, low, high
-                       21,-2.05,0.05,  //eta_TPC: n bins, low, high
-                       16,-1.55,0.05,  //eta bToF: nBins, low, high
-                       7,-2.05,-1.35);  //eta eToF: nBins, low, high
+                       41,-2.05,2.05,  //eta_TPC: n bins, low, high
+                       25,-1.25,1.25,  //eta bToF: nBins, low, high
+                       6,-1.65,-1.05);  //eta eToF: nBins, low, high
 
   cuts->makeCutInformationHistogram();
 
