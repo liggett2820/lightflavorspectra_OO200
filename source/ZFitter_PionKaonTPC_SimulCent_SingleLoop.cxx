@@ -2091,24 +2091,93 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
       for(int iii = 0; iii < 11; iii++) previousGoodParameters[iii] = -999;
     }
 
-    TCanvas* fittingCanvas = new TCanvas("fittingCanvas","Fitting Canvas");
-    fittingCanvas->SetWindowSize(1300,700);
-    fittingCanvas->SetCanvasSize(1200,600);
-    fittingCanvas->Draw();
-    TPad* topPad = new TPad("topPad_PiKTPC","topPad_PiKTPC",0.0,0.3,1.0,1.0);
-    TPad* bottomPad = new TPad("bottomPad_PiKTPC","bottomPad_PiKTPC",0.0,0.0,1.0,0.3);
-    topPad->Draw();
-    bottomPad->Draw();
-    fittingCanvas->cd();
-    topPad->cd();
-    topPad->SetLogy(true);
-    topPad->SetRightMargin(0.4);
-    bottomPad->SetLogy(false);
-    bottomPad->SetRightMargin(0.4);
-    gStyle->SetOptFit(0111);
+    // Perf 2026-07: canvas creation, and the entire per-bin diagnostic plotting/PNG
+    // block inside the centrality loop below, are gated on m_saveDiagnosticImages
+    // (default true, so behavior is unchanged unless a caller opts out via
+    // setSaveDiagnosticImages(false) -- see RunZFitter.C, and the fuller explanation in
+    // ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx's copy of this same change). The
+    // physics-output SetBinContent/SetBinError calls have been moved to run immediately
+    // after numberOfCentEvents below, BEFORE the plotting block, so they execute
+    // unconditionally either way.
+    TCanvas* fittingCanvas = nullptr;
+    TPad* topPad = nullptr;
+    TPad* bottomPad = nullptr;
+    if(m_saveDiagnosticImages){
+      fittingCanvas = new TCanvas("fittingCanvas","Fitting Canvas");
+      fittingCanvas->SetWindowSize(1300,700);
+      fittingCanvas->SetCanvasSize(1200,600);
+      fittingCanvas->Draw();
+      topPad = new TPad("topPad_PiKTPC","topPad_PiKTPC",0.0,0.3,1.0,1.0);
+      bottomPad = new TPad("bottomPad_PiKTPC","bottomPad_PiKTPC",0.0,0.0,1.0,0.3);
+      topPad->Draw();
+      bottomPad->Draw();
+      fittingCanvas->cd();
+      topPad->cd();
+      topPad->SetLogy(true);
+      topPad->SetRightMargin(0.4);
+      bottomPad->SetLogy(false);
+      bottomPad->SetRightMargin(0.4);
+      gStyle->SetOptFit(0111);
+    }
 
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
       double numberOfCentEvents = m_centEvents[m_currentPartIndex]->GetBinContent(centIndex+1);
+
+      // Physics output -- moved here from its original position after the plotting
+      // block; runs unconditionally regardless of m_saveDiagnosticImages.
+      if(centIndex == 0){ // only write the all cent data once
+        //PION
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[0]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[1]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[2]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[0]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[1]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[2]);
+        //KAON
+        m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[3]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[4]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[3]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[4]);
+        //ELECTRON
+        m_Fit_Data_ZTPC[m_currentPartIndex][3][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[5]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][3][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[6]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][3][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[5]);
+        m_Fit_Data_ZTPC[m_currentPartIndex][3][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[6]);
+      }
+      //PION
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[7 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[0]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[1]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[2]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[7 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[0]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[1]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[2]);
+      //KAON
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[8 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[3]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[4]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[8 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[3]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[4]);
+      //ELECTRON
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[9 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[5]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[6]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[9 + 3*centIndex]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[5]);
+      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[6]);
+      if(m_currentPartIndex == 0){
+        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[7 + 3*centIndex]*numberOfCentEvents);
+        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[7 + 3*centIndex]*numberOfCentEvents);
+      }
+      if(m_currentPartIndex == 1){
+        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[8 + 3*centIndex]*numberOfCentEvents);
+        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[8 + 3*centIndex]*numberOfCentEvents);
+      }
+
+      if(!m_saveDiagnosticImages) continue; // skip all plotting below for this centIndex
+
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerStyle(20);
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerColor(kBlack);
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerSize(0.5);
@@ -2252,56 +2321,9 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
         fittingCanvas->SaveAs(Form("%s/%s/%s/dEdxFits_Cent%02d/NoLog_RapBin_%02d_STEP_%02d_mTm0Bin_%02d.png",m_imagePreDir.c_str(), m_imgDirName.c_str(),
                m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data(),centIndex,m_currentRapBin,fitting_round, m_currentMtM0Bin));
       }
-      if(centIndex == 0){ // only write the all cent data once
-        //PION
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[0]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[1]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[2]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[0]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[1]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[2]);
-        //KAON
-        m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[3]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[4]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[3]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[4]);
-        //ELECTRON
-        m_Fit_Data_ZTPC[m_currentPartIndex][3][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[5]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][3][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[6]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][3][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[5]);
-        m_Fit_Data_ZTPC[m_currentPartIndex][3][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[6]);
-      }
-      //PION
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[7 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[0]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[1]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[2]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[7 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[0]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[1]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[2]);
-      //KAON
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[8 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[3]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[4]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[8 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[3]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[4]);
-      //ELECTRON
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][0][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[9 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][1][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[5]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][2][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[6]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][0][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[9 + 3*centIndex]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][1][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[5]);
-      m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][2][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin, simulParamErrors[6]);
-      if(m_currentPartIndex == 0){
-        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[7 + 3*centIndex]*numberOfCentEvents);
-        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[7 + 3*centIndex]*numberOfCentEvents);
-      }
-      if(m_currentPartIndex == 1){
-        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[8 + 3*centIndex]*numberOfCentEvents);
-        m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[8 + 3*centIndex]*numberOfCentEvents);
-      }
+      // (SetBinContent/SetBinError physics-output block originally lived here --
+      // moved above the "if(!m_saveDiagnosticImages) continue;" line so it always
+      // runs; see comment near the top of this function for why that's safe.)
       #ifndef _SAVE_POINTERS_
         #ifndef _ZFITTER_PHYSMATH_BYPASS_
           delete combinedFunct;
@@ -2323,9 +2345,11 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
     } // end centrality loop
     //minimizer->Clear();
     #ifndef _SAVE_POINTERS_
-      delete topPad;
-      delete bottomPad;
-      delete fittingCanvas;
+      if(m_saveDiagnosticImages){
+        delete topPad;
+        delete bottomPad;
+        delete fittingCanvas;
+      }
       delete chiSqrdFunctor;
       delete minimizer;
     #endif

@@ -245,6 +245,7 @@ ZFitter::ZFitter(){
   m_doIntegralOfBinForFits = false;
   m_storeFitsNotStatusZero = true;
   m_saveNoLogImages = false;
+  m_saveDiagnosticImages = true; // default true -- preserves existing behavior unless a caller opts out via setSaveDiagnosticImages(false)
   m_convertInvBetaToMassSquared = false;
   m_useColliderStopTable = false;
 

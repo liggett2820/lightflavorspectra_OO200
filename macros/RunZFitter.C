@@ -174,6 +174,12 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   bool useStudentTForTPC             = false; // only implemented for solo de/dx right now
   bool separatePM_bToF_AllCent       = true;
   bool drawInitialSeedsToFits        = true;
+  // Perf 2026-07: set false to skip the per-bin diagnostic fit-overlay PNGs (proton TPC
+  // and pion/kaon TPC fitters currently honor this; the BTOF fitter does not yet). This
+  // is by far the most expensive part of a ZFitter run (a full canvas render + PNG
+  // encode for every rapidity/mTm0/centrality/step bin) and does not affect the fitted
+  // spectra output at all -- see ZFitter.h's setSaveDiagnosticImages() for details.
+  bool saveDiagnosticImages          = true;
 
   // stop momentum to zoom in and fit with single bump (per particle-space, plus/minus)
   vector<double> a_mom_dEdx_plus      = {0.3, 0.4, 0.8, 0.0, 1.4, 1.4, 0.5, 0.5, 0.1};
@@ -357,6 +363,7 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   fitter->massSquaredMode(massSquaredMode);
   fitter->storeFitsNotStatusZero(true);
   fitter->setSaveNoLogImages(false);
+  fitter->setSaveDiagnosticImages(saveDiagnosticImages);
   fitter->setConvertInvBetaToMassSquared(convertInvBetaToMassSquared);
 
   fitter->loadBasicDataHistograms(a_pionYieldFile, hasETOF); // PION file must have simple histos in it

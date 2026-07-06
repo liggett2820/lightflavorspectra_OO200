@@ -1195,27 +1195,82 @@ void ZFitter::fitTPCProton_SimulCent_ByRapidity(){
       for(int iii = 0; iii < 11; iii++) previousGoodParameters[iii] = -999;
     }
 
-    TCanvas* fittingCanvas = new TCanvas("fittingCanvas","Fitting Canvas");
-    fittingCanvas->SetWindowSize(1300,700);
-    fittingCanvas->SetCanvasSize(1200,600);
-    fittingCanvas->Draw();
-    TPad* topPad = new TPad("topPad_P_TPC","topPad_P_TPC",0.0,0.3,1.0,1.0);
-    TPad* bottomPad = new TPad("bottomPad_P_TPC","bottomPad_P_TPC",0.0,0.0,1.0,0.3);
-    topPad->Draw();
-    bottomPad->Draw();
-    fittingCanvas->cd();
-    topPad->cd();
-    topPad->SetLogy(true);
-    topPad->SetRightMargin(0.4);
-    bottomPad->SetLogy(false);
-    bottomPad->SetRightMargin(0.4);
-    gStyle->SetOptFit(0111);
+    // Perf 2026-07: canvas creation, and the entire per-bin diagnostic plotting/PNG
+    // block inside the centrality loop below, are gated on m_saveDiagnosticImages
+    // (default true, so behavior is unchanged unless a caller opts out via
+    // setSaveDiagnosticImages(false) -- see RunZFitter.C). This is by far the most
+    // expensive part of a ZFitter run: a full canvas render + PNG encode for every
+    // rapidity/mTm0/centrality/step combination, far more than the fit itself. The
+    // setBinValues(...) calls that write the actual fit result into the output spectra
+    // histograms have been moved to run immediately after numberOfCentEvents below,
+    // BEFORE the plotting block, so they execute unconditionally either way -- they
+    // only read simulParams/simulParamErrors/numberOfCentEvents (already finalized by
+    // the fit before this whole section), so this reordering does not change their
+    // values, just guarantees they aren't skipped when diagnostic images are off.
+    TCanvas* fittingCanvas = nullptr;
+    TPad* topPad = nullptr;
+    TPad* bottomPad = nullptr;
+    if(m_saveDiagnosticImages){
+      fittingCanvas = new TCanvas("fittingCanvas","Fitting Canvas");
+      fittingCanvas->SetWindowSize(1300,700);
+      fittingCanvas->SetCanvasSize(1200,600);
+      fittingCanvas->Draw();
+      topPad = new TPad("topPad_P_TPC","topPad_P_TPC",0.0,0.3,1.0,1.0);
+      bottomPad = new TPad("bottomPad_P_TPC","bottomPad_P_TPC",0.0,0.0,1.0,0.3);
+      topPad->Draw();
+      bottomPad->Draw();
+      fittingCanvas->cd();
+      topPad->cd();
+      topPad->SetLogy(true);
+      topPad->SetRightMargin(0.4);
+      bottomPad->SetLogy(false);
+      bottomPad->SetRightMargin(0.4);
+      gStyle->SetOptFit(0111);
+    }
 
     TF1* combinedFunct_CentStorage[16];
     for(int iii = 0; iii < 16; iii++) combinedFunct_CentStorage[iii] = NULL;
 
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
       double numberOfCentEvents = m_centEvents[m_currentPartIndex]->GetBinContent(centIndex+1);
+
+      // Physics output -- moved here from its original position after the plotting
+      // block (see comment above); runs unconditionally regardless of
+      // m_saveDiagnosticImages.
+      if(centIndex == 0){ // only write the all cent data once
+        //PION
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[0], simulParamErrors[0]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[1], simulParamErrors[1]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[2], simulParamErrors[2]);
+        //KAON
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[3], simulParamErrors[3]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[4], simulParamErrors[4]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[5], simulParamErrors[5]);
+        //PROTON
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[6], simulParamErrors[6]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[7], simulParamErrors[7]);
+        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[8], simulParamErrors[8]);
+      }
+      //PION
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[9 + 3*centIndex], simulParamErrors[9 + 3*centIndex]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[0], simulParamErrors[0]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[1], simulParamErrors[1]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[2], simulParamErrors[2]);
+      //KAON
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[10 + 3*centIndex], simulParamErrors[10 + 3*centIndex]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[3], simulParamErrors[3]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[4], simulParamErrors[4]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[5], simulParamErrors[5]);
+      //PROTON
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[11 + 3*centIndex], simulParamErrors[11 + 3*centIndex]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[6], simulParamErrors[6]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[7], simulParamErrors[7]);
+      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[8], simulParamErrors[8]);
+
+      HistogramUtilities::setBinValues(m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[11 + 3*centIndex]*numberOfCentEvents, simulParamErrors[11 + 3*centIndex]*numberOfCentEvents);
+
+      if(!m_saveDiagnosticImages) continue; // skip all plotting below for this centIndex
+
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerStyle(20);
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerColor(kBlack);
       m_currentHistosToFit_ByCent[centIndex]->SetMarkerSize(0.5);
@@ -1369,38 +1424,9 @@ void ZFitter::fitTPCProton_SimulCent_ByRapidity(){
         fittingCanvas->SaveAs(Form("%s/%s/%s/dEdxFits_Cent%02d/NoLog_RapBin_%02d_STEP_%02d_mTm0Bin_%02d_%s.png",m_imagePreDir.c_str(), m_imgDirName.c_str(), 
                m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data(),centIndex, m_currentRapBin,fitting_round, m_currentMtM0Bin,roundTag[fitting_round].c_str()));
       }
-      if(centIndex == 0){ // only write the all cent data once
-        //PION
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[0], simulParamErrors[0]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[1], simulParamErrors[1]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][0][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[2], simulParamErrors[2]);
-        //KAON
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[3], simulParamErrors[3]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[4], simulParamErrors[4]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][1][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[5], simulParamErrors[5]);
-        //PROTON
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[6], simulParamErrors[6]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[7], simulParamErrors[7]);
-        HistogramUtilities::setBinValues(m_Fit_Data_ZTPC[m_currentPartIndex][2][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[8], simulParamErrors[8]);
-      }
-      //PION
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[9 + 3*centIndex], simulParamErrors[9 + 3*centIndex]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[0], simulParamErrors[0]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[1], simulParamErrors[1]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[2], simulParamErrors[2]);     
-      //KAON
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[10 + 3*centIndex], simulParamErrors[10 + 3*centIndex]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[3], simulParamErrors[3]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[4], simulParamErrors[4]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[5], simulParamErrors[5]); 
-      //PROTON
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][0][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[11 + 3*centIndex], simulParamErrors[11 + 3*centIndex]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][1][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[6], simulParamErrors[6]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][2][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[7], simulParamErrors[7]);
-      HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZTPC[m_currentPartIndex][2][centIndex][3][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[8], simulParamErrors[8]); 
-
-      HistogramUtilities::setBinValues(m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex], m_currentRapBin, m_currentMtM0Bin, simulParams[11 + 3*centIndex]*numberOfCentEvents, simulParamErrors[11 + 3*centIndex]*numberOfCentEvents);
-
+      // (setBinValues calls originally lived here -- moved above the
+      // "if(!m_saveDiagnosticImages) continue;" line so they always run; see comment
+      // near the top of this function for why that's safe.)
 
       #ifndef _SAVE_POINTERS_
         #ifndef _ZFITTER_PHYSMATH_BYPASS_
@@ -1426,6 +1452,7 @@ void ZFitter::fitTPCProton_SimulCent_ByRapidity(){
 
 
     //DRAW IMAGE WITH ALL CENTRALITIES
+    if(m_saveDiagnosticImages){
     TCanvas* fittingCanvasSimul = new TCanvas("fittingCanvasSimul_SimulTPC","Fitting Canvas");
     fittingCanvasSimul->SetWindowSize(1300,700);
     fittingCanvasSimul->SetCanvasSize(1200,600);
@@ -1473,7 +1500,7 @@ void ZFitter::fitTPCProton_SimulCent_ByRapidity(){
 
     gPad->Update();
     gSystem->ProcessEvents();
-    fittingCanvasSimul->SaveAs(Form("%s/%s/%s/dEdxFits/SimulCent_RapBin_%02d_STEP_%02d_mTm0Bin_%02d_%s.png",m_imagePreDir.c_str(), m_imgDirName.c_str(), 
+    fittingCanvasSimul->SaveAs(Form("%s/%s/%s/dEdxFits/SimulCent_RapBin_%02d_STEP_%02d_mTm0Bin_%02d_%s.png",m_imagePreDir.c_str(), m_imgDirName.c_str(),
          m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data(), m_currentRapBin, fitting_round, m_currentMtM0Bin,roundTag[fitting_round].c_str()));
 
 
@@ -1486,6 +1513,10 @@ void ZFitter::fitTPCProton_SimulCent_ByRapidity(){
       delete topPad;
       delete bottomPad;
       delete fittingCanvas;
+    #endif
+    } // end if(m_saveDiagnosticImages) -- SimulCent overlay plot
+
+    #ifndef _SAVE_POINTERS_
       delete chiSqrdFunctor;
       delete minimizer;
     #endif

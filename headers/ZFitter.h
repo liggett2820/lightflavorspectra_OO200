@@ -224,6 +224,12 @@ public:
 
   void setCanvasParameters(int a_windowWidth,int a_windowHeight, int a_canvasWidth, int a_canvasHeight);
   void setSaveNoLogImages(bool a_toggle = true){m_saveNoLogImages = a_toggle;};
+  // Perf toggle added 2026-07: set false to skip generating the per-bin diagnostic
+  // fit-overlay PNGs (TPC Pion/Kaon, TPC Proton, and BTOF fitters) -- this is by far the
+  // most expensive part of a ZFitter run (canvas render + PNG encode for every
+  // rapidity/mTm0/centrality/step bin combination, vastly more than the fit itself), and
+  // turning it off does not change the fitted spectra output, only skips the QA plots.
+  void setSaveDiagnosticImages(bool a_toggle = true){m_saveDiagnosticImages = a_toggle;};
   void setConvertInvBetaToMassSquared(bool a_toggle = true){m_convertInvBetaToMassSquared = a_toggle;}; // for mapping invBeta BTOF into mass^2
   void setUseColliderStopTable(bool a_toggle = true){m_useColliderStopTable = a_toggle;}; // this will stop fitting tpc when it isn't needed anymore
 
@@ -435,6 +441,13 @@ private:
   bool m_usePearsonIVinSingle;
   bool m_useIdenticalRangeOfAllCent;
   bool m_saveNoLogImages;
+  // Perf toggle added 2026-07: gates the per-bin diagnostic TCanvas/TF1-overlay/PNG
+  // generation in the TPC (Pion/Kaon and Proton) and BTOF fitters -- NOT any actual
+  // fitting/minimizer/parameter-storage logic, so turning this off does not change the
+  // fitted spectra output at all, only skips writing out the per-bin QA plots. Defaults
+  // to true so existing behavior (every bin's fit gets a PNG) is unchanged unless a
+  // caller opts in via setSaveDiagnosticImages(false). See RunZFitter.C.
+  bool m_saveDiagnosticImages;
 
   bool m_useRootMinimizer; // not yet complete
   bool m_useGeneralETOFFitDataConstraint;
