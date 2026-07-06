@@ -1345,8 +1345,14 @@ void PicoBinner(string    a_filelist,
       pT       = track->pPt();
       pZ       = track->pMom().Z();
       dEdx     = track->dEdx();
+      // Cached 2026-07: gDCA() does real helix-propagation math, and isGoodTrack() was
+      // called with these exact same arguments up to 4x (gDCA up to ~11x) per track
+      // further down this loop -- computed once here and reused everywhere below,
+      // identical values, just without the redundant recomputation.
+      double dca = track->gDCA(eventVertex).Mag();
+      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(), track->nHitsDedx(), dca, phi);
       //FILL DCA for Proton and AntiProton
-      if(doProtonDCA && (a_partIndex < 0 || a_partIndex == 2) && a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)){
+      if(doProtonDCA && (a_partIndex < 0 || a_partIndex == 2) && goodTrack){
         double rapidity = PhysMath::rapidity(particleInfo->GetParticleMass(2), pT, pZ);
         double mTm0     = PhysMath::mTm0(particleInfo->GetParticleMass(2), pT);
         Int_t bTofPidIndex = track->bTofPidTraitsIndex();
@@ -1363,17 +1369,17 @@ void PicoBinner(string    a_filelist,
         }
         if(fabs(track->nSigmaProton()) < 2.0 && (!hasBTOFTraits || (hasBTOFTraits && invBeta > 0.0 && a_cutClass->isSpecificParticleByBTOF(invBeta,momentum,2)))){
           if(track->charge() > 0.0){
-            DCA_by_cent_ProtonPlus[centralityIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
+            DCA_by_cent_ProtonPlus[centralityIndex]->Fill(rapidity,mTm0,dca);
           }else{
-            DCA_by_cent_ProtonMinus[centralityIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
+            DCA_by_cent_ProtonMinus[centralityIndex]->Fill(rapidity,mTm0,dca);
           }
         }
         if(fabs(track->nSigmaPion()) < 2.0){
-          DCA_by_cent_PionMinus[centralityIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
+          DCA_by_cent_PionMinus[centralityIndex]->Fill(rapidity,mTm0,dca);
         }
       }//Proton DCA
 
-      if(a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)){
+      if(goodTrack){
         for(int partBaseIndex = 0; partBaseIndex < nParticles; partBaseIndex++){
           if(a_partIndex >= 0 && partBaseIndex != a_partIndex) continue;
           if(partBaseIndex == 3 || partBaseIndex == 8){
@@ -1404,11 +1410,11 @@ void PicoBinner(string    a_filelist,
             double rapidity = PhysMath::rapidity(particleInfo->GetParticleMass(partBaseIndex), pT, pZ);
             double mTm0     = PhysMath::mTm0(particleInfo->GetParticleMass(partBaseIndex), pT);
             if(track->charge() > 0.0){
-              y_mTm0_DCA_woTOF_Plus[partBaseIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
-              if(validParticleWithTOF) y_mTm0_DCA_Plus[partBaseIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
+              y_mTm0_DCA_woTOF_Plus[partBaseIndex]->Fill(rapidity,mTm0,dca);
+              if(validParticleWithTOF) y_mTm0_DCA_Plus[partBaseIndex]->Fill(rapidity,mTm0,dca);
             }else{
-              y_mTm0_DCA_woTOF_Minus[partBaseIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
-              if(validParticleWithTOF) y_mTm0_DCA_Minus[partBaseIndex]->Fill(rapidity,mTm0,track->gDCA(eventVertex).Mag());
+              y_mTm0_DCA_woTOF_Minus[partBaseIndex]->Fill(rapidity,mTm0,dca);
+              if(validParticleWithTOF) y_mTm0_DCA_Minus[partBaseIndex]->Fill(rapidity,mTm0,dca);
             }
           }
         }
@@ -1417,7 +1423,7 @@ void PicoBinner(string    a_filelist,
       if(track->charge() > 0.0) dEdx_Plus_withoutBGCut->Fill(momentum,dEdx);
       else                      dEdx_Minus_withoutBGCut->Fill(momentum,dEdx);
 
-      if(!a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
+      if(!goodTrack) continue;
       if(track->charge() == 0.0) continue;
 
       // RESET TRACK VARIABLES
@@ -1535,11 +1541,16 @@ void PicoBinner(string    a_filelist,
          nSigmaBTOF_part[partIndex]   = -999;
          rapidity_part[partIndex]  = PhysMath::rapidity(particleInfo->GetParticleMass(partIndex), pT, pZ);
          mTm0_part[partIndex]      = PhysMath::mTm0(particleInfo->GetParticleMass(partIndex), pT);
+         // Cached 2026-07: bichselCurves[partIndex]->Eval(momentum) is a TF1 evaluation
+         // (not free) and was being computed twice with identical arguments for every
+         // partIndex > 3 (once for nSigmaTPC_part, once for zTPC_part below) -- computed
+         // once and reused, same values.
+         double bichselLogRatio = log(dEdx/bichselCurves[partIndex]->Eval(momentum));
          if(partIndex >3 ){
-           nSigmaTPC_part[partIndex] = log(dEdx/bichselCurves[partIndex]->Eval(momentum))/log(1.07);
+           nSigmaTPC_part[partIndex] = bichselLogRatio/log(1.07);
          }
          // _USE_CALIB_CLASS_ was not defined; only the Bichsel-curve path survives.
-         zTPC_part[partIndex] = log(dEdx/bichselCurves[partIndex]->Eval(momentum));
+         zTPC_part[partIndex] = bichselLogRatio;
 
          if(preciseBTOF){
             zBTOF_part[partIndex] = invBeta - PhysMath::invBeta(a_cutClass->getMassBTOF(partIndex),momentum);
@@ -1577,7 +1588,7 @@ void PicoBinner(string    a_filelist,
       if(a_makeBasicHistos){
         etaPhi->Fill(eta,phi);
         eta_pT->Fill(eta,pT);
-        dcaHisto->Fill(track->gDCA(eventVertex).Mag());
+        dcaHisto->Fill(dca);
         pion_y_pT->Fill(rapidity_part[0],pT);
 
         // ColliderCenter binning only (FixedTarget fabs() variant deleted -- dead for this build)
