@@ -371,7 +371,14 @@ void PicoBinner(string    a_filelist,
     //## TRACK LEVEL ####
     dcaHisto = new TH1I("dca", "Event DCA; DCA; Counts", 1000, 0, 3.5);
     etaPhi   = new TH2I("etaPhi","Phi vs Eta; #eta; #phi",600, -2.0, 2.0,600,-3.1415,3.1415);
-    eta_pT   = new TH2I("eta_pT",";#eta;p_{T}",350,-3.5,2.0,250,0,6.0);
+    // Same live-lookup fix as pion_y_pT below: eta_pT used the same stale
+    // fixed-target-era range (-3.5,2.0). This is eta, not rapidity, so it pulls from
+    // CutClass's eta bin structure (getEtaPtBinStructure, tag 1=TPC) rather than
+    // getLowRapidity/getHighRapidity.
+    eta_pT   = new TH2I("eta_pT",";#eta;p_{T}",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 250,0,6.0);
 
     dEdx_Plus  = HistogramUtilities::make2DHistLogBinsInt("dEdxVsMom_Plus","dE/dx vs Primary Track Momentum;p_{tot} (GeV/c); dE/dx",
                  true, 1000,0.01, 20,true,1000,1.0,200);
