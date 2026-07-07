@@ -381,18 +381,25 @@ void PicoBinner(string    a_filelist,
                  true, 1000,0.01, 20,true,1000,1.0,200);
     dEdx_Minus_withoutBGCut = HistogramUtilities::make2DHistLogBinsInt("dEdxVsMom_Minus_withoutBGCut","dE/dx vs Primary Track Momentum;p_{tot} (GeV/c); dE/dx",
                  true, 1000,0.01, 20,true,1000,1.0,200);
-    pion_y_pT        = new TH2I("pion_y_pT","Pion Acceptance; y; pT",250,-3.5,2.0,250,0,6);
+    // Rapidity axis bounds below are pulled live from a_cutClass (getLowRapidity/
+    // getHighRapidity, tag 1=TPC, 2=BTOF -- see CutClass::getRapMtM0BinStructure)
+    // instead of the hardcoded fixed-target-era values (-3.5/2.0, -2.5/0) this used to
+    // have, so these acceptance plots always match whatever range SetCutClass.C is
+    // actually configured with, without needing a manual update here every time that
+    // changes. Bin COUNT is left as-is (only the low/high bounds changed) since only
+    // the range was asked for.
+    pion_y_pT        = new TH2I("pion_y_pT","Pion Acceptance; y; pT",250,a_cutClass->getLowRapidity(0,1),a_cutClass->getHighRapidity(0,1),250,0,6);
 
     // ColliderCenter TOF acceptance binning (FixedTarget variant deleted -- dead for this build)
-    pion_y_pT_tof          = new TH2I("pion_y_pT_tof","Pion Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    kaon_y_pT_tof          = new TH2I("kaon_y_pT_tof","Kaon Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    proton_y_pT_tof        = new TH2I("proton_y_pT_tof","Proton Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    pion_y_pT_tof_2        = new TH2I("pion_y_pT_tof_2","Pion Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    kaon_y_pT_tof_2        = new TH2I("kaon_y_pT_tof_2","Kaon Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    proton_y_pT_tof_2      = new TH2I("proton_y_pT_tof_2","Proton Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    pion_y_pT_tof_3        = new TH2I("pion_y_pT_tof_3","Pion Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    kaon_y_pT_tof_3        = new TH2I("kaon_y_pT_tof_3","Kaon Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
-    proton_y_pT_tof_3      = new TH2I("proton_y_pT_tof_3","Proton Acceptance in TOF; y; pT",500,-2.5,0,500,0,2.5);
+    pion_y_pT_tof          = new TH2I("pion_y_pT_tof","Pion Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(0,2),a_cutClass->getHighRapidity(0,2),500,0,2.5);
+    kaon_y_pT_tof          = new TH2I("kaon_y_pT_tof","Kaon Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(1,2),a_cutClass->getHighRapidity(1,2),500,0,2.5);
+    proton_y_pT_tof        = new TH2I("proton_y_pT_tof","Proton Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(2,2),a_cutClass->getHighRapidity(2,2),500,0,2.5);
+    pion_y_pT_tof_2        = new TH2I("pion_y_pT_tof_2","Pion Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(0,2),a_cutClass->getHighRapidity(0,2),500,0,2.5);
+    kaon_y_pT_tof_2        = new TH2I("kaon_y_pT_tof_2","Kaon Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(1,2),a_cutClass->getHighRapidity(1,2),500,0,2.5);
+    proton_y_pT_tof_2      = new TH2I("proton_y_pT_tof_2","Proton Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(2,2),a_cutClass->getHighRapidity(2,2),500,0,2.5);
+    pion_y_pT_tof_3        = new TH2I("pion_y_pT_tof_3","Pion Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(0,2),a_cutClass->getHighRapidity(0,2),500,0,2.5);
+    kaon_y_pT_tof_3        = new TH2I("kaon_y_pT_tof_3","Kaon Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(1,2),a_cutClass->getHighRapidity(1,2),500,0,2.5);
+    proton_y_pT_tof_3      = new TH2I("proton_y_pT_tof_3","Proton Acceptance in TOF; y; pT",500,a_cutClass->getLowRapidity(2,2),a_cutClass->getHighRapidity(2,2),500,0,2.5);
 
     for(int partIndex = 0; partIndex < 9; partIndex++){
       for(int pmIndex = 0; pmIndex < 2; pmIndex++){
