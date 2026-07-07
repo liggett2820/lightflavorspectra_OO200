@@ -1,0 +1,95 @@
+<!--
+  haddPicoBinner_SDCC_template.xml - lightflavorspectra_OO200
+
+  SDCC/RCF star-submit job description for STAGE 1 of a parallel "chunk-then-merge"
+  hadd of PicoBinner's SDCC batch output. A single serial `hadd` over every
+  *_Processed.root fragment (there can be hundreds per species, one per PicoBinner
+  worker process) is slow; this job splits that file list across N worker processes
+  (maxFilesPerProcess below), each of which hadds only its own slice into one chunk
+  file via scripts/hadd_chunk_from_filelist.sh. Once every chunk has landed in the
+  permanent output directory (check with condor_q liggett2820 until the job is done),
+  run STAGE 2 by hand (this is fast now; only a handful of chunk files, not hundreds
+  of fragments):
+
+    scripts/hadd_picobinner_sdcc_output.sh \
+      /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/ \
+      /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root \
+      "chunk_*.root"
+
+  *** BEFORE SUBMITTING: this job needs a plain file list of the existing
+  *_Processed.root fragments; these are NOT in the StarCatalog (they're just files
+  PicoBinner already wrote to disk), so <input> below uses filelist: not catalog:.
+  Generate the list on SDCC first, e.g. for PION:
+    ls /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/*_Processed.root \
+      > /star/u/liggett2820/lightflavorspectra_OO200/xml/pion_processed.list
+
+  *** SPECIES: this template does ONE species per job, same convention as
+  runPicoBinner_OO200_SDCC_template.xml. Make three copies (or three submissions),
+  changing the file list path, job name, and output paths, to cover PION / KAON /
+  PROTON.
+
+  *** maxFilesPerProcess controls parallelism: fewer files per process means more
+  worker processes (more parallelism, faster wall-clock) but more per-process overhead
+  and more chunk files to merge in STAGE 2. 12-20 is a reasonable starting point for a
+  few hundred input fragments; adjust based on how many fragments you actually have.
+
+  Unlike runPicoBinner_OO200_SDCC_template.xml, this job doesn't compile or load any
+  of this repo's ROOT macros/libraries; it only calls the standard `hadd` CLI tool
+  from the STAR container, so the SandBox below packages just the scripts/ directory,
+  not bin/headers/submodule/source/macros.
+-->
+
+<job name="haddPicoBinner_OO200_PION" maxFilesPerProcess="15" simulateSubmission="false" filesPerHour="1000" copyInputLocally="false">
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
+
+  <!-- Scheduler log files -->
+  <stdout URL="file:/star/data03/scratch/liggett/haddPicoBinner_OO200/stdout_stderr/" />
+  <stderr URL="file:/star/data03/scratch/liggett/haddPicoBinner_OO200/stdout_stderr/" />
+
+  <!-- Plain file list of already-existing *_Processed.root fragments (see note above
+       about generating this file before submitting). -->
+  <input URL="filelist:/star/u/liggett2820/lightflavorspectra_OO200/xml/pion_processed.list" nFiles="all" />
+
+  <!-- Scheduler's own auxiliary files -->
+  <Generator><Location>
+    /star/data03/scratch/liggett/schedFiles/haddPicoBinner_OO200
+  </Location></Generator>
+
+  <SandBox installer="ZIP">
+    <Package name="HaddPicoBinner_OO200">
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts</File>
+    </Package>
+  </SandBox>
+
+  <!-- starver just needs to match a release with a working `hadd`; SL24y is fine
+       since this doesn't touch this repo's own compiled libraries at all. -->
+  <command>
+
+    starver SL24y
+
+    pwd
+    ls
+    echo LS TO SCRIPTS:
+    ls scripts
+
+    cd scripts
+    chmod +x hadd_chunk_from_filelist.sh
+
+    echo starting awk command to remove numEvents after file name in list
+    set newList="$PWD"/"$JOBID".list
+    awk '{print $1}' ${FILELIST} > $newList
+
+    pwd
+    ls
+
+    ./hadd_chunk_from_filelist.sh $newList ${SCRATCH}/chunk_$JOBID.root
+
+    <!-- Permanent output area - SCRATCH is wiped after the job -->
+    mv ${SCRATCH}/chunk_$JOBID.root /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/
+
+  </command>
+
+  <!-- Same permanent output area as the mv above -->
+  <output fromScratch="chunk_*.root" toURL="file:/star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/" />
+</job>
