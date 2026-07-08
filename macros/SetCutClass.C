@@ -111,9 +111,15 @@ void SetCutClass(CutClass *cuts){
   // same percentile labels, different multiplicity thresholds (likely a different
   // vertex/pile-up/track-cut configuration upstream). PicoBinner bakes centIndex into
   // the raw yield histograms at production time, so THIS is the scheme that matters.
-  double centCutsArray[5] = {44,37,28,17,5};
-  int percents[5] = {5,10,20,40,80};
-  cuts->setCentralities(5, &centCutsArray[0], &percents[0]);
+  // 80-100% bin added (edge=0) so the most peripheral events aren't dropped entirely --
+  // without it, CutClass::centralityIndex() falls through its loop for any event with
+  // refMult below the old last edge (5) and rejects it (m_rejectedEvents->Fill(6.5),
+  // return -1), the same way the 0-5% bin's upper "no limit" edge is handled by pushing
+  // a large sentinel in CutClass::setCentralities(). refMult=0 as the floor is exact
+  // (not derived/estimated), so this doesn't need DeriveCentralityEdges.C to add.
+  double centCutsArray[6] = {44,37,28,17,5,0};
+  int percents[6] = {5,10,20,40,80,100};
+  cuts->setCentralities(6, &centCutsArray[0], &percents[0]);
 
   // Previous 9-bin scheme (0-5,5-10,10-20,20-30,30-40,40-50,50-60,60-70,70-80) -- kept
   // here, not deleted, in case you need to revert or compare. Shown here ALREADY
