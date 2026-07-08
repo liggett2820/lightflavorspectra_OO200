@@ -112,18 +112,22 @@ links.
 
 ## One-time build setup
 
-1. Build the PicoDst reader submodule and copy its library and dictionary pcm into
-   `bin/` (2026-07-04: this step used to only copy `libStPicoDst.so`, missing
-   `StPicoDst_Dict_rdict.pcm` -- that's a separate file `make` also produces, and
-   without it in `bin/`, RunPicoBinner.C's SDCC SandBox packaging silently ends up
-   missing it, since the XML references `bin/StPicoDst_Dict_rdict.pcm` directly):
+1. Build the PicoDst reader submodule and copy its library into `bin/`:
    ```
    cd submodule/PicoDstReader_SL24y
    make
    cp libStPicoDst.so ../../bin/
-   cp StPicoDst_Dict_rdict.pcm ../../bin/
+   cp StPicoDst_Dict_rdict.pcm ../../bin/ 2>/dev/null || true   # see note below
    cd ../..
    ```
+   **On `StPicoDst_Dict_rdict.pcm`**: a local macOS build produces this dictionary
+   sidecar alongside `libStPicoDst.so`, but SDCC's ROOT/rootcling does not generate one
+   for this submodule at all (confirmed via an actual SDCC build directory listing --
+   only `.o` files plus `StPicoDst_Dict.C/.h`, no `.pcm`), and it isn't needed there
+   either (`xml/runPicoBinner_OO200_SDCC_template.xml` packages only `libStPicoDst.so`,
+   matching how lightflavorspectra_etof's own working production job does it). Copy it
+   opportunistically if it exists; don't treat its absence as an error, especially on
+   SDCC. `scripts/rebuild_libs.sh` handles this automatically.
 2. Compile everything else via ACLiC (run from the repo root):
    ```
    root -l -q -b macros/makeLibs.C
