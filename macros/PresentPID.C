@@ -46,17 +46,22 @@ void PresentPID(string a_inputFile, string a_outDir = "."){
   TCanvas* c = new TCanvas("PresentPID","PID overview",1400,1000);
   c->Divide(2,2);
 
-  c->cd(1); gPad->SetLogx(); gPad->SetLogz();
-  if(dEdxPlus){ dEdxPlus->SetTitle("dE/dx vs p (positive tracks)"); dEdxPlus->Draw("COLZ"); }
+  // Units: StPicoTrack::dEdx() is stored in keV/cm (StPicoTrack.cxx::setDedx() scales
+  // the native GeV/cm value by 1e6); mass comes from PhysMath::mass_fromBeta(p,beta)
+  // with p in GeV/c, i.e. natural units (c=1), so mass is in GeV/c^2.
+  // Extra right margin on every COLZ pad below -- otherwise the z-axis (palette)
+  // power-of-10 labels get clipped/overlap the next pad in a Divide() grid.
+  c->cd(1); gPad->SetLogx(); gPad->SetLogy(); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(dEdxPlus){ dEdxPlus->SetTitle("dE/dx vs p (positive tracks)"); dEdxPlus->GetYaxis()->SetTitle("dE/dx (keV/cm)"); dEdxPlus->Draw("COLZ"); }
 
-  c->cd(2); gPad->SetLogx(); gPad->SetLogz();
-  if(dEdxMinus){ dEdxMinus->SetTitle("dE/dx vs p (negative tracks)"); dEdxMinus->Draw("COLZ"); }
+  c->cd(2); gPad->SetLogx(); gPad->SetLogy(); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(dEdxMinus){ dEdxMinus->SetTitle("dE/dx vs p (negative tracks)"); dEdxMinus->GetYaxis()->SetTitle("dE/dx (keV/cm)"); dEdxMinus->Draw("COLZ"); }
 
-  c->cd(3); gPad->SetLogz();
-  if(massPlus){ massPlus->SetTitle("BTOF mass vs p (positive tracks)"); massPlus->Draw("COLZ"); }
+  c->cd(3); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(massPlus){ massPlus->SetTitle("BTOF mass vs p (positive tracks)"); massPlus->GetYaxis()->SetTitle("m/q (GeV/c^{2})"); massPlus->Draw("COLZ"); }
 
-  c->cd(4); gPad->SetLogz();
-  if(massMinus){ massMinus->SetTitle("BTOF mass vs p (negative tracks)"); massMinus->Draw("COLZ"); }
+  c->cd(4); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(massMinus){ massMinus->SetTitle("BTOF mass vs p (negative tracks)"); massMinus->GetYaxis()->SetTitle("m/q (GeV/c^{2})"); massMinus->Draw("COLZ"); }
 
   string outPath = a_outDir + "/PresentPID.png";
   c->SaveAs(outPath.c_str());

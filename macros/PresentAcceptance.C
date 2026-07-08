@@ -48,14 +48,22 @@ void PresentAcceptance(string a_inputFile, string a_outDir = "."){
   TCanvas* c = new TCanvas("PresentAcceptance","Acceptance overview",1400,500);
   c->Divide(3,1);
 
-  c->cd(1); gPad->SetLogz();
-  if(pionYPt){ pionYPt->SetTitle("Acceptance: y (pion hyp.) vs pT, TPC-only cuts"); pionYPt->Draw("COLZ"); }
+  // y/eta are dimensionless (no unit); pT is in GeV/c (filled from PicoBinner's pT
+  // variable, same convention as the dE/dx-vs-momentum plots in PresentPID.C).
+  // Extra right margin -- otherwise the z-axis (palette) power-of-10 labels get
+  // clipped/overlap the next pad in this Divide(3,1) grid.
+  // Rapidity (y) axis capped at 0 on the high end for display -- keeps whatever low
+  // edge the histogram was actually booked with (species-dependent, from CutClass),
+  // just clips the plotted range rather than re-binning/re-cutting the data itself.
+  // eta_pT is left alone -- its x-axis is detector eta, not rapidity.
+  c->cd(1); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(pionYPt){ pionYPt->SetTitle("Acceptance: y (pion mass assumed) vs pT, TPC-only cuts"); pionYPt->GetYaxis()->SetTitle("p_{T} (GeV/c)"); pionYPt->GetXaxis()->SetRangeUser(pionYPt->GetXaxis()->GetXmin(), 0); pionYPt->Draw("COLZ"); }
 
-  c->cd(2); gPad->SetLogz();
-  if(etaPt){ etaPt->SetTitle("Acceptance: #eta vs pT"); etaPt->Draw("COLZ"); }
+  c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(etaPt){ etaPt->SetTitle("Acceptance: #eta vs pT"); etaPt->GetYaxis()->SetTitle("p_{T} (GeV/c)"); etaPt->Draw("COLZ"); }
 
-  c->cd(3); gPad->SetLogz();
-  if(protonYPtTof){ protonYPtTof->SetTitle("Acceptance: y (proton hyp.) vs pT, TOF-matched"); protonYPtTof->Draw("COLZ"); }
+  c->cd(3); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(protonYPtTof){ protonYPtTof->SetTitle("Acceptance: y (proton mass assumed) vs pT, TOF-matched"); protonYPtTof->GetYaxis()->SetTitle("p_{T} (GeV/c)"); protonYPtTof->GetXaxis()->SetRangeUser(protonYPtTof->GetXaxis()->GetXmin(), 0); protonYPtTof->Draw("COLZ"); }
 
   string outPath = a_outDir + "/PresentAcceptance.png";
   c->SaveAs(outPath.c_str());

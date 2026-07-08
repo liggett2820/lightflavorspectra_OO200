@@ -204,6 +204,7 @@ void PicoBinner(string    a_filelist,
   TH1I* dcaHisto = NULL;
   TH2I* etaPhi   = NULL;
   TH2I* eta_pT   = NULL;
+  TH2I* eta_nHitsFit = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
   TH2I* dEdx_Plus_withoutBGCut  = NULL;
@@ -379,6 +380,13 @@ void PicoBinner(string    a_filelist,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                  250,0,6.0);
+    // Same live-lookup pattern as eta_pT above (TPC eta range from CutClass rather than
+    // a hardcoded value). N_hits^fit tops out around the TPC's 45 padrows, so 0-50
+    // covers the full range with a little headroom.
+    eta_nHitsFit = new TH2I("eta_nHitsFit",";#eta;N_{hits}^{fit}",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 50,0,50);
 
     dEdx_Plus  = HistogramUtilities::make2DHistLogBinsInt("dEdxVsMom_Plus","dE/dx vs Primary Track Momentum;p_{tot} (GeV/c); dE/dx",
                  true, 1000,0.01, 20,true,1000,1.0,200);
@@ -1602,6 +1610,7 @@ void PicoBinner(string    a_filelist,
       if(a_makeBasicHistos){
         etaPhi->Fill(eta,phi);
         eta_pT->Fill(eta,pT);
+        eta_nHitsFit->Fill(eta,track->nHitsFit());
         dcaHisto->Fill(dca);
         pion_y_pT->Fill(rapidity_part[0],pT);
 

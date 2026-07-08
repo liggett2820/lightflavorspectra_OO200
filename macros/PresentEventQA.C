@@ -25,6 +25,10 @@
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TStyle.h"
+#include "TPaveStats.h"
+#include "TLine.h"
+#include "TLatex.h"
+#include "TMath.h"
 #include <iostream>
 using namespace std;
 
@@ -54,14 +58,59 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   TCanvas* c = new TCanvas("PresentEventQA","Event QA overview",1400,1000);
   c->Divide(2,2);
 
+  // zVertex's X axis already carries units (cm) from PicoBinner.cxx; its Y axis (a
+  // plain bin count) isn't set there, so label it here for consistency with
+  // xyHisto/refMult/centEvents, which already have it baked into their titles.
   c->cd(1);
-  if(zVertex){ zVertex->SetTitle("Event Z vertex"); zVertex->Draw(); }
+  if(zVertex){ zVertex->SetTitle("Event Z vertex"); zVertex->GetYaxis()->SetTitle("Number of Events"); zVertex->Draw(); }
 
-  c->cd(2); gPad->SetLogz();
-  if(xyHisto){ xyHisto->SetTitle("Event vertex X vs Y"); xyHisto->Draw("COLZ"); }
+  // Extra right margin -- otherwise the z-axis (palette) power-of-10 labels get
+  // clipped/overlap the next pad in this Divide(2,2) grid.
+  c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
+  if(xyHisto){
+    xyHisto->SetTitle("Event vertex X vs Y");
+    xyHisto->Draw("COLZ");
+    // The default stats box (gStyle->SetOptStat(1) above) sits top-right, right on top
+    // of the COLZ palette -- move it to the top-left corner instead, out of the way.
+    gPad->Update();
+    TPaveStats* xyStats = (TPaveStats*) xyHisto->FindObject("stats");
+    if(xyStats){
+      xyStats->SetX1NDC(0.15); xyStats->SetX2NDC(0.40);
+      xyStats->SetY1NDC(0.75); xyStats->SetY2NDC(0.90);
+      gPad->Modified();
+    }
+  }
 
+  // Display range capped at 140 -- refMult is booked 0-1000 in PicoBinner.cxx; this
+  // just clips the plotted range, doesn't rebin or drop any underlying entries.
   c->cd(3); gPad->SetLogy();
-  if(refMult){ refMult->SetTitle("refMult"); refMult->Draw(); }
+  if(refMult){
+    refMult->SetTitle("refMult");
+    refMult->GetXaxis()->SetRangeUser(0, 140);
+    refMult->Draw();
+
+    // Overlay the official 5-bin centrality cuts from SetCutClass.C (2026-07-03:
+    // {44,37,28,17,5} at the 5/10/20/40/80% boundaries -- these are the values that
+    // actually produced this file's centIndex, NOT re-derived here).
+    double centCuts[5]     = {44, 37, 28, 17, 5};
+    int    centPercents[5] = {5, 10, 20, 40, 80};
+    gPad->Update();
+    double yMin = TMath::Power(10, gPad->GetUymin());
+    double yMax = TMath::Power(10, gPad->GetUymax());
+    for(int iii = 0; iii < 5; iii++){
+      TLine* cutLine = new TLine(centCuts[iii], yMin, centCuts[iii], yMax);
+      cutLine->SetLineColor(kRed);
+      cutLine->SetLineStyle(2);
+      cutLine->SetLineWidth(2);
+      cutLine->Draw("SAME");
+
+      TLatex* cutLabel = new TLatex(centCuts[iii], yMax, Form("%d%%",centPercents[iii]));
+      cutLabel->SetTextColor(kRed);
+      cutLabel->SetTextSize(0.035);
+      cutLabel->SetTextAlign(21); // centered horizontally, bottom-aligned
+      cutLabel->Draw("SAME");
+    }
+  }
 
   c->cd(4);
   if(centEvents){ centEvents->SetTitle("Events per centrality bin"); centEvents->Draw(); }
