@@ -36,6 +36,21 @@ with ascending percents (same magnitudes, wrong order) -- `CutClass::centralityI
 only discriminates central from peripheral correctly with descending edges, so this was
 corrected (edge order reversed, values not re-derived) as part of the 2026-07-02 change.
 
+**UPDATE 2026-07-07**: the `{44,37,28,17,5}` refMult values are the official cuts from a
+separate, already-validated analysis -- not something to re-derive. The observed skew
+(most events landing in the 40-80% bin, values that looked like the old `{300,150,100,
+70,0}` scheme) turned out to be a stale build, not wrong cut values: `macros/makeLibs.C`
+compiles `SetCutClass.C` via `gSystem->CompileMacro()`, which only recompiles when it
+sees the source as newer than the existing `bin/SetCutClass_C.so`. If the updated
+`SetCutClass.C` reaches SDCC in a way that preserves an older mtime (e.g. `rsync`/`scp
+-p`), that check silently passes and SDCC keeps running the previously-compiled (old-cut)
+binary even though the source text is correct. Fix: `root -l -q -b
+'macros/makeLibs.C("clean")'` (wipes `bin/*`) then rebuild with `root -l -q -b
+macros/makeLibs.C` before re-running PicoBinner. `macros/DeriveCentralityEdges.C` (reads
+a yield file's `refMult` histogram and reports the refMult value at each percentile
+boundary) is available as an independent sanity check against the official cuts, not a
+replacement for them.
+
 Centrality assignment happens once, per event, inside `PicoBinner` (it calls
 `CutClass::centralityIndex()` and bakes the resulting centIndex into the raw yield
 histograms) -- so **any change to this scheme requires re-running PicoBinner for all
