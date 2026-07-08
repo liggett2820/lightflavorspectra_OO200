@@ -18,6 +18,13 @@
 # rebuilt and copied back in every time bin/ gets wiped, or makeLibs.C fails immediately
 # with "libStPicoDst.so does not exist".
 #
+# That submodule's own Makefile only tracks libStPicoDst.so as a target -- if it's
+# already sitting in submodule/PicoDstReader_SL24y/ from a previous build, plain `make`
+# reports "Nothing to be done" and skips the rootcint step entirely, so
+# StPicoDst_Dict_rdict.pcm (a side-effect file, not its own tracked target) never gets
+# (re)created and the later `cp` fails with "No such file or directory". `make clean`
+# first forces both the dictionary and the library to actually regenerate.
+#
 # USAGE (run from anywhere -- it cd's to the repo root itself):
 #   ./scripts/rebuild_libs.sh              # full clean rebuild (default, recommended)
 #   ./scripts/rebuild_libs.sh --no-clean    # skip the bin/ wipe, just recompile changed
@@ -37,7 +44,7 @@ if [ "${1:-}" = "--no-clean" ]; then
 fi
 
 echo "=== [1/4] Building PicoDstReader_SL24y submodule ==="
-( cd submodule/PicoDstReader_SL24y && make )
+( cd submodule/PicoDstReader_SL24y && make clean && make )
 
 if [ $CLEAN -eq 1 ]; then
   echo "=== [2/4] Clearing bin/ (root -l -q -b 'macros/makeLibs.C(\"clean\")') ==="
