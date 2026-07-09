@@ -320,19 +320,40 @@ template, every `/liggett` path needs updating to their own account first.
 
 ### Before you can submit
 
-1. **Rebuild on SDCC, not just on your laptop.** `bin/*.so` are not committed to this
+1. **Push local commits, then `git pull` on SDCC, before rebuilding.** Any source edit
+   made on a laptop (or anywhere else) only exists on SDCC once it's been pushed to
+   GitHub *and* pulled into the SDCC checkout -- `bin/*.so` there is built from whatever
+   `git pull` last brought in, not from whatever's newest on your laptop. It's easy to
+   edit `PicoBinner.cxx`/`CutClass.cxx`/`SetCutClass.C` etc., rebuild and test locally,
+   and then submit an SDCC job assuming it picked up the change, when SDCC is actually
+   still running an older checkout -- the job won't error, it'll just silently produce
+   output missing whatever the new code was supposed to add (this happened in practice:
+   a new `eta_nHitsFit` histogram was added, committed, and even rebuilt locally, but the
+   commit sat unpushed while a real production PicoBinner job ran on SDCC against the old
+   code, so the resulting yield file simply didn't have the histogram -- nothing failed,
+   it just wasn't there). Checklist, every time before submitting:
+   ```
+   # wherever you made the edit:
+   git push origin master
+   # on the SDCC/RCF interactive node:
+   git pull
+   ```
+2. **Rebuild on SDCC, not just on your laptop.** `bin/*.so` are not committed to this
    repo (see `.gitignore`) because a laptop build produces macOS/arm64 binaries that
-   will not load on BNL's Linux nodes. After cloning this repo onto an SDCC/RCF
-   interactive node, run the "One-time build setup" steps above (build
-   `submodule/PicoDstReader_SL24y`, then `root -l -q -b macros/makeLibs.C`) there first --
-   the `<SandBox>` packages whatever's actually in `bin/` at submission time, so it needs
-   to already be genuine Linux binaries.
-2. **If you're not liggett2820, update every `/liggett` path in the XML** -- the scratch
+   will not load on BNL's Linux nodes. After `git pull` on an SDCC/RCF interactive node,
+   run the "One-time build setup" steps above (build `submodule/PicoDstReader_SL24y`,
+   then `root -l -q -b macros/makeLibs.C`) there -- the `<SandBox>` packages whatever's
+   actually in `bin/` at submission time, so it needs to already be genuine Linux
+   binaries built from the code you just pulled. If in doubt whether a change actually
+   recompiled, force it: `root -l -q -b 'macros/makeLibs.C("clean")'` then rebuild (see
+   "Centrality binning" above for a case where a stale `.so` silently kept running old
+   cut values even though the source was correct).
+3. **If you're not liggett2820, update every `/liggett` path in the XML** -- the scratch
    log directory (`<stdout>`/`<stderr>`), the `<Generator><Location>`, and the permanent
    output directory (the `mv` line in `<command>` plus the `<output>` element). These are
    filled in for one specific SDCC account and disk allocation; they won't resolve for
    anyone else as-is.
-3. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021` part
+4. **Double-check the catalog query.** The `trgsetupname=production_OO_200GeV_2021` part
    of the `<input URL="catalog:...">` line, and its runnumber whitelist, are copied from
    `lightflavorspectra_etof`'s working O+O 200 GeV XML job; `production=`/`library=` have
    been changed to `P24iy`/`SL24y` per this repo's port (the reference job instead paired
@@ -341,7 +362,7 @@ template, every `/liggett` path needs updating to their own account first.
    been independently re-verified against the current StarCatalog, so confirm it still
    resolves to files before relying on it (an unverified pairing may just return zero
    files).
-4. Make one copy of the template per species (PION/KAON/PROTON), editing the `PARTNAME`
+5. Make one copy of the template per species (PION/KAON/PROTON), editing the `PARTNAME`
    argument in the `run_picobinner_sdcc.bash` call, the job `name`, and the output paths
    in each copy so the three jobs don't collide.
 
