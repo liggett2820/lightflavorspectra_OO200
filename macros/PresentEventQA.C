@@ -62,7 +62,15 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   // plain bin count) isn't set there, so label it here for consistency with
   // xyHisto/refMult/centEvents, which already have it baked into their titles.
   c->cd(1);
-  if(zVertex){ zVertex->SetTitle("Event Z vertex"); zVertex->GetYaxis()->SetTitle("Number of Events"); zVertex->Draw(); }
+  if(zVertex){
+    zVertex->SetTitle("Event Z vertex");
+    zVertex->GetYaxis()->SetTitle("Number of Events");
+    // Display range capped at [-4,4]cm -- just clips the plotted range (SetCutClass.C's
+    // setZRange(-2,2) event-level cut is well inside this), doesn't rebin or drop any
+    // underlying entries.
+    zVertex->GetXaxis()->SetRangeUser(-4, 4);
+    zVertex->Draw();
+  }
 
   // Extra right margin -- otherwise the z-axis (palette) power-of-10 labels get
   // clipped/overlap the next pad in this Divide(2,2) grid.
@@ -113,7 +121,14 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   }
 
   c->cd(4);
-  if(centEvents){ centEvents->SetTitle("Events per centrality bin"); centEvents->Draw(); }
+  if(centEvents){
+    centEvents->SetTitle("Events per centrality bin");
+    // Force the y-axis to start at 0 -- ROOT's default autoscale starts near the
+    // lowest bin content, which zero-suppresses the axis and exaggerates bin-to-bin
+    // differences that are actually small relative to the total.
+    centEvents->SetMinimum(0);
+    centEvents->Draw();
+  }
 
   string outPath = a_outDir + "/PresentEventQA.png";
   c->SaveAs(outPath.c_str());
