@@ -97,15 +97,17 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     refMult->GetXaxis()->SetRangeUser(0, 140);
     refMult->Draw();
 
-    // Overlay the official 5-bin centrality cuts from SetCutClass.C (2026-07-03:
-    // {44,37,28,17,5} at the 5/10/20/40/80% boundaries -- these are the values that
-    // actually produced this file's centIndex, NOT re-derived here).
-    double centCuts[5]     = {44, 37, 28, 17, 5};
-    int    centPercents[5] = {5, 10, 20, 40, 80};
+    // Overlay the official 6-bin centrality cuts from SetCutClass.C (2026-07-09:
+    // {44,37,28,17,5,0} at the 5/10/20/40/80/100% boundaries -- the 0 edge is the
+    // 80-100% bin added so peripheral events aren't dropped, see SetCutClass.C's
+    // own comment. These are the values that actually produced this file's
+    // centIndex, NOT re-derived here.
+    double centCuts[6]     = {44, 37, 28, 17, 5, 0};
+    int    centPercents[6] = {5, 10, 20, 40, 80, 100};
     gPad->Update();
     double yMin = TMath::Power(10, gPad->GetUymin());
     double yMax = TMath::Power(10, gPad->GetUymax());
-    for(int iii = 0; iii < 5; iii++){
+    for(int iii = 0; iii < 6; iii++){
       TLine* cutLine = new TLine(centCuts[iii], yMin, centCuts[iii], yMax);
       cutLine->SetLineColor(kRed);
       cutLine->SetLineStyle(2);
