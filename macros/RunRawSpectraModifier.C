@@ -78,7 +78,7 @@ void RunRawSpectraModifier(string a_pionYieldFile, string a_kaonYieldFile, strin
   }
 
   // ################  FIXED CONFIGURATION (identical across all 7 original entries)  ################
-  int  nCentBins = 5; // STALE as of 2026-07-09: SetCutClass.C now sets a 6-bin scheme (0-5,5-10,10-20,20-40,40-80,80-100) -- this was not updated to match and needs bumping to 6 before running against data binned under the new scheme (see README's "Centrality binning" section)
+  int  nCentBins = 6; // matches CutClass's 6-bin scheme (0-5,5-10,10-20,20-40,40-80,80-100) set in SetCutClass.C -- bumped from 5 on 2026-07-09 when the 80-100% bin was added (see README's "Centrality binning" section)
   bool converted16CentBinsTo9CentBins = false;
   bool pTLossMode = true;
 

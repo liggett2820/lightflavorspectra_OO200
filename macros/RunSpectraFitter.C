@@ -69,7 +69,7 @@
 void RunSpectraFitter(string a_spectraFile,   // RawSpectraModifier's writeRapiditySpectra(...) output
                        string a_outputFile,   // where the fit results get written
                        string a_imageDir = "./spectrafit_images",  // directory for diagnostic fit-quality plots
-                       int    a_numCent = 5, // STALE as of 2026-07-09: SetCutClass.C now sets a 6-bin scheme (0-5,5-10,10-20,20-40,40-80,80-100) -- this default was not updated to match and needs bumping to 6 before running against data binned under the new scheme (see README's "Centrality binning" section)
+                       int    a_numCent = 6, // matches CutClass's 6-bin scheme (0-5,5-10,10-20,20-40,40-80,80-100) set in SetCutClass.C -- bumped from 5 on 2026-07-09 when the 80-100% bin was added (see README's "Centrality binning" section)
                        bool   a_corrected = true,
                        bool   a_doInclusiveFits = false, // false does PRIMORDIAL fits (original repo's own comment)
                        TString a_TPC_TOF = "TPC_BTOF",
