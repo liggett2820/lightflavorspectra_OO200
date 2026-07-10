@@ -1844,6 +1844,7 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(dcaHisto);
     HistogramUtilities::ConditionalWrite(etaPhi);
     HistogramUtilities::ConditionalWrite(eta_pT);
+    HistogramUtilities::ConditionalWrite(eta_nHitsFit);
     HistogramUtilities::ConditionalWrite(pion_y_pT);
     HistogramUtilities::ConditionalWrite(pion_y_pT_tof);
     HistogramUtilities::ConditionalWrite(kaon_y_pT_tof);
