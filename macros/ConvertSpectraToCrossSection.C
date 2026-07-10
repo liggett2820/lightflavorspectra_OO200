@@ -20,12 +20,16 @@
 // means multiplying by that bin's SHARE of the total reaction cross section, i.e.
 //   sigma_bin = (percentile width of the bin) * sigma_reaction_total
 // e.g. the 0-5% (most central) bin gets 5% of sigma_reaction_total, the 10-20% bin
-// gets 10%, etc. The percentile widths used here are copied verbatim from
-// source/CutClass.cxx's setStRefMultCorrCentralities() (see its own header comment,
-// "Centrality binning:", around line 400) -- NOT re-derived or assumed -- so they are
-// guaranteed to match this repo's own centIndex convention (centIndex 0 = 0-5% most
-// central ... centIndex 8 = 70-80% most peripheral for the 9-bin scheme this repo
-// defaults to; see CutClass::centralityIndex(), "centIndex = 8 - getCentralityBin9()").
+// gets 10%, etc. The centEdges9/centEdges16 tables below (a_centScheme=1/2) are copied
+// verbatim from source/CutClass.cxx's setStRefMultCorrCentralities() (see its own header
+// comment, "Centrality binning:", around line 400) for anyone still working with that
+// older output -- NOT re-derived or assumed. NOTE: that function and its
+// getCentralityBin9()-based indexing belong to the _STREFMULTCORR_ / m_useStRefMultCorr
+// code path, which is NOT what this repo actually runs -- _STREFMULTCORR_ is never
+// defined for this build (m_useStRefMultCorr defaults false in CutClass.cxx, and
+// SetCutClass.C/PicoBinner.cxx both note it was never turned on for _OO_200_COL_), so
+// centIndex here always comes from the plain raw-refMult branch in
+// CutClass::centralityIndex() (the m_centEdges loop), not from getCentralityBin9().
 //
 // sigma_reaction_total (mb, with its uncertainty) is NOT computed here -- it comes from
 // a separate Glauber Monte Carlo calculation (this repo has no Glauber code of its
@@ -39,10 +43,17 @@
 //   root -l -q -b LoadDrawingLibs.C 'ConvertSpectraToCrossSection.C("fit_output.root","../../glaubermchardness/data/sigmaReaction_OO200.root")'
 //   root -l -q -b LoadDrawingLibs.C 'ConvertSpectraToCrossSection.C("fit_output.root","sigmaReaction.root","crossSections.root",1)'
 //
-// a_centScheme: 0 (default) = the 5-bin scheme (0-5,5-10,10-20,20-40,40-80%) SetCutClass.C
-// currently configures; 1 = the old 9-bin scheme (0-5,5-10,10-20,20-30,...,70-80%); 2 =
-// the old 16-bin scheme (all 5%-wide). Must match whatever a_numCent RunSpectraFitter.C
-// was actually run with -- passing the wrong one will silently apply the wrong bin widths.
+// a_centScheme: 0 (default) = a 5-bin scheme (0-5,5-10,10-20,20-40,40-80%); 1 = the old
+// 9-bin scheme (0-5,5-10,10-20,20-30,...,70-80%); 2 = the old 16-bin scheme (all
+// 5%-wide). Must match whatever a_numCent RunSpectraFitter.C was actually run with --
+// passing the wrong one will silently apply the wrong bin widths.
+//
+// STALE as of 2026-07-09: SetCutClass.C now configures a 6-bin scheme (adds 80-100%),
+// so a_centScheme=0/centEdges5 below no longer matches "SetCutClass.C's current"
+// configuration -- it reflects the previous 5-bin scheme only. Don't use a_centScheme=0
+// against a yield file produced under the new 6-bin scheme without first adding the
+// 80-100% edge here (and confirming RunSpectraFitter.C's a_numCent was also updated to
+// 6 for that run -- see README's "Centrality binning" section).
 
 #include "../makefile_toggles.h"
 // Needed so cling knows this type when the macro is interpreted -- gSystem->Load() in
@@ -68,11 +79,12 @@ static const int g_MaxRapBins = 35;
 void ConvertSpectraToCrossSection(string  a_fitOutputFile,                    // SpectraFitter's writeOutputs() output, e.g. "fit_output.root"
                                    string  a_sigmaReactionFile,                // BootstrapReactionCrossSection.C's output (see header comment)
                                    string  a_outputFile     = "crossSections.root",
-                                   int     a_centScheme     = 0){              // 0=5-bin (current default, see header comment), 1=old 9-bin, 2=old 16-bin
+                                   int     a_centScheme     = 0){              // 0=5-bin (STALE default, see header comment), 1=old 9-bin, 2=old 16-bin
 
   // ---- Centrality percentile-width table (fractional, e.g. 0.05 = 5%) ----
-  // centEdges5 matches SetCutClass.C's current setCentralities(5,...) call exactly
-  // (0-5,5-10,10-20,20-40,40-80%). centEdges9/centEdges16 are copied verbatim from
+  // centEdges5 matches SetCutClass.C's PREVIOUS setCentralities(5,...) call (0-5,5-10,
+  // 10-20,20-40,40-80%) -- NOT its current 6-bin one (see STALE note in the header
+  // comment above). centEdges9/centEdges16 are copied verbatim from
   // source/CutClass.cxx's setStRefMultCorrCentralities() m_centPercents (see that
   // function's header comment for the full bin-index-to-% table) and kept here for
   // anyone still working with older 9-bin/16-bin output. centIndex i covers

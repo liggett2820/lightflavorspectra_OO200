@@ -1,9 +1,11 @@
 // DeriveCentralityEdges.C -- lightflavorspectra_OO200
 //
-// WHY THIS EXISTS: SetCutClass.C's setCentralities(5, centCutsArray, percents) call
-// uses refMult thresholds {44,37,28,17,5} for the 5/10/20/40/80% bins -- these are the
-// OFFICIAL cuts from a separate, already-validated analysis, not something to re-derive
-// or second-guess. (A 2026-07-07 investigation into a reported population skew traced
+// WHY THIS EXISTS: SetCutClass.C's setCentralities(6, centCutsArray, percents) call
+// uses refMult thresholds {44,37,28,17,5,0} for the 5/10/20/40/80/100% bins -- these are
+// the OFFICIAL cuts from a separate, already-validated analysis (the trailing 0 for the
+// 80-100% bin was added 2026-07-09; exact by construction since it's the multiplicity
+// floor, not derived), not something to re-derive or second-guess. (A 2026-07-07
+// investigation into a reported population skew traced
 // that symptom to a stale compiled bin/SetCutClass_C.so on SDCC still running an older
 // cut scheme, not to these values being wrong -- see README's "Centrality binning"
 // section, "UPDATE 2026-07-07".)

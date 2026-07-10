@@ -107,7 +107,7 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   cout << "  image dir name:    " << imageDirName << endl;
   cout << "  spectra file name: " << spectraFileName << endl;
 
-  int  nCentToRun = 5; // matches CutClass's 5-bin scheme (0-5,5-10,10-20,20-40,40-80) set in SetCutClass.C
+  int  nCentToRun = 5; // STALE as of 2026-07-09: SetCutClass.C now sets a 6-bin scheme (0-5,5-10,10-20,20-40,40-80,80-100) -- this was not updated to match and needs bumping to 6 before running against data binned under the new scheme (see README's "Centrality binning" section)
   bool onlyDoOneCent = false;
 
   vector<int> rapBinsToTest = {};

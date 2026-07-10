@@ -20,13 +20,16 @@ which values were fixed verbatim vs. exposed as new function arguments, and why.
 
 ## Centrality binning
 
-`macros/SetCutClass.C` configures a **5-bin** raw refMult centrality scheme via
-`CutClass::setCentralities()`: 0-5%, 5-10%, 10-20%, 20-40%, 40-80% (as of 2026-07-02,
-replacing an earlier 9-bin scheme -- see that call's header comment for the previous
-9-bin cut values, kept commented out there for reference). The refMult cut values for
-this 5-bin scheme are not newly derived -- they're the same cuts the 9-bin scheme
-already used at the percentile boundaries that survive merging (5/10/20/40/80% were
-already 9-bin edges; only the intermediate 30/50/60/70% edges are dropped).
+`macros/SetCutClass.C` configures a **6-bin** raw refMult centrality scheme via
+`CutClass::setCentralities()`: 0-5%, 5-10%, 10-20%, 20-40%, 40-80%, 80-100% (as of
+2026-07-02, replacing an earlier 9-bin scheme -- see that call's header comment for the
+previous 9-bin cut values, kept commented out there for reference). The refMult cut
+values for the 5 most-central bins are not newly derived -- they're the same cuts the
+9-bin scheme already used at the percentile boundaries that survive merging (5/10/20/40/
+80% were already 9-bin edges; only the intermediate 30/50/60/70% edges are dropped). The
+80-100% bin (edge=0) was added on 2026-07-09 so the most peripheral events, which the
+5-bin scheme silently rejected outright, are binned instead -- 0 as the floor is exact,
+not derived, so it didn't need re-deriving via `DeriveCentralityEdges.C`.
 
 Centrality classes are defined by integrating the Glauber-model multiplicity
 distribution from most-central (highest multiplicity) to most-peripheral, so the
@@ -36,7 +39,7 @@ with ascending percents (same magnitudes, wrong order) -- `CutClass::centralityI
 only discriminates central from peripheral correctly with descending edges, so this was
 corrected (edge order reversed, values not re-derived) as part of the 2026-07-02 change.
 
-**UPDATE 2026-07-07**: the `{44,37,28,17,5}` refMult values are the official cuts from a
+**UPDATE 2026-07-07**: the `{44,37,28,17,5,0}` refMult values are the official cuts from a
 separate, already-validated analysis -- not something to re-derive. The observed skew
 (most events landing in the 40-80% bin, values that looked like the old `{300,150,100,
 70,0}` scheme) turned out to be a stale build, not wrong cut values: `macros/makeLibs.C`
@@ -57,7 +60,7 @@ histograms) -- so **any change to this scheme requires re-running PicoBinner for
 three species**; existing yield files binned under a different scheme are not
 compatible and must be regenerated. `RunZFitter.C`'s `nCentToRun`, `RunRawSpectraModifier.C`'s
 `nCentBins`, and `RunSpectraFitter.C`'s `a_numCent` default all need to match whatever
-scheme is actually configured here (currently 5) -- they're kept in sync manually, not
+scheme is actually configured here (currently 6) -- they're kept in sync manually, not
 read from `CutClass` automatically, so double-check all three if you change this again.
 
 ## PicoDst reader version
