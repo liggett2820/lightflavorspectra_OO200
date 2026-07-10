@@ -67,7 +67,12 @@ void SetCutClass(CutClass *cuts){
   cuts->setTrigToggle(true);
 
   //###############    TRACK QUALITY CUTS ###################
-  cuts->setNHitsFit(20); // was 15 -- corrected 2026-07-03 to match SDCC
+  cuts->setNHitsFit(15); // reverted from 20 (2026-07-10) to recover more forward (large
+                         // |eta|, low pT) tracks -- 20 was the 2026-07-03 SDCC-matched
+                         // value; this is a deliberate divergence from that officially-
+                         // validated cut, not a correction, so treat results under this
+                         // as a track-quality systematic variation until/unless the
+                         // official analysis itself adopts 15.
   cuts->setNHitsDeDx(10);
   cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
   cuts->setBTOF(1.6, 2.8);
