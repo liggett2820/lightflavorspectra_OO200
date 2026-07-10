@@ -205,6 +205,7 @@ void PicoBinner(string    a_filelist,
   TH2I* etaPhi   = NULL;
   TH2I* eta_pT   = NULL;
   TH2I* eta_nHitsFit = NULL;
+  TH2I* eta_nHitsMax = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
   TH2I* dEdx_Plus_withoutBGCut  = NULL;
@@ -384,6 +385,14 @@ void PicoBinner(string    a_filelist,
     // a hardcoded value). N_hits^fit tops out around the TPC's 45 padrows, so 0-50
     // covers the full range with a little headroom.
     eta_nHitsFit = new TH2I("eta_nHitsFit",";#eta;N_{hits}^{fit}",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 50,0,50);
+    // Same live-lookup pattern again. N_hits^max is the geometric ceiling nHitsFit is
+    // divided by for CutClass's fitMaxRatio cut -- plotting it vs eta shows whether a
+    // low-yield corner (large |eta| + low pT) is acceptance-limited (nHitsMax itself
+    // drops there) as opposed to cut-limited (plenty of possible hits, just not fit).
+    eta_nHitsMax = new TH2I("eta_nHitsMax",";#eta;N_{hits}^{max}",350,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                  50,0,50);
@@ -1611,6 +1620,7 @@ void PicoBinner(string    a_filelist,
         etaPhi->Fill(eta,phi);
         eta_pT->Fill(eta,pT);
         eta_nHitsFit->Fill(eta,track->nHitsFit());
+        eta_nHitsMax->Fill(eta,track->nHitsMax());
         dcaHisto->Fill(dca);
         pion_y_pT->Fill(rapidity_part[0],pT);
 
@@ -1845,6 +1855,7 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(etaPhi);
     HistogramUtilities::ConditionalWrite(eta_pT);
     HistogramUtilities::ConditionalWrite(eta_nHitsFit);
+    HistogramUtilities::ConditionalWrite(eta_nHitsMax);
     HistogramUtilities::ConditionalWrite(pion_y_pT);
     HistogramUtilities::ConditionalWrite(pion_y_pT_tof);
     HistogramUtilities::ConditionalWrite(kaon_y_pT_tof);
