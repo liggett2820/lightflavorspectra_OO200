@@ -67,12 +67,20 @@ void SetCutClass(CutClass *cuts){
   cuts->setTrigToggle(true);
 
   //###############    TRACK QUALITY CUTS ###################
-  cuts->setNHitsFit(15); // reverted from 20 (2026-07-10) to recover more forward (large
-                         // |eta|, low pT) tracks -- 20 was the 2026-07-03 SDCC-matched
-                         // value; this is a deliberate divergence from that officially-
-                         // validated cut, not a correction, so treat results under this
-                         // as a track-quality systematic variation until/unless the
-                         // official analysis itself adopts 15.
+  cuts->setNHitsFit(10); // lowered from 15 to 10 (2026-07-11) to recover more forward
+                         // (large |eta|, low pT) tracks -- 20 was the 2026-07-03
+                         // SDCC-matched, officially-validated value; 10 is STAR's own
+                         // tracker floor (NIM paper: tracks need >=10 padrow hits or
+                         // they're too likely to be broken fragments), i.e. this cut is
+                         // now doing NO extra quality filtering beyond what the tracker
+                         // itself already requires to report a track at all. Treat
+                         // results under this as a track-quality systematic variation,
+                         // not the production cut, and note the fitMaxRatio cut that's
+                         // supposed to catch split/broken tracks currently has a known
+                         // integer-division bug (PicoBinner.cxx:1325,1384) making it a
+                         // near no-op -- with both the absolute floor this low AND that
+                         // safety net not functioning, split/fragment contamination risk
+                         // here is real, not just theoretical.
   cuts->setNHitsDeDx(10);
   cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
   cuts->setBTOF(1.6, 2.8);
