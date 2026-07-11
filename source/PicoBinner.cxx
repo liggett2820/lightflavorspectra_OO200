@@ -1322,7 +1322,12 @@ void PicoBinner(string    a_filelist,
 
     for (int trackIndex = 0; trackIndex < (int)dst->numberOfTracks(); trackIndex++){
       StPicoTrack* track = dst->track(trackIndex);
-      if(!a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
+      // Bug fix 2026-07-11: nHits()/nHitsPoss() was INTEGER division (both are Int_t),
+      // truncating to 0 unless a track used literally every possible padrow -- this made
+      // the fitMaxRatio cut inside isGoodTrack() effectively "reject unless nHitsFit ==
+      // nHitsMax exactly" instead of the intended >=50% ratio, silently defeating the
+      // split/broken-track rejection this cut exists for. Cast to double BEFORE dividing.
+      if(!a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
       double eta = track->pMom().Eta();
       if(eta >= -1.0 && eta <= 0.0) refMultHighVar++;
       if(eta >= 0.0 && eta <= 1.0) refMultLowVar++;
@@ -1381,7 +1386,9 @@ void PicoBinner(string    a_filelist,
       // further down this loop -- computed once here and reused everywhere below,
       // identical values, just without the redundant recomputation.
       double dca = track->gDCA(eventVertex).Mag();
-      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(), track->nHitsDedx(), dca, phi);
+      // Same integer-division fix as the isGoodTrack() call above -- cast to double
+      // before dividing, see that call site's comment for the full explanation.
+      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()), track->nHitsDedx(), dca, phi);
       //FILL DCA for Proton and AntiProton
       if(doProtonDCA && (a_partIndex < 0 || a_partIndex == 2) && goodTrack){
         double rapidity = PhysMath::rapidity(particleInfo->GetParticleMass(2), pT, pZ);
