@@ -1,20 +1,24 @@
 #!/bin/bash
-# hadd_chunk_from_filelist.sh -- lightflavorspectra_OO200
+# hadd_stage1_chunk_worker.sh -- lightflavorspectra_OO200
+# (formerly hadd_chunk_from_filelist.sh -- renamed 2026-07-11 so the STAGE 1/STAGE 2
+# split with hadd_final_merge.sh is obvious from the filenames alone.)
 #
 # WHY THIS EXISTS:
 # Companion to xml/haddPicoBinner_SDCC_template.xml's parallel chunk-then-merge strategy
 # for combining PicoBinner's many per-job SDCC output fragments (*_Processed.root)
-# faster than a single serial `hadd` over all of them. SUMS splits the full file list
-# across N worker processes (maxFilesPerProcess in that XML); each process calls this
-# script with ITS OWN slice of the file list (${FILELIST}, populated automatically by
-# the scheduler) and hadds just that slice into one chunk file. Once every process's
-# chunk has landed in the permanent output directory, run
-#   scripts/hadd_picobinner_sdcc_output.sh <chunkDir> <finalOutput> "chunk_*.root"
+# faster than a single serial `hadd` over all of them. This is STAGE 1: SUMS splits the
+# full file list across N worker processes (maxFilesPerProcess in that XML); each
+# process calls this script with ITS OWN slice of the file list (${FILELIST}, populated
+# automatically by the scheduler) and hadds just that slice into one chunk file. You
+# never run this one by hand -- the XML's <command> block does it per worker process.
+# Once every process's chunk has landed in the permanent output directory, run STAGE 2
+# by hand:
+#   scripts/hadd_final_merge.sh <chunkDir> <finalOutput> "chunk_*.root"
 # to do the final merge -- much cheaper than the original merge, since it's now
 # combining only a handful of chunk files instead of hundreds of small fragments.
 #
 # USAGE:
-#   ./scripts/hadd_chunk_from_filelist.sh <fileList> <outputChunkFile>
+#   ./scripts/hadd_stage1_chunk_worker.sh <fileList> <outputChunkFile>
 #
 #   <fileList>         text file, one input *_Processed.root path per line (this is
 #                      ${FILELIST}, provided automatically by the SUMS scheduler)

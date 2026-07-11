@@ -6,12 +6,12 @@
   *_Processed.root fragment (there can be hundreds per species, one per PicoBinner
   worker process) is slow; this job splits that file list across N worker processes
   (maxFilesPerProcess below), each of which hadds only its own slice into one chunk
-  file via scripts/hadd_chunk_from_filelist.sh. Once every chunk has landed in the
+  file via scripts/hadd_stage1_chunk_worker.sh. Once every chunk has landed in the
   permanent output directory (check with condor_q liggett2820 until the job is done),
   run STAGE 2 by hand (this is fast now; only a handful of chunk files, not hundreds
   of fragments):
 
-    scripts/hadd_picobinner_sdcc_output.sh \
+    scripts/hadd_final_merge.sh \
       /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/ \
       /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root \
       "chunk_*.root"
@@ -74,7 +74,7 @@
     ls scripts
 
     cd scripts
-    chmod +x hadd_chunk_from_filelist.sh
+    chmod +x hadd_stage1_chunk_worker.sh
 
     echo starting awk command to remove numEvents after file name in list
     set newList="$PWD"/"$JOBID".list
@@ -83,7 +83,7 @@
     pwd
     ls
 
-    ./hadd_chunk_from_filelist.sh $newList ${SCRATCH}/chunk_$JOBID.root
+    ./hadd_stage1_chunk_worker.sh $newList ${SCRATCH}/chunk_$JOBID.root
 
     <!-- Permanent output area - SCRATCH is wiped after the job -->
     mv ${SCRATCH}/chunk_$JOBID.root /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/

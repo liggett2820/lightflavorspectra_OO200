@@ -1,5 +1,7 @@
 #!/bin/bash
-# hadd_picobinner_sdcc_output.sh -- lightflavorspectra_OO200
+# hadd_final_merge.sh -- lightflavorspectra_OO200
+# (formerly hadd_picobinner_sdcc_output.sh -- renamed 2026-07-11 so the STAGE 1/STAGE 2
+# split with hadd_stage1_chunk_worker.sh is obvious from the filenames alone.)
 #
 # WHY THIS EXISTS:
 # The PicoBinner SDCC batch job (xml/runPicoBinner_OO200_SDCC_template.xml) splits the
@@ -20,7 +22,7 @@
 #
 #   1. Directly on PicoBinner's raw per-worker fragments (fine for a modest fragment
 #      count -- a single serial hadd over everything):
-#        ./scripts/hadd_picobinner_sdcc_output.sh \
+#        ./scripts/hadd_final_merge.sh \
 #          /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/ \
 #          /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root
 #        (pattern defaults to *_Processed.root, matching the SDCC XML's <output> tag)
@@ -29,14 +31,14 @@
 #      xml/haddPicoBinner_SDCC_template.xml (used when there are hundreds of fragments --
 #      STAGE 1 of that XML fans a parallel hadd out across worker processes first,
 #      producing a handful of chunk_*.root files instead of hundreds of fragments):
-#        ./scripts/hadd_picobinner_sdcc_output.sh \
+#        ./scripts/hadd_final_merge.sh \
 #          /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/ \
 #          /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root \
 #          "chunk_*.root"
 #        (pattern must be passed explicitly here -- the default won't match chunk files)
 #
 # USAGE:
-#   ./scripts/hadd_picobinner_sdcc_output.sh <inputDir> <outputFile> [pattern] [--force]
+#   ./scripts/hadd_final_merge.sh <inputDir> <outputFile> [pattern] [--force]
 #
 #   <inputDir>    directory containing the ROOT files to merge -- either PicoBinner's raw
 #                 per-job output (usage 1 above) or STAGE 1's chunk_*.root output
