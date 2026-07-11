@@ -8,20 +8,43 @@
 # permanent output area (currently /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_<PARTNAME>/,
 # per that XML's <output> tag). Every downstream stage (ZFitter's RunZFitter.C, in
 # particular) expects ONE yield file per species, not dozens of per-job fragments -- this
-# script merges them with `hadd`, which correctly SUMS histograms of the same name across
-# files, exactly equivalent to having run PicoBinner once over the combined input. This is
-# unrelated to run_picobinner_resilient.sh's chunk-merge step -- that script chunks and
-# merges a LOCAL run; this one merges an SDCC batch job's already-produced output.
+# script merges a directory of ROOT files with `hadd`, which correctly SUMS histograms of
+# the same name across files, exactly equivalent to having run PicoBinner once over the
+# combined input. This is unrelated to run_picobinner_resilient.sh's chunk-merge step --
+# that script chunks and merges a LOCAL run; this one merges an SDCC batch job's
+# already-produced output.
+#
+# This script is generic (just <inputDir>/<pattern> -> one hadd'd <outputFile>) and is
+# actually used in TWO different places in the pipeline -- pick whichever matches what
+# you're merging:
+#
+#   1. Directly on PicoBinner's raw per-worker fragments (fine for a modest fragment
+#      count -- a single serial hadd over everything):
+#        ./scripts/hadd_picobinner_sdcc_output.sh \
+#          /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/ \
+#          /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root
+#        (pattern defaults to *_Processed.root, matching the SDCC XML's <output> tag)
+#
+#   2. As STAGE 2 of the two-stage "chunk-then-merge" workflow in
+#      xml/haddPicoBinner_SDCC_template.xml (used when there are hundreds of fragments --
+#      STAGE 1 of that XML fans a parallel hadd out across worker processes first,
+#      producing a handful of chunk_*.root files instead of hundreds of fragments):
+#        ./scripts/hadd_picobinner_sdcc_output.sh \
+#          /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION_chunks/ \
+#          /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root \
+#          "chunk_*.root"
+#        (pattern must be passed explicitly here -- the default won't match chunk files)
 #
 # USAGE:
-#   ./scripts/hadd_picobinner_sdcc_output.sh <inputDir> <outputFile> [pattern]
+#   ./scripts/hadd_picobinner_sdcc_output.sh <inputDir> <outputFile> [pattern] [--force]
 #
-#   <inputDir>    directory containing the per-job PicoBinner outputs (e.g.
-#                 /star/data03/pwg/liggett/PicoBinner_OO200/SL24y_PION/)
+#   <inputDir>    directory containing the ROOT files to merge -- either PicoBinner's raw
+#                 per-job output (usage 1 above) or STAGE 1's chunk_*.root output
+#                 (usage 2 above)
 #   <outputFile>  path to write the single merged ROOT file to (e.g.
 #                 /star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_pion.root)
 #   [pattern]     glob pattern (relative to inputDir) matching the files to merge
-#                 (default: *_Processed.root, matching the SDCC XML's <output> tag)
+#                 (default: *_Processed.root -- override to "chunk_*.root" for usage 2)
 #
 # Refuses to run (exits nonzero without touching anything) if no files match the pattern,
 # or if <outputFile> already exists -- pass --force as the last argument to overwrite.
