@@ -382,20 +382,25 @@ void PicoBinner(string    a_filelist,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                  250,0,6.0);
     // Same live-lookup pattern as eta_pT above (TPC eta range from CutClass rather than
-    // a hardcoded value). N_hits^fit tops out around the TPC's 45 padrows, so 0-50
-    // covers the full range with a little headroom.
+    // a hardcoded value). This dataset is post-iTPC upgrade (2026-07-11: confirmed --
+    // inner sector went from 13 to 40 padrows, so the TPC now has 40+32=72 total
+    // padrows, up from the original 45; see the iTPC upgrade NIM/JINST papers). N_hits^fit
+    // tops out around 72 now, so 0-80 covers the full range with a little headroom
+    // (was 0-50, sized for the pre-upgrade 45-padrow ceiling -- too narrow for this
+    // dataset and would have silently clipped any track above 50 hits).
     eta_nHitsFit = new TH2I("eta_nHitsFit",";#eta;N_{hits}^{fit}",350,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
-                 50,0,50);
-    // Same live-lookup pattern again. N_hits^max is the geometric ceiling nHitsFit is
-    // divided by for CutClass's fitMaxRatio cut -- plotting it vs eta shows whether a
-    // low-yield corner (large |eta| + low pT) is acceptance-limited (nHitsMax itself
-    // drops there) as opposed to cut-limited (plenty of possible hits, just not fit).
+                 80,0,80);
+    // Same live-lookup pattern again, same post-iTPC 72-padrow ceiling as eta_nHitsFit
+    // above. N_hits^max is the geometric ceiling nHitsFit is divided by for CutClass's
+    // fitMaxRatio cut -- plotting it vs eta shows whether a low-yield corner (large
+    // |eta| + low pT) is acceptance-limited (nHitsMax itself drops there) as opposed to
+    // cut-limited (plenty of possible hits, just not fit).
     eta_nHitsMax = new TH2I("eta_nHitsMax",";#eta;N_{hits}^{max}",350,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
-                 50,0,50);
+                 80,0,80);
 
     dEdx_Plus  = HistogramUtilities::make2DHistLogBinsInt("dEdxVsMom_Plus","dE/dx vs Primary Track Momentum;p_{tot} (GeV/c); dE/dx",
                  true, 1000,0.01, 20,true,1000,1.0,200);
