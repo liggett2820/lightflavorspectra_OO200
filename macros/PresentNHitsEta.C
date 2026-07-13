@@ -70,7 +70,7 @@ void PresentNHitsEta(string a_inputFile, string a_outDir = "."){
 
   c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(etaNHitsMax){
-    etaNHitsMax->SetTitle("TPC Geometric Max Hits vs #eta");
+    etaNHitsMax->SetTitle("TPC NHitsMax vs #eta");
     etaNHitsMax->GetXaxis()->SetTitle("#eta");
     etaNHitsMax->GetYaxis()->SetTitle("N_{hits}^{max}");
     etaNHitsMax->Draw("COLZ");
