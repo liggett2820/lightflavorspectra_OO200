@@ -71,7 +71,10 @@ void SetCutClass(CutClass *cuts){
   cuts->setNHitsDeDx(10);
   cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
   cuts->setBTOF(1.6, 2.8);
-  cuts->setDCA(1); // was 1.0 -- corrected 2026-07-03 to match SDCC
+  cuts->setDCA(1); // reverted to 1 (2026-07-11) -- diverges from the 3 recorded here
+                    // 2026-07-03 as the SDCC-matched, officially-validated value; not
+                    // re-verified against SDCC at this new value, so treat results
+                    // under this as a DCA systematic variation rather than production.
   cuts->setETOFMaxClusterSize(99);
   cuts->setETOFMatchFlagCut(-1);
   // added 2026-07-03 -- absent here before, present in the SDCC file (4-arg: meanDeltaX, meanDeltaY, widthDeltaX, widthDeltaY)
