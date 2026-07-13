@@ -1322,12 +1322,20 @@ void PicoBinner(string    a_filelist,
 
     for (int trackIndex = 0; trackIndex < (int)dst->numberOfTracks(); trackIndex++){
       StPicoTrack* track = dst->track(trackIndex);
-      // Bug fix 2026-07-11: nHits()/nHitsPoss() was INTEGER division (both are Int_t),
-      // truncating to 0 unless a track used literally every possible padrow -- this made
-      // the fitMaxRatio cut inside isGoodTrack() effectively "reject unless nHitsFit ==
-      // nHitsMax exactly" instead of the intended >=50% ratio, silently defeating the
-      // split/broken-track rejection this cut exists for. Cast to double BEFORE dividing.
-      if(!a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
+      // Reverted to integer division 2026-07-11, on request, undoing the 2026-07-11
+      // double-cast fix (see git history: "Fix isGoodTrack integer-division bug..."/
+      // commit bb3704b). nHits()/nHitsPoss() is INTEGER division (both are Int_t), which
+      // truncates to 0 unless a track used literally every geometrically-possible
+      // padrow -- this makes the fitMaxRatio cut inside isGoodTrack() a de facto
+      // "reject unless nHitsFit == nHitsMax exactly" requirement rather than the
+      // configured fitMaxRatio threshold (currently 0.5001, which is no longer
+      // consulted in any graduated way -- this bug makes it functionally binary). If
+      // you want a deliberately strict (but not all-or-nothing) split-track cut
+      // instead, raise cuts->setFitMaxRatio(...) in SetCutClass.C with the double-cast
+      // version reinstated, rather than relying on this truncation -- that preserves
+      // real discriminating power between e.g. a 0.95 and a 0.15 ratio, which this
+      // integer version destroys (both collapse to 0).
+      if(!a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
       double eta = track->pMom().Eta();
       if(eta >= -1.0 && eta <= 0.0) refMultHighVar++;
       if(eta >= 0.0 && eta <= 1.0) refMultLowVar++;
@@ -1386,9 +1394,9 @@ void PicoBinner(string    a_filelist,
       // further down this loop -- computed once here and reused everywhere below,
       // identical values, just without the redundant recomputation.
       double dca = track->gDCA(eventVertex).Mag();
-      // Same integer-division fix as the isGoodTrack() call above -- cast to double
-      // before dividing, see that call site's comment for the full explanation.
-      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()), track->nHitsDedx(), dca, phi);
+      // Same reverted-to-integer-division change as the isGoodTrack() call above -- see
+      // that call site's comment for the full explanation.
+      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(), track->nHitsDedx(), dca, phi);
       //FILL DCA for Proton and AntiProton
       if(doProtonDCA && (a_partIndex < 0 || a_partIndex == 2) && goodTrack){
         double rapidity = PhysMath::rapidity(particleInfo->GetParticleMass(2), pT, pZ);
