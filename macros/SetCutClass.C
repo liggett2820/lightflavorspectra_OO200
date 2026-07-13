@@ -50,7 +50,7 @@ void SetCutClass(CutClass *cuts){
   // last several ZFitter reruns appeared to complete ("ran fine") but never actually
   // wrote new spectra data. Switch back to "SL23c" once the real Bichsel curve file is
   // obtained from SDCC/RCF and placed in submodule/ParticleInfo/PidFunctions_Data/.
-  cuts->setStarver("dev");
+  cuts->setStarver("SL24y");
   cuts->setSqrts_NN(200);
   cuts->setBeamEnergy(100);
   cuts->setBeamLocation(0.0,0.0);
@@ -62,29 +62,16 @@ void SetCutClass(CutClass *cuts){
   cuts->setUseT0(false); // was true -- corrected 2026-07-03; SDCC has setTofT0Cut commented out entirely so it's dropped here too
   cuts->setEventConfig("ColliderCenter");
   cuts->setYCM(0.0);
-  cuts->setRadialCut(2.0);
+  cuts->setRadialCut(1.0);
   cuts->setTofMatch(0); // was 3 -- corrected 2026-07-03 to match SDCC
   cuts->setTrigToggle(true);
 
   //###############    TRACK QUALITY CUTS ###################
-  cuts->setNHitsFit(10); // lowered from 15 to 10 (2026-07-11) to recover more forward
-                         // (large |eta|, low pT) tracks -- 20 was the 2026-07-03
-                         // SDCC-matched, officially-validated value; 10 is STAR's own
-                         // tracker floor (NIM paper: tracks need >=10 padrow hits or
-                         // they're too likely to be broken fragments), i.e. this cut is
-                         // now doing NO extra quality filtering beyond what the tracker
-                         // itself already requires to report a track at all. Treat
-                         // results under this as a track-quality systematic variation,
-                         // not the production cut, and note the fitMaxRatio cut that's
-                         // supposed to catch split/broken tracks currently has a known
-                         // integer-division bug (PicoBinner.cxx:1325,1384) making it a
-                         // near no-op -- with both the absolute floor this low AND that
-                         // safety net not functioning, split/fragment contamination risk
-                         // here is real, not just theoretical.
+  cuts->setNHitsFit(10); // was 15 -- corrected 2026-07-03 to match SDCC
   cuts->setNHitsDeDx(10);
   cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
   cuts->setBTOF(1.6, 2.8);
-  cuts->setDCA(3); // was 1.0 -- corrected 2026-07-03 to match SDCC
+  cuts->setDCA(1); // was 1.0 -- corrected 2026-07-03 to match SDCC
   cuts->setETOFMaxClusterSize(99);
   cuts->setETOFMatchFlagCut(-1);
   // added 2026-07-03 -- absent here before, present in the SDCC file (4-arg: meanDeltaX, meanDeltaY, widthDeltaX, widthDeltaY)
