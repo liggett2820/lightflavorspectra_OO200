@@ -65,10 +65,10 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   if(zVertex){
     zVertex->SetTitle("Event Z vertex");
     zVertex->GetYaxis()->SetTitle("Number of Events");
-    // Display range capped at [-4,4]cm -- just clips the plotted range (SetCutClass.C's
+    // Display range capped at [-3,3]cm -- just clips the plotted range (SetCutClass.C's
     // setZRange(-2,2) event-level cut is well inside this), doesn't rebin or drop any
     // underlying entries.
-    zVertex->GetXaxis()->SetRangeUser(-4, 4);
+    zVertex->GetXaxis()->SetRangeUser(-3, 3);
     zVertex->Draw();
   }
 
