@@ -206,6 +206,7 @@ void PicoBinner(string    a_filelist,
   TH2I* eta_pT   = NULL;
   TH2I* eta_nHitsFit = NULL;
   TH2I* eta_nHitsMax = NULL;
+  TH2D* eta_fitMaxRatio = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
   TH2I* dEdx_Plus_withoutBGCut  = NULL;
@@ -401,6 +402,21 @@ void PicoBinner(string    a_filelist,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                  80,0,80);
+    // Added 2026-07-14: isolates hit-finding EFFICIENCY (nHitsFit/nHitsMax) from the
+    // pure geometric ceiling plotted in eta_nHitsMax above. This is filled with a real
+    // double division (see the Fill call below), NOT the truncated integer division
+    // isGoodTrack() currently uses for its cut (see the reverted-to-int comment at the
+    // isGoodTrack() call sites) -- this histogram is diagnostic only and needs the true
+    // graduated ratio to be useful. If this ratio itself sags at large |eta| (rather
+    // than just eta_nHitsMax's ceiling shrinking), that points to a hit-finding
+    // efficiency loss at those eta values -- e.g. multiple scattering or energy loss in
+    // whatever beampipe material the track crossed at that eta (STAR's beampipe isn't
+    // one uniform material along z) knocking real, geometrically-available hits out of
+    // the fit -- as opposed to the hits simply not existing to begin with.
+    eta_fitMaxRatio = new TH2D("eta_fitMaxRatio",";#eta;N_{hits}^{fit}/N_{hits}^{max}",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 100,0,1.0001);
 
     dEdx_Plus  = HistogramUtilities::make2DHistLogBinsInt("dEdxVsMom_Plus","dE/dx vs Primary Track Momentum;p_{tot} (GeV/c); dE/dx",
                  true, 1000,0.01, 20,true,1000,1.0,200);
@@ -1653,6 +1669,10 @@ void PicoBinner(string    a_filelist,
         eta_pT->Fill(eta,pT);
         eta_nHitsFit->Fill(eta,track->nHitsFit());
         eta_nHitsMax->Fill(eta,track->nHitsMax());
+        // True double division here (diagnostic only) -- deliberately NOT the
+        // truncated integer version isGoodTrack() enforces on the actual cut. See the
+        // booking comment above for why.
+        eta_fitMaxRatio->Fill(eta,((double)track->nHits())/((double)track->nHitsPoss()));
         dcaHisto->Fill(dca);
         pion_y_pT->Fill(rapidity_part[0],pT);
 
@@ -1888,6 +1908,7 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(eta_pT);
     HistogramUtilities::ConditionalWrite(eta_nHitsFit);
     HistogramUtilities::ConditionalWrite(eta_nHitsMax);
+    HistogramUtilities::ConditionalWrite(eta_fitMaxRatio);
     HistogramUtilities::ConditionalWrite(pion_y_pT);
     HistogramUtilities::ConditionalWrite(pion_y_pT_tof);
     HistogramUtilities::ConditionalWrite(kaon_y_pT_tof);
