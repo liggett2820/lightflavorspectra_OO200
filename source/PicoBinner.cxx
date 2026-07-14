@@ -1390,6 +1390,18 @@ void PicoBinner(string    a_filelist,
     //###########################################################################
     for(int trackIndex = 0; trackIndex < (int) dst->numberOfTracks(); trackIndex++){
       StPicoTrack* track = dst->track(trackIndex);
+      // Added 2026-07-13: this loop was missing the isPrimary() guard that the
+      // earlier T0 loop (see ~line 1208) already has. StPicoTrack::pMom() is
+      // documented to return exactly (0,0,0) for a non-primary (global-only)
+      // track, and TVector3::Eta() falls back to returning 0.0 for a zero
+      // vector -- so non-primary tracks were sneaking through isGoodTrack()
+      // (its dca comes from gDCA(), which doesn't require primary status) and
+      // landing at eta=0 with their own real, unrelated nHitsMax/nHitsFit
+      // values. That's what was producing the bright eta=0 line spanning the
+      // full nHitsMax range in eta_nHitsMax (and the same contamination in
+      // etaPhi/eta_pT/eta_nHitsFit) -- not a real trajectory, just tracks
+      // with no valid primary momentum being mis-binned at eta=0.
+      if(!track->isPrimary()) continue;
       momentum = (double) track->pPtot();
       pT       = track->pPt();
       pZ       = track->pMom().Z();
