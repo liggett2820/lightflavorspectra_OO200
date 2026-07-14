@@ -69,7 +69,12 @@ void SetCutClass(CutClass *cuts){
   //###############    TRACK QUALITY CUTS ###################
   cuts->setNHitsFit(10); // was 15 -- corrected 2026-07-03 to match SDCC
   cuts->setNHitsDeDx(10);
-  cuts->setFitMaxRatio(0.5001); // was 0.505 -- corrected 2026-07-03 to match SDCC
+  cuts->setFitMaxRatio(0.52); // raised from 0.5001 (2026-07-14), alongside restoring
+                              // real double division at the isGoodTrack() call sites in
+                              // PicoBinner.cxx -- 0.5001 was set 2026-07-03 to match
+                              // SDCC back when this was still graduated; diverges from
+                              // that SDCC-matched value now, so treat as a systematic
+                              // variation, not yet re-verified against SDCC.
   cuts->setBTOF(1.6, 2.8);
   cuts->setDCA(1); // reverted to 1 (2026-07-11) -- diverges from the 3 recorded here
                     // 2026-07-03 as the SDCC-matched, officially-validated value; not

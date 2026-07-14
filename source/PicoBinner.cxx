@@ -1343,20 +1343,17 @@ void PicoBinner(string    a_filelist,
 
     for (int trackIndex = 0; trackIndex < (int)dst->numberOfTracks(); trackIndex++){
       StPicoTrack* track = dst->track(trackIndex);
-      // Reverted to integer division 2026-07-11, on request, undoing the 2026-07-11
-      // double-cast fix (see git history: "Fix isGoodTrack integer-division bug..."/
-      // commit bb3704b). nHits()/nHitsPoss() is INTEGER division (both are Int_t), which
-      // truncates to 0 unless a track used literally every geometrically-possible
-      // padrow -- this makes the fitMaxRatio cut inside isGoodTrack() a de facto
-      // "reject unless nHitsFit == nHitsMax exactly" requirement rather than the
-      // configured fitMaxRatio threshold (currently 0.5001, which is no longer
-      // consulted in any graduated way -- this bug makes it functionally binary). If
-      // you want a deliberately strict (but not all-or-nothing) split-track cut
-      // instead, raise cuts->setFitMaxRatio(...) in SetCutClass.C with the double-cast
-      // version reinstated, rather than relying on this truncation -- that preserves
-      // real discriminating power between e.g. a 0.95 and a 0.15 ratio, which this
-      // integer version destroys (both collapse to 0).
-      if(!a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
+      // Restored to double-cast division 2026-07-14, undoing the 2026-07-11 revert to
+      // integer division (see git history: commit bb3704b for the original fix, commit
+      // 793eca8 for the revert). Integer division collapsed the fitMaxRatio cut into a
+      // de facto "reject unless nHitsFit == nHitsMax exactly" requirement -- the
+      // eta_fitMaxRatio diagnostic (added 2026-07-14) plus the beampipe-material
+      // discussion made clear that any track losing even one hit to ordinary
+      // scattering/energy-loss effects (not just genuine split tracks) was getting
+      // thrown out entirely under that binary version. This restores real graduated
+      // discriminating power -- the threshold itself was also raised (see
+      // SetCutClass.C's setFitMaxRatio) alongside this, to 0.52 from 0.5001.
+      if(!a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()),track->nHitsDedx(), track->gDCA(eventVertex).Mag(), phi)) continue;
       double eta = track->pMom().Eta();
       if(eta >= -1.0 && eta <= 0.0) refMultHighVar++;
       if(eta >= 0.0 && eta <= 1.0) refMultLowVar++;
@@ -1427,9 +1424,9 @@ void PicoBinner(string    a_filelist,
       // further down this loop -- computed once here and reused everywhere below,
       // identical values, just without the redundant recomputation.
       double dca = track->gDCA(eventVertex).Mag();
-      // Same reverted-to-integer-division change as the isGoodTrack() call above -- see
-      // that call site's comment for the full explanation.
-      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), track->nHits()/track->nHitsPoss(), track->nHitsDedx(), dca, phi);
+      // Same restored-to-double-cast-division change as the isGoodTrack() call above --
+      // see that call site's comment for the full explanation.
+      bool goodTrack = a_cutClass->isGoodTrack(track->nHitsFit(), ((double)track->nHits())/((double)track->nHitsPoss()), track->nHitsDedx(), dca, phi);
       //FILL DCA for Proton and AntiProton
       if(doProtonDCA && (a_partIndex < 0 || a_partIndex == 2) && goodTrack){
         double rapidity = PhysMath::rapidity(particleInfo->GetParticleMass(2), pT, pZ);
