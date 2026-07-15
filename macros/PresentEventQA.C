@@ -122,10 +122,22 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
       cutLine->Draw("SAME");
 
       double yLabel = (iii % 2 == 0) ? yLabelHigh : yLabelLow;
-      TLatex* cutLabel = new TLatex(centCuts[iii], yLabel, Form("%d%%",centPercents[iii]));
+      // The 100% edge sits at centCuts=0, the left boundary of the plotted range
+      // (SetRangeUser(0,140) above) -- a centered label there gets half its text
+      // clipped off the left side of the frame, which is what made it unreadable
+      // even after the height-staggering fix. Left-align that one instead (with a
+      // small rightward nudge off the line) so the full string stays on-frame;
+      // every other label still has room to be centered on its line.
+      double xLabel = centCuts[iii];
+      int    labelAlign = 21; // centered horizontally, bottom-aligned
+      if(centCuts[iii] <= 0){
+        xLabel += 2;
+        labelAlign = 11; // left-aligned, bottom-aligned
+      }
+      TLatex* cutLabel = new TLatex(xLabel, yLabel, Form("%d%%",centPercents[iii]));
       cutLabel->SetTextColor(kRed);
       cutLabel->SetTextSize(0.035);
-      cutLabel->SetTextAlign(21); // centered horizontally, bottom-aligned
+      cutLabel->SetTextAlign(labelAlign);
       cutLabel->Draw("SAME");
     }
   }
