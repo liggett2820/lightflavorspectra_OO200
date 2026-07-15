@@ -97,47 +97,29 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     refMult->GetXaxis()->SetRangeUser(0, 140);
     refMult->Draw();
 
-    // Overlay the official 6-bin centrality cuts from SetCutClass.C (2026-07-09:
-    // {44,37,28,17,5,0} at the 5/10/20/40/80/100% boundaries -- the 0 edge is the
-    // 80-100% bin added so peripheral events aren't dropped, see SetCutClass.C's
-    // own comment. These are the values that actually produced this file's
-    // centIndex, NOT re-derived here.
-    double centCuts[6]     = {44, 37, 28, 17, 5, 0};
-    int    centPercents[6] = {5, 10, 20, 40, 80, 100};
+    // Overlay the official centrality cuts from SetCutClass.C (2026-07-09:
+    // {44,37,28,17,5} at the 5/10/20/40/80% boundaries). The 80-100% bin's own 0 edge
+    // (see SetCutClass.C's comment on why it's added so peripheral events aren't
+    // dropped) isn't drawn here -- it sits right at the refMult=0 axis edge, so its
+    // line/label added no information beyond "everything left of the 80% line is the
+    // 80-100% bin." These are the values that actually produced this file's centIndex,
+    // NOT re-derived here.
+    double centCuts[5]     = {44, 37, 28, 17, 5};
+    int    centPercents[5] = {5, 10, 20, 40, 80};
     gPad->Update();
     double yMin = TMath::Power(10, gPad->GetUymin());
     double yMax = TMath::Power(10, gPad->GetUymax());
-    // Stagger the label heights (alternating high/low) instead of drawing every label
-    // at yMax -- at this zoom level the 80% and 100% edges (refMult 5 and 0) are only
-    // 5 units apart, so same-height labels overlap. Alternating iii%2 puts adjacent
-    // edges (including that 80/100 pair) at different heights.
-    double logRange   = gPad->GetUymax() - gPad->GetUymin();
-    double yLabelHigh  = yMax;
-    double yLabelLow   = TMath::Power(10, gPad->GetUymax() - 0.07*logRange);
-    for(int iii = 0; iii < 6; iii++){
+    for(int iii = 0; iii < 5; iii++){
       TLine* cutLine = new TLine(centCuts[iii], yMin, centCuts[iii], yMax);
       cutLine->SetLineColor(kRed);
       cutLine->SetLineStyle(2);
       cutLine->SetLineWidth(2);
       cutLine->Draw("SAME");
 
-      double yLabel = (iii % 2 == 0) ? yLabelLow : yLabelHigh;
-      // The 100% edge sits at centCuts=0, the left boundary of the plotted range
-      // (SetRangeUser(0,140) above) -- a centered label there gets half its text
-      // clipped off the left side of the frame, which is what made it unreadable
-      // even after the height-staggering fix. Left-align that one instead (with a
-      // small rightward nudge off the line) so the full string stays on-frame;
-      // every other label still has room to be centered on its line.
-      double xLabel = centCuts[iii];
-      int    labelAlign = 21; // centered horizontally, bottom-aligned
-      if(centCuts[iii] <= 0){
-        xLabel += 2;
-        labelAlign = 11; // left-aligned, bottom-aligned
-      }
-      TLatex* cutLabel = new TLatex(xLabel, yLabel, Form("%d%%",centPercents[iii]));
+      TLatex* cutLabel = new TLatex(centCuts[iii], yMax, Form("%d%%",centPercents[iii]));
       cutLabel->SetTextColor(kRed);
       cutLabel->SetTextSize(0.035);
-      cutLabel->SetTextAlign(labelAlign);
+      cutLabel->SetTextAlign(21); // centered horizontally, bottom-aligned
       cutLabel->Draw("SAME");
     }
   }
