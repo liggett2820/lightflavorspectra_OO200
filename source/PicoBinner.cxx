@@ -206,6 +206,15 @@ void PicoBinner(string    a_filelist,
   TH2I* eta_pT   = NULL;
   TH2I* eta_nHitsFit = NULL;
   TH2I* eta_nHitsMax = NULL;
+  // Per-TPC-sector breakdown of eta_nHitsMax, requested at the 2026-07-15 advisor
+  // meeting -- 12 azimuthal (phi) sectors, 30 degrees each, spanning the full eta
+  // range in each (both TPC ends already distinguished by eta's sign, so this
+  // splits by phi wedge only, not by west/east separately). Meant to test whether
+  // the eta~1.1-1.2 hit-loss bump (see eta_fitMaxRatio / PresentHitLossEta.C) is
+  // tied to a specific azimuthal region/sector boundary rather than being uniform
+  // across all sectors, which would instead point to a purely eta-dependent
+  // geometric effect (e.g. barrel-to-endcap exit crossover).
+  TH2I* eta_nHitsMax_bySector[12] = {NULL};
   TH2D* eta_fitMaxRatio = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
@@ -402,6 +411,17 @@ void PicoBinner(string    a_filelist,
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                  a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                  80,0,80);
+    // 12 phi-sector copies of eta_nHitsMax above, one per 30-degree TPC sector
+    // (sector index 0-11 computed from phi in [-pi,pi), same convention as etaPhi).
+    // Same binning as eta_nHitsMax so any single sector's plot is directly comparable
+    // to the all-sector-combined one.
+    for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
+      eta_nHitsMax_bySector[sectorIndex] = new TH2I(Form("eta_nHitsMax_sector%d",sectorIndex),
+                   Form(";#eta;N_{hits}^{max} (sector %d)",sectorIndex),350,
+                   a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                   a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                   80,0,80);
+    }
     // Added 2026-07-14: isolates hit-finding EFFICIENCY (nHitsFit/nHitsMax) from the
     // pure geometric ceiling plotted in eta_nHitsMax above. This is filled with a real
     // double division (see the Fill call below), NOT the truncated integer division
@@ -1666,6 +1686,14 @@ void PicoBinner(string    a_filelist,
         eta_pT->Fill(eta,pT);
         eta_nHitsFit->Fill(eta,track->nHitsFit());
         eta_nHitsMax->Fill(eta,track->nHitsMax());
+        // Per-sector fill: phi runs [-pi,pi) (same convention as etaPhi), 12 sectors
+        // of 30 degrees (pi/6) each. Clamp defensively in case phi lands exactly on
+        // the upper edge (+pi) due to floating point, which would otherwise compute
+        // sectorIndex==12 and index out of bounds.
+        int sectorIndex = (int)((phi + TMath::Pi()) / (TMath::Pi()/6.0));
+        if(sectorIndex < 0)  sectorIndex = 0;
+        if(sectorIndex > 11) sectorIndex = 11;
+        eta_nHitsMax_bySector[sectorIndex]->Fill(eta,track->nHitsMax());
         // True double division here (diagnostic only) -- deliberately NOT the
         // truncated integer version isGoodTrack() enforces on the actual cut. See the
         // booking comment above for why.
@@ -1905,6 +1933,9 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(eta_pT);
     HistogramUtilities::ConditionalWrite(eta_nHitsFit);
     HistogramUtilities::ConditionalWrite(eta_nHitsMax);
+    for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
+      HistogramUtilities::ConditionalWrite(eta_nHitsMax_bySector[sectorIndex]);
+    }
     HistogramUtilities::ConditionalWrite(eta_fitMaxRatio);
     HistogramUtilities::ConditionalWrite(pion_y_pT);
     HistogramUtilities::ConditionalWrite(pion_y_pT_tof);
