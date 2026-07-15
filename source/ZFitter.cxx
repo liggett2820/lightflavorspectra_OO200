@@ -3853,6 +3853,35 @@ void ZFitter::makeSpectra(string a_outFileName){
       HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZTPC[partBaseIndex][centIndex][1]);
     }
 
+    // Added 2026-07-15: m_Spectra_Cent_ZbTOF/ZeTOF are filled by fitBTOF_SimulCent()
+    // exactly in parallel with m_Spectra_Cent_ZTPC above (same clone-and-name pattern,
+    // see the "InvBetaBTOFSpectra_..."/"InvBetaETOFSpectra_..." vs "dEdxSpectra_..."
+    // naming at the fill sites in ZFitter.cxx and ZFitter_BTOF_ColliderCenter_SimulCent.cxx)
+    // -- but this function was never writing them out, only the TPC version. That meant
+    // a completed BTOF run's actual spectra (as opposed to just its chi-square/fit-status
+    // diagnostics, written separately above) were silently discarded once the ROOT
+    // process exited, with no way to recover them afterward. Mirrors the ZTPC write
+    // block immediately above; m_Spectra_Cent_ZeTOF is only written when m_hasETOF is
+    // set, matching how its chi-square/fit-status counterparts are already gated above.
+    for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+      HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][0]);
+      HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][0]);
+    }
+    for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+      HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][1]);
+      HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][1]);
+    }
+    if(m_hasETOF){
+      for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+        HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][0]);
+        HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][0]);
+      }
+      for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+        HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][1]);
+        HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][1]);
+      }
+    }
+
   }
 
 

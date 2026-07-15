@@ -1326,6 +1326,39 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
       #ifdef _ZFITTER_DEBUG_
         cout << "  Fit Before? " << (currentBinWasFitBefore ? "yes" : "no") << "  with ptr: " << m_rebinZTPCHistoStorage_ByCent[0][m_currentMtM0Bin] <<  endl;
       #endif
+    // Added 2026-07-15: currentBinWasFitBefore only tracks whether this mT-m0 bin's raw
+    // histogram was already grabbed/cached earlier THIS SAME rapidity bin's fitting
+    // sequence (m_rebinZTPCHistoStorage_ByCent is reset fresh at the top of this
+    // function, i.e. once per rapidity bin -- see the loop a few dozen lines up). That
+    // caching happens unconditionally, BEFORE the low-statistics skip below ("continue"
+    // a few lines down) and before the point where a fit's actual results get written
+    // into m_Fit_Data_ZTPC / m_Fit_Data_Cent_ZTPC. Some mT-m0 bins are deliberately
+    // revisited across rounds (e.g. the low-mT-m0 range is pushed into both the
+    // "electronRegion" and "electronRegionStdFix" round index vectors above) --
+    // legitimate reuse. But if an EARLIER round's attempt at that same bin got skipped
+    // (too few counts, non-finite momentum, etc.) before ever reaching the fit itself,
+    // the histogram cache pointer is still set from that skipped attempt, so
+    // currentBinWasFitBefore comes back true even though the fit-parameter storage was
+    // never actually written for this bin -- GetBinContent() on those never-written
+    // bins silently returns exactly 0.0 for every parameter (mean/sigma/skew/amplitude
+    // alike). Seeding the next attempt from an all-zero sigma produces an inverted,
+    // invalid parameter range (SetVariableLimits(1, 0.04, 2.5*0.0) = (0.04, 0.0)) that
+    // corrupts Minuit2's setup badly enough to segfault inside its Hesse/eigenvalue
+    // computation on a later bin (confirmed live: RapBin 35, MtM0Bin 15, PionPlus,
+    // "electronRegionStdFix" round -- Cent 0 had 619 counts, above the 600 skip
+    // threshold on this visit, but an earlier round's visit to the same bin evidently
+    // hadn't cleared that threshold).
+    // Fix: only trust the stored fit parameters as real seeds if they were genuinely
+    // written by a completed fit, checked here via pion sigma being > 0 -- a real fit
+    // never produces exactly zero width, but an unwritten histogram bin defaults to
+    // exactly 0.0 (same ">0.0" "was this actually set" convention already used a few
+    // lines below in the usePositiveChargeAsSeeds branch). When false, this falls
+    // through to the usePreviousGoodParams (consecutive-bin) seeding below, or failing
+    // that the Bichsel-prediction defaults already computed above -- either is a far
+    // better (and non-degenerate) seed than a stale zero readback.
+    bool priorFitParamsValid = currentBinWasFitBefore
+      && m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]
+      && m_Fit_Data_ZTPC[m_currentPartIndex][0][2][m_currentPlusMinusIndex]->GetBinContent(m_currentRapBin,m_currentMtM0Bin) > 0.0;
     if(!currentBinWasFitBefore){
       for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
         m_currentHistosToFit_ByCent[centIndex] = grabSpecificHistogram(m_currentPartIndex, m_currentPartCharge, centIndex, 0, m_currentRapBin, m_currentMtM0Bin, 80, false, -999, -999, true,false);
@@ -1390,7 +1423,7 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
     double electronSigmaInit       =  sigmaGuess;
 
     //If the data has been fit before, use the previous parameters
-    if(currentBinWasFitBefore){
+    if(priorFitParamsValid){
       #ifdef _ZFITTER_DEBUG_
         cout << "Getting Parameters from previous fits... " << endl;
       #endif
@@ -1445,7 +1478,7 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
 
 
     //######################    LOAD PREVIOUS GOOD PARAMETERS AS SEEDS   ###########################
-    if(usePreviousGoodParams && !currentBinWasFitBefore && isConsecutiveBin){ // use the previous fit parameters as seeds
+    if(usePreviousGoodParams && !priorFitParamsValid && isConsecutiveBin){ // use the previous fit parameters as seeds
       #ifdef _ZFITTER_DEBUG_
         cout << "Getting Parameters from Previous Good Parameters... " << endl;
       #endif
@@ -1657,7 +1690,7 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
     parameters_simul_cent[5] = electronMeanInit;
     parameters_simul_cent[6] = electronSigmaInit;
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-      if(currentBinWasFitBefore){
+      if(priorFitParamsValid){
         parameters_simul_cent[7 + centIndex*3]  = m_Fit_Data_Cent_ZTPC[m_currentPartIndex][0][centIndex][0][m_currentPlusMinusIndex]->GetBinContent(m_currentRapBin,m_currentMtM0Bin);
         parameters_simul_cent[8 + centIndex*3]  = m_Fit_Data_Cent_ZTPC[m_currentPartIndex][1][centIndex][0][m_currentPlusMinusIndex]->GetBinContent(m_currentRapBin,m_currentMtM0Bin);
         parameters_simul_cent[9 + centIndex*3]  = m_Fit_Data_Cent_ZTPC[m_currentPartIndex][3][centIndex][0][m_currentPlusMinusIndex]->GetBinContent(m_currentRapBin,m_currentMtM0Bin);
