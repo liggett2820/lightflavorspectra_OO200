@@ -6,7 +6,7 @@
 // the physics downstream.
 //
 // Reads (exact names from PicoBinner.cxx):
-//   zVertex   -- event Z vertex position
+//   dca       -- per-track DCA (distance of closest approach) to the primary vertex
 //   xyHisto   -- event vertex X vs Y
 //   refMult   -- raw reference multiplicity per event
 //   centEvents[<Species>] -- events per centrality bin. If PicoBinner was run for a
@@ -39,14 +39,14 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     return;
   }
 
-  TH1* zVertex   = (TH1*) inFile->Get("zVertex");
+  TH1* dca       = (TH1*) inFile->Get("dca");
   TH2* xyHisto   = (TH2*) inFile->Get("xyHisto");
   TH1* refMult   = (TH1*) inFile->Get("refMult");
   TH1* centEvents = (TH1*) inFile->Get(("centEvents"+a_speciesSuffix).c_str());
   if(!centEvents) centEvents = (TH1*) inFile->Get("centEvents"); // try the no-suffix name too
 
-  if(!zVertex && !xyHisto && !refMult && !centEvents){
-    cout << "!!! None of zVertex/xyHisto/refMult/centEvents(" << a_speciesSuffix
+  if(!dca && !xyHisto && !refMult && !centEvents){
+    cout << "!!! None of dca/xyHisto/refMult/centEvents(" << a_speciesSuffix
          << ") found in " << a_inputFile
          << " -- run FindHistoInFile.C to see what's actually in this file." << endl;
     return;
@@ -58,18 +58,14 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   TCanvas* c = new TCanvas("PresentEventQA","Event QA overview",1400,1000);
   c->Divide(2,2);
 
-  // zVertex's X axis already carries units (cm) from PicoBinner.cxx; its Y axis (a
-  // plain bin count) isn't set there, so label it here for consistency with
-  // xyHisto/refMult/centEvents, which already have it baked into their titles.
-  c->cd(1);
-  if(zVertex){
-    zVertex->SetTitle("Event Z vertex");
-    zVertex->GetYaxis()->SetTitle("Number of Events");
-    // Display range capped at [-4,4]cm -- just clips the plotted range (SetCutClass.C's
-    // setZRange(-2,2) event-level cut is well inside this), doesn't rebin or drop any
-    // underlying entries.
-    zVertex->GetXaxis()->SetRangeUser(-4, 4);
-    zVertex->Draw();
+  // dca is track-level (booked 0-3.5, unitless in PicoBinner.cxx, but the DCA cut
+  // itself is quoted in cm elsewhere in this repo -- e.g. SetCutClass.C's "DCA
+  // tightened to 1cm" -- so label the axis accordingly here.
+  c->cd(1); gPad->SetLogy();
+  if(dca){
+    dca->SetTitle("Track DCA");
+    dca->GetXaxis()->SetTitle("DCA [cm]");
+    dca->Draw();
   }
 
   // Extra right margin -- otherwise the z-axis (palette) power-of-10 labels get
