@@ -65,10 +65,10 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   if(zVertex){
     zVertex->SetTitle("Event Z vertex");
     zVertex->GetYaxis()->SetTitle("Number of Events");
-    // Display range capped at [-3,3]cm -- just clips the plotted range (SetCutClass.C's
+    // Display range capped at [-4,4]cm -- just clips the plotted range (SetCutClass.C's
     // setZRange(-2,2) event-level cut is well inside this), doesn't rebin or drop any
     // underlying entries.
-    zVertex->GetXaxis()->SetRangeUser(-3, 3);
+    zVertex->GetXaxis()->SetRangeUser(-4, 4);
     zVertex->Draw();
   }
 
@@ -107,6 +107,13 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     gPad->Update();
     double yMin = TMath::Power(10, gPad->GetUymin());
     double yMax = TMath::Power(10, gPad->GetUymax());
+    // Stagger the label heights (alternating high/low) instead of drawing every label
+    // at yMax -- at this zoom level the 80% and 100% edges (refMult 5 and 0) are only
+    // 5 units apart, so same-height labels overlap. Alternating iii%2 puts adjacent
+    // edges (including that 80/100 pair) at different heights.
+    double logRange   = gPad->GetUymax() - gPad->GetUymin();
+    double yLabelHigh  = yMax;
+    double yLabelLow   = TMath::Power(10, gPad->GetUymax() - 0.07*logRange);
     for(int iii = 0; iii < 6; iii++){
       TLine* cutLine = new TLine(centCuts[iii], yMin, centCuts[iii], yMax);
       cutLine->SetLineColor(kRed);
@@ -114,7 +121,8 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
       cutLine->SetLineWidth(2);
       cutLine->Draw("SAME");
 
-      TLatex* cutLabel = new TLatex(centCuts[iii], yMax, Form("%d%%",centPercents[iii]));
+      double yLabel = (iii % 2 == 0) ? yLabelHigh : yLabelLow;
+      TLatex* cutLabel = new TLatex(centCuts[iii], yLabel, Form("%d%%",centPercents[iii]));
       cutLabel->SetTextColor(kRed);
       cutLabel->SetTextSize(0.035);
       cutLabel->SetTextAlign(21); // centered horizontally, bottom-aligned
