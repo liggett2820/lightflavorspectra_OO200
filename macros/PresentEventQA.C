@@ -61,10 +61,13 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   // dca is track-level (booked 0-3.5, unitless in PicoBinner.cxx, but the DCA cut
   // itself is quoted in cm elsewhere in this repo -- e.g. SetCutClass.C's "DCA
   // tightened to 1cm" -- so label the axis accordingly here.
-  c->cd(1); gPad->SetLogy();
+  c->cd(1);
   if(dca){
     dca->SetTitle("Track DCA");
     dca->GetXaxis()->SetTitle("DCA [cm]");
+    // Display range capped at 3cm -- just clips the plotted range (booked out to 3.5),
+    // doesn't rebin or drop any underlying entries.
+    dca->GetXaxis()->SetRangeUser(0, 3);
     dca->Draw();
   }
 
