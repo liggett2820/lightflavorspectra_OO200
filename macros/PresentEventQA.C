@@ -121,7 +121,7 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
       cutLine->SetLineWidth(2);
       cutLine->Draw("SAME");
 
-      double yLabel = (iii % 2 == 0) ? yLabelHigh : yLabelLow;
+      double yLabel = (iii % 2 == 0) ? yLabelLow : yLabelHigh;
       // The 100% edge sits at centCuts=0, the left boundary of the plotted range
       // (SetRangeUser(0,140) above) -- a centered label there gets half its text
       // clipped off the left side of the frame, which is what made it unreadable
