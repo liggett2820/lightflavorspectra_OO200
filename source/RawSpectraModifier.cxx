@@ -108,7 +108,16 @@ RawSpectraModifier::RawSpectraModifier(){
 
 
 
-  m_partInfo = new ParticleInfo("SL19b",true);
+  // Updated 2026-07-15 (was "SL19b"): macros/RunRawSpectraModifier.C comments out
+  // mod->setStarVer(...) as unused, so this constructor default is what's actually in
+  // effect at runtime for this stage -- it wasn't just an inert default. Changed to
+  // match the SL24y starver now used everywhere else in this analysis (see the matching
+  // change/comment in macros/SetCutClass.C's setStarver(...) call), so stage 3
+  // (RawSpectraModifier) reads dE/dx off the same Bichsel calibration as stage 2
+  // (ZFitter) instead of silently mixing SL19b into a pipeline that's otherwise SL24y
+  // throughout. Requires submodule/ParticleInfo/PidFunctions_Data/SL24y_BichselCurves.root
+  // to exist (generated on SDCC via CollectBichselFunctions.csh SL24y, see SetCutClass.C).
+  m_partInfo = new ParticleInfo("SL24y",true);
 
   m_loadedETOF = false;
 }
@@ -655,12 +664,21 @@ void RawSpectraModifier::loadSpectraFile(string a_filename){
 
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
 
-      m_dEdxSpectraPlus[partIndex][centIndex]         = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
-      m_dEdxSpectraMinus[partIndex][centIndex]        = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaBTOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaBTOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaETOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaETOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
+      // Fixed 2026-07-15: these Form() strings were missing the underscore before
+      // Plus/Minus that ZFitter.cxx's makeSpectra() actually writes (e.g.
+      // "dEdxSpectra_Pion_Plus_Cent00", not "dEdxSpectra_PionPlus_Cent00" -- see
+      // ZFitter.cxx's SetName(Form("dEdxSpectra_%s_Plus_Cent%02d",...)) and the
+      // InvBetaBTOFSpectra_/InvBetaETOFSpectra_ equivalents). TFile::Get() silently
+      // returns NULL on a name mismatch rather than erroring, so every one of these
+      // six lookups was quietly returning NULL and would have surfaced later as a
+      // null-pointer use rather than a clear "not found" message. Added the missing
+      // underscores so these actually match what gets written.
+      m_dEdxSpectraPlus[partIndex][centIndex]         = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
+      m_dEdxSpectraMinus[partIndex][centIndex]        = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaBTOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaBTOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaETOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaETOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
 
       if(centIndex == 0){
         if(m_dEdxSpectraPlus[partIndex][centIndex]){

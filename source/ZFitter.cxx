@@ -3853,34 +3853,16 @@ void ZFitter::makeSpectra(string a_outFileName){
       HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZTPC[partBaseIndex][centIndex][1]);
     }
 
-    // Added 2026-07-15: m_Spectra_Cent_ZbTOF/ZeTOF are filled by fitBTOF_SimulCent()
-    // exactly in parallel with m_Spectra_Cent_ZTPC above (same clone-and-name pattern,
-    // see the "InvBetaBTOFSpectra_..."/"InvBetaETOFSpectra_..." vs "dEdxSpectra_..."
-    // naming at the fill sites in ZFitter.cxx and ZFitter_BTOF_ColliderCenter_SimulCent.cxx)
-    // -- but this function was never writing them out, only the TPC version. That meant
-    // a completed BTOF run's actual spectra (as opposed to just its chi-square/fit-status
-    // diagnostics, written separately above) were silently discarded once the ROOT
-    // process exited, with no way to recover them afterward. Mirrors the ZTPC write
-    // block immediately above; m_Spectra_Cent_ZeTOF is only written when m_hasETOF is
-    // set, matching how its chi-square/fit-status counterparts are already gated above.
-    for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-      HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][0]);
-      HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][0]);
-    }
-    for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-      HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][1]);
-      HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZbTOF[partBaseIndex][centIndex][1]);
-    }
-    if(m_hasETOF){
-      for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-        HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][0]);
-        HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][0]);
-      }
-      for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-        HistogramUtilities::discardNanHistoData(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][1]);
-        HistogramUtilities::ConditionalWrite(m_Spectra_Cent_ZeTOF[partBaseIndex][centIndex][1]);
-      }
-    }
+    // NOTE 2026-07-15: a block was briefly added here to write
+    // m_Spectra_Cent_ZbTOF/ZeTOF, based on a mistaken read that they were never
+    // written anywhere. They actually already are -- correctly, under
+    // BTOF_FitData/<species>/ and ETOF_FitData/<species>/ further down in this same
+    // function (see the "Writing BTOF Fit Data"/"Writing ETOF Fit Data" sections
+    // below), which predate this comment and were never broken. The block removed
+    // from here would have written a harmless but incorrect duplicate copy into
+    // DeDx_FitData/<species>/ instead (this cd context), cluttering the output file
+    // with the same histograms under the wrong folder. Removed; no functional change
+    // versus the original (pre-2026-07-15) behavior for BTOF/ETOF spectra writing.
 
   }
 

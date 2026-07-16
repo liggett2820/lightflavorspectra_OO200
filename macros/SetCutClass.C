@@ -40,16 +40,27 @@ void SetCutClass(CutClass *cuts){
   cuts->setZRange(-2,2); // was (-70,70) -- corrected 2026-07-03 to match the SDCC file actually used
 
   // ---- _OO_200_COL_ specific values (from the original's #ifdef _OO_200_COL_ block) ----
-  // TEMPORARILY reverted 2026-07-03 back to "dev" (the "SL23c" correction above is
-  // still the physically-correct value matching the real SDCC production, but the
-  // corresponding SL23c_BichselCurves.root file doesn't actually exist anywhere --
-  // checked both this repo's and the full etof repo's submodule/ParticleInfo/
-  // PidFunctions_Data/ directories, only SL19b/SL20d/dev are present in either. Using
-  // "SL23c" makes ParticleInfo::ReadBichselFile() call exit(EXIT_FAILURE) immediately,
-  // silently killing the whole ROOT process with no further output -- this is why the
-  // last several ZFitter reruns appeared to complete ("ran fine") but never actually
-  // wrote new spectra data. Switch back to "SL23c" once the real Bichsel curve file is
-  // obtained from SDCC/RCF and placed in submodule/ParticleInfo/PidFunctions_Data/.
+  // HISTORICAL (2026-07-03 through 2026-07-15, superseded below): this used to say
+  // "dev" -- the "SL23c" correction referenced below was reverted at the time because
+  // no matching SL23c_BichselCurves.root file existed anywhere (only SL19b/SL20d/dev
+  // were present in submodule/ParticleInfo/PidFunctions_Data/), and using a
+  // not-found starver string makes ParticleInfo::ReadBichselFile() call
+  // exit(EXIT_FAILURE) -- sometimes silently (no message, killing the whole ROOT
+  // process with no explanation -- this is why several ZFitter reruns around that time
+  // appeared to complete "fine" but never actually wrote new spectra data), sometimes
+  // with a "BichselFile ... not found!" message (as seen 2026-07-15, when this line was
+  // briefly "SL24y" -- a copy-paste of the PicoDst-reader/STAR-library version string,
+  // e.g. submodule/PicoDstReader_SL24y -- before SL24y_BichselCurves.root existed
+  // locally, so it hit the same failure under yet another not-found string).
+  //
+  // RESOLVED 2026-07-15: SL24y_BichselCurves.root generated on SDCC via
+  // submodule/ParticleInfo/CollectBichselFunctions.csh SL24y (which drives
+  // BichselFunctionCollector.C under an actual STAR SL24y environment) and pulled back
+  // into submodule/ParticleInfo/PidFunctions_Data/ here. This is also now the
+  // physically-correct choice, not just a fallback -- SL24y is the actual PicoDst
+  // reader/library version this whole analysis is built against (see
+  // submodule/PicoDstReader_SL24y), so this setting and the reader version are now
+  // consistent with each other, unlike "dev" or the old aspirational "SL23c" note.
   cuts->setStarver("SL24y");
   cuts->setSqrts_NN(200);
   cuts->setBeamEnergy(100);

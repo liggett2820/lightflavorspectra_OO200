@@ -215,6 +215,14 @@ void PicoBinner(string    a_filelist,
   // across all sectors, which would instead point to a purely eta-dependent
   // geometric effect (e.g. barrel-to-endcap exit crossover).
   TH2I* eta_nHitsMax_bySector[12] = {NULL};
+  // Added 2026-07-16: same per-sector breakdown as eta_nHitsMax_bySector above, but
+  // for eta_nHitsFit instead. eta_nHitsMax_bySector tests whether the hit-loss bump
+  // traces back to the geometric ceiling (N_hits^max) itself varying by sector; this
+  // tests whether it instead (or additionally) shows up in how many of those possible
+  // hits actually get fit (N_hits^fit) on a per-sector basis -- e.g. a sector with a
+  // dead/noisy padrow region would show a normal nHitsMax ceiling but a depressed
+  // nHitsFit relative to other sectors at the same eta.
+  TH2I* eta_nHitsFit_bySector[12] = {NULL};
   TH2D* eta_fitMaxRatio = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
@@ -418,6 +426,15 @@ void PicoBinner(string    a_filelist,
     for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
       eta_nHitsMax_bySector[sectorIndex] = new TH2I(Form("eta_nHitsMax_sector%d",sectorIndex),
                    Form(";#eta;N_{hits}^{max} (sector %d)",sectorIndex),350,
+                   a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                   a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                   80,0,80);
+    }
+    // 12 phi-sector copies of eta_nHitsFit, same binning/convention as
+    // eta_nHitsMax_bySector above (see the declaration comment for why this exists).
+    for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
+      eta_nHitsFit_bySector[sectorIndex] = new TH2I(Form("eta_nHitsFit_sector%d",sectorIndex),
+                   Form(";#eta;N_{hits}^{fit} (sector %d)",sectorIndex),350,
                    a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
                    a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                    80,0,80);
@@ -1694,6 +1711,7 @@ void PicoBinner(string    a_filelist,
         if(sectorIndex < 0)  sectorIndex = 0;
         if(sectorIndex > 11) sectorIndex = 11;
         eta_nHitsMax_bySector[sectorIndex]->Fill(eta,track->nHitsMax());
+        eta_nHitsFit_bySector[sectorIndex]->Fill(eta,track->nHitsFit());
         // True double division here (diagnostic only) -- deliberately NOT the
         // truncated integer version isGoodTrack() enforces on the actual cut. See the
         // booking comment above for why.
@@ -1935,6 +1953,9 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(eta_nHitsMax);
     for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
       HistogramUtilities::ConditionalWrite(eta_nHitsMax_bySector[sectorIndex]);
+    }
+    for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
+      HistogramUtilities::ConditionalWrite(eta_nHitsFit_bySector[sectorIndex]);
     }
     HistogramUtilities::ConditionalWrite(eta_fitMaxRatio);
     HistogramUtilities::ConditionalWrite(pion_y_pT);
