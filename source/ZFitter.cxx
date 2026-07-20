@@ -28,6 +28,10 @@
 #include "../source/ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx"
 #include "../source/ZFitter_BTOF_ColliderCenter_SimulCent.cxx"
 #include "../source/ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx"
+// 2026-07: shared diagnostic-snapshot write/render code (see that file's header comment)
+// -- used by the two _SimulCent_SingleLoop.cxx drivers #included just above, and by
+// macros/MakeDiagnosticImagesFromSnapshot.C.
+#include "../source/ZFitter_DiagnosticSnapshot.cxx"
 
 
 //=========================================================================================================================================================================
@@ -246,6 +250,13 @@ ZFitter::ZFitter(){
   m_storeFitsNotStatusZero = true;
   m_saveNoLogImages = false;
   m_saveDiagnosticImages = true; // default true -- preserves existing behavior unless a caller opts out via setSaveDiagnosticImages(false)
+  // 2026-07: default off -- opt-in via setSaveDiagnosticSnapshots(true,...), no behavior
+  // change for existing callers. File/tree are opened lazily on first fill, not here.
+  m_saveDiagnosticSnapshots = false;
+  m_diagnosticSnapshotFilePath = "";
+  m_diagnosticSnapshotFile = nullptr;
+  m_diagnosticSnapshotTree = nullptr;
+  m_diagnosticSnapshotHistPtr = nullptr;
   m_convertInvBetaToMassSquared = false;
   m_useColliderStopTable = false;
 
@@ -1843,71 +1854,83 @@ void ZFitter::setParticleInfo(string a_starVer){
 }
 
 //=========================================================================================================================================================================
-void ZFitter::setImageDir(string a_prePath, string a_imgDirName){
+void ZFitter::setImageDir(string a_prePath, string a_imgDirName, int a_detectorIndex){
 
   m_imagePreDir = a_prePath;
   m_imgDirName = a_imgDirName;
   cout << "m_imagePreDir: " << m_imagePreDir << endl;
   cout << "m_imgDirName: " << m_imgDirName << endl;
   gSystem->mkdir(Form("%s/%s",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/eta_betaGamma_dEdx",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/mom_invBetaBTOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/mom_invBetaETOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/dEdxMomFits",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/electronStudy",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/BichselShifts",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  gSystem->mkdir(Form("%s/%s/ParticleWidths",m_imagePreDir.c_str(), m_imgDirName.c_str()));
-  /*for(int partIndex = 0; partIndex < 9; partIndex++){
-    if(!m_particleLoaded[partIndex]) continue;
-    gSystem->mkdir(Form("%s/%s/%s",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    gSystem->mkdir(Form("%s/%s/%s/dEdxFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    if(m_hasETOF) gSystem->mkdir(Form("%s/%s/%s/invBetaETOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-      gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data(),centIndex));
-      if(m_hasETOF) gSystem->mkdir(Form("%s/%s/%s/invBetaETOFFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data(),centIndex));
-      gSystem->mkdir(Form("%s/%s/%s/dEdxFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data(),centIndex));
-    }
-    //gSystem->mkdir(Form("%s/%s/%s/ZTPC_Zoomed",m_imagePreDir.c_str(), m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    //gSystem->mkdir(Form("%s/%s/%s/BTOF_Zoomed",m_imagePreDir.c_str(), m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    //if(m_hasETOF) gSystem->mkdir(Form("%s/%s/%s/ETOF_Zoomed",m_imagePreDir.c_str(), m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    //gSystem->mkdir(Form("%s/%s/%s/eta_betaGamma_dEdx",m_imagePreDir.c_str(), m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-    gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
 
-    for(int partIndex2 = 0; partIndex2 < 9; partIndex2++){
-      gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/%s",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data(),m_partInfo->GetParticleName(partIndex2,0).Data()));
-    }
-    gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/PionElectron",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,0).Data()));
-
-  }*/
+  // 2026-07: rewritten to only create the subdirectories the LIVE fit pipeline
+  // (RunZFitter.C -> fitTPCPionKaon_SimulCent_RapidityLooper / fitBTOF_SimulCent /
+  // ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx's driver) actually writes into, instead
+  // of the full menu this function used to create unconditionally every run regardless
+  // of what was being fit -- Andrew noticed the resulting clutter and asked for it to
+  // be trimmed. Verified by tracing every SaveAs()/Print() call site that targets
+  // m_imagePreDir/m_imgDirName across ZFitter.cxx and the three live
+  // *_SimulCent_*.cxx driver files back to whether it's ever actually reachable from
+  // RunZFitter.C (grepping for real callers of each enclosing function, not just
+  // assuming). The following are dropped entirely, unconditionally, regardless of
+  // a_detectorIndex, because nothing in this codebase can ever write into them:
+  //   - top-level mom_invBetaBTOFFits, mom_invBetaETOFFits, dEdxMomFits,
+  //     electronStudy, BichselShifts, ParticleWidths: correspond to methods
+  //     (fitInvBetaVsMom_ETOF, fitDeDxVsMom, electronStudy,
+  //     findPartShiftsAndRatiosWithRap, findMassSquaredWidths) that are either never
+  //     called anywhere in this repo (confirmed via grep for callers -- zero hits) or
+  //     were deliberately dropped when RunZFitter.C was ported from the original --
+  //     see that file's own header comment.
+  //   - per-species eta_betaGamma_dEdx: the two PNGs that ARE genuinely written live
+  //     every run (bichsel_plot.png, invBetaCalib_plot.png, from
+  //     drawBichselOnDeDxPlot()/drawInvBetaPredictionPlot(), both called
+  //     unconditionally from RunZFitter.C) save directly into the top-level dir, not
+  //     this subfolder -- confirmed by reading their SaveAs() calls directly. The
+  //     EtaIndex-numbered variants that DO target this subfolder only exist in the
+  //     dead ZFitter_dEdxFuncts.cxx (see the chi^2/ndf fix's comments elsewhere in
+  //     this file for the fuller explanation of why that file, ZFitter_TPCFuncts.cxx,
+  //     and ZFitter_bTOFFuncts.cxx are all dead -- the pre-SimulCent, single-
+  //     centrality-at-a-time fit codepath RunZFitter.C never calls).
+  //   - per-species dEdxParamExtrapolations, ZTPC_BTOFIsolated/* (including its 9x9
+  //     per-species-pair fan-out and the PionElectron special case): only ever
+  //     written from the dead ZFitter_TPCFuncts.cxx.
+  //   - per-species invBetaETOFFits, invBetaETOFFits_Overview, invBetaETOFFits_Cent*:
+  //     ETOF fit drivers were never ported for this analysis at all (see
+  //     RunZFitter.C's header comment) -- nothing has ever written into these, or
+  //     ever can with the current codebase.
+  //   - per-species invBetaBTOFFits_Overview: draw_ZVar_mTm0_data_with_fit_data() (the
+  //     only live writer of any "*_Overview" folder) is only ever called with
+  //     a_detIndex=0 (from ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx), so its
+  //     a_detIndex==1 branch (this folder) is dead code in practice.
+  //
+  // What's left (dEdxFits, dEdxFits_Overview, dEdxFits_Cent%02d, TPCParamExtrapolations
+  // for TPC; invBetaBTOFFits, invBetaBTOFFits_Cent%02d, BTOFParamExtrapolations for
+  // BTOF) is genuinely detector-dependent -- RunZFitter.C only ever fits ONE detector
+  // per invocation (a_detectorIndex: 0=TPC, 1=BTOF), so gate on it. a_detectorIndex<0
+  // (the default, for any future/other caller) falls back to creating both sets,
+  // preserving the old fully-inclusive behavior rather than silently
+  // under-provisioning for a caller this wasn't verified against.
+  bool makeTPCDirs  = (a_detectorIndex < 0 || a_detectorIndex == 0);
+  bool makeBTOFDirs = (a_detectorIndex < 0 || a_detectorIndex == 1);
 
   for(int chargePM = -1; chargePM < 2; chargePM+=2){
     for(int partIndex = 0; partIndex < 9; partIndex++){
       if(!m_particleLoaded[partIndex]) continue;
       gSystem->mkdir(Form("%s/%s/%s",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/dEdxFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/dEdxFits_Overview",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/dEdxParamExtrapolations",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits_Overview",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/BTOFParamExtrapolations",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      gSystem->mkdir(Form("%s/%s/%s/TPCParamExtrapolations",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      if(m_hasETOF){
-        gSystem->mkdir(Form("%s/%s/%s/invBetaETOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-        gSystem->mkdir(Form("%s/%s/%s/invBetaETOFFits_Overview",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+      if(makeTPCDirs){
+        gSystem->mkdir(Form("%s/%s/%s/dEdxFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+        gSystem->mkdir(Form("%s/%s/%s/dEdxFits_Overview",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+        gSystem->mkdir(Form("%s/%s/%s/TPCParamExtrapolations",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+        for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+          gSystem->mkdir(Form("%s/%s/%s/dEdxFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),centIndex));
+        }
       }
-      for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
-        gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),centIndex));
-        if(m_hasETOF) gSystem->mkdir(Form("%s/%s/%s/invBetaETOFFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),centIndex));
-        gSystem->mkdir(Form("%s/%s/%s/dEdxFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),centIndex));
+      if(makeBTOFDirs){
+        gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+        gSystem->mkdir(Form("%s/%s/%s/BTOFParamExtrapolations",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
+        for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
+          gSystem->mkdir(Form("%s/%s/%s/invBetaBTOFFits_Cent%02d",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),centIndex));
+        }
       }
-      gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-      for(int partIndex2 = 0; partIndex2 < 9; partIndex2++){
-        gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/%s",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data(),m_partInfo->GetParticleName(partIndex2,chargePM).Data()));
-
-      }
-      gSystem->mkdir(Form("%s/%s/%s/ZTPC_BTOFIsolated/PionElectron",m_imagePreDir.c_str(),m_imgDirName.c_str(),m_partInfo->GetParticleName(partIndex,chargePM).Data()));
-
     }
   }
 }

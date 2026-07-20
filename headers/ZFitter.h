@@ -83,6 +83,7 @@
 #include "TPad.h"
 #include "TSystem.h"
 #include "TFile.h"
+#include "TTree.h"
 #include "TF1.h"
 #include "TGraphErrors.h"
 #include "TLine.h"
@@ -119,6 +120,71 @@ using namespace std;
 
 const int g_ZFitter_MaxNumRapBins = 35;
 const int g_ZFitter_MaxNumMtM0Bins = 300;
+
+// 2026-07: everything the per-bin diagnostic plotting code (in
+// ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx / ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx)
+// needs to redraw a single bin's fit-overlay canvas + pull plot, WITHOUT the minimizer,
+// the histogram-loading machinery, or any other live-fit state still being around --
+// this is what gets written to / read back from the diagnostic snapshot TTree (see
+// setSaveDiagnosticSnapshots() below and source/ZFitter_DiagnosticSnapshot.cxx).
+//
+// "species" here always means 3 slots in a fixed order: slot 0 = pion, slot 1 = kaon,
+// slot 2 = electron (driverType 0, PionKaonTPC's skew-pion + 2-Gaussian fit) or proton
+// (driverType 1, ProtonTPC's 3-skew-normal fit). Gaussian species just don't use their
+// gamma slot (left at 0) -- which render function to call, and which combined-function
+// builder it uses internally, is decided entirely by driverType, not by anything stored
+// per-species here.
+//
+// The text-box contents (topTextLines / bottomTextLines) are stored PRE-FORMATTED,
+// generated with the exact same Form(...) calls the live plotting code already uses,
+// captured at fill-time while the minimizer/paramNames/limits are still valid -- rather
+// than trying to re-derive fixed-flags / "Ignore" skips / AT-LIMIT percentages later
+// from raw numbers, which would risk silently drifting from what a live run actually
+// shows. The render functions just AddText() these lines back in, unchanged.
+struct ZFitterDiagnosticSnapshot{
+  int driverType; // 0 = PionKaonTPC (pion skew + kaon/electron Gaussian), 1 = ProtonTPC (3 skew)
+  string particleName; // m_partInfo->GetParticleName(m_currentPartIndex, charge) at fill time
+  int charge;
+  int centIndex;
+  int rapBin;
+  int mtm0Bin;
+  int fittingRound;
+  string roundTag; // ProtonTPC only (appended to the output filename there); empty for PionKaonTPC
+
+  double lowRange;
+  double highRange;
+  double currentLowFitRange;
+  double currentHighFitRange;
+  double sigmaGuess;
+  bool   drawInitialSeeds;
+  bool   saveNoLogImages;
+
+  double N[3];
+  double N_err[3];
+  double mu[3];
+  double mu_err[3];
+  double sigma[3];
+  double sigma_err[3];
+  double gamma[3]; // unused (0) for Gaussian species
+  double gamma_err[3];
+
+  // Seed/initial values used to draw the optional "_init" overlay curves (only drawn
+  // when drawInitialSeeds is true). For PionKaonTPC's electron slot this is already the
+  // doElectronPionRatio-resolved amplitude (that branch is resolved once at fill time,
+  // not re-derived here).
+  double seedN[3];
+  double seedMu[3];
+  double seedSigma[3];
+  double seedGamma[3];
+  bool   doFit[3]; // doFitPion/doFitKaon/doFitElectron(or Proton) -- ProtonTPC zeroes a seed curve's amplitude when false
+
+  int color[3]; // m_partInfo->GetParticleColor(<global particle index>) at fill time -- slot order doesn't match global particle index for PionKaonTPC's electron slot, so this can't be re-derived from driverType alone
+
+  vector<string> topTextLines;    // fitParsTxt: final fit values + (fixed) tags
+  vector<string> bottomTextLines; // fitTxt: initial/seed values + limits (+ AT LIMIT for PionKaonTPC)
+
+  TH1D* hist; //the raw dE/dx histogram that was fit for this bin/centrality -- owned by the caller (either the live driver's m_currentHistosToFit_ByCent, or a clone read back from the snapshot tree); render functions only read it, never delete it
+};
 
 class ZFitter{
 public:
@@ -182,7 +248,12 @@ public:
   void setWeightedAverageStdDev(bool* a_weightedAverage_stdDev){for(int iii=0; iii< 9; iii++) m_weightedAverage_stdDev[iii] = a_weightedAverage_stdDev[iii]; };
   void drawInitialSeedsToFits(bool a_toggle = true){m_drawInitialSeedsToFits = a_toggle;};
   //where do you want the pictures of the fits to be generated
-  void setImageDir(string a_prePath, string a_imgDirName);
+  // a_detectorIndex (0=TPC,1=BTOF, <0 = unknown/legacy caller): 2026-07, only creates
+  // the detector-relevant image subdirectories instead of the full menu for both
+  // detectors -- see the .cxx for the verification behind which folders are actually
+  // live. <0 preserves the old fully-inclusive behavior for any caller this wasn't
+  // verified against.
+  void setImageDir(string a_prePath, string a_imgDirName, int a_detectorIndex = -1);
   void setTextFileDir(string a_textFileDir);
 
   //LEGACY used to constrain electron parameters to single value
@@ -230,6 +301,36 @@ public:
   // rapidity/mTm0/centrality/step bin combination, vastly more than the fit itself), and
   // turning it off does not change the fitted spectra output, only skips the QA plots.
   void setSaveDiagnosticImages(bool a_toggle = true){m_saveDiagnosticImages = a_toggle;};
+  // Perf toggle added 2026-07: independent of setSaveDiagnosticImages() above -- either,
+  // both, or neither can be on. When on, the per-bin diagnostic plotting code writes a
+  // lightweight "snapshot" (the raw fit histogram + everything needed to redraw the same
+  // plot -- see ZFitterDiagnosticSnapshot above) into a_snapshotFilePath's TTree instead
+  // of (or alongside) rendering a PNG live: no TCanvas, no TF1 construction, no PNG
+  // encode -- just a histogram clone + a TTree::Fill(), so this is cheap even when
+  // setSaveDiagnosticImages(false) is skipping the expensive part of a run. Run
+  // macros/MakeDiagnosticImagesFromSnapshot.C afterward to turn a snapshot file into the
+  // same PNGs a live setSaveDiagnosticImages(true) run would have produced, without
+  // re-running the fit. See source/ZFitter_DiagnosticSnapshot.cxx.
+  void setSaveDiagnosticSnapshots(bool a_toggle, string a_snapshotFilePath){
+    m_saveDiagnosticSnapshots = a_toggle; m_diagnosticSnapshotFilePath = a_snapshotFilePath;};
+  // Flush and close the snapshot TTree/TFile if setSaveDiagnosticSnapshots(true,...) ever
+  // opened one. Call once, after all fitXXX(...) calls are done (see RunZFitter.C) --
+  // safe/no-op to call even if snapshots were never turned on.
+  void closeDiagnosticSnapshotFile();
+  // Shared rendering code for both live plotting and macros/MakeDiagnosticImagesFromSnapshot.C
+  // -- defined in source/ZFitter_DiagnosticSnapshot.cxx. Produces byte-identical PNGs to
+  // the pre-2026-07 inline plotting code these replaced (see that file's header comment).
+  void renderPionKaonTPCDiagnosticPlot(const ZFitterDiagnosticSnapshot& a_snapshot);
+  void renderProtonTPCDiagnosticPlot(const ZFitterDiagnosticSnapshot& a_snapshot);
+  // Lazily opens m_diagnosticSnapshotFile/m_diagnosticSnapshotTree on first use (only
+  // called when m_saveDiagnosticSnapshots is true) and books all branches. Internal
+  // glue used from within the two live fit drivers -- not meant to be called directly
+  // from a run macro.
+  void ensureDiagnosticSnapshotTreeOpen();
+  // Clones a_snapshot.hist with a unique name, copies every other field into the bound
+  // "current row" scratch members, and Fill()s the tree. Internal glue, same caveat as
+  // ensureDiagnosticSnapshotTreeOpen() above.
+  void fillDiagnosticSnapshotTreeRow(const ZFitterDiagnosticSnapshot& a_snapshot);
   void setConvertInvBetaToMassSquared(bool a_toggle = true){m_convertInvBetaToMassSquared = a_toggle;}; // for mapping invBeta BTOF into mass^2
   void setUseColliderStopTable(bool a_toggle = true){m_useColliderStopTable = a_toggle;}; // this will stop fitting tpc when it isn't needed anymore
 
@@ -448,6 +549,24 @@ private:
   // to true so existing behavior (every bin's fit gets a PNG) is unchanged unless a
   // caller opts in via setSaveDiagnosticImages(false). See RunZFitter.C.
   bool m_saveDiagnosticImages;
+
+  // 2026-07: independent snapshot-instead-of/alongside-images toggle -- see
+  // setSaveDiagnosticSnapshots() above for the full explanation. m_diagnosticSnapshotFile/
+  // Tree are opened lazily (ensureDiagnosticSnapshotTreeOpen()) on first fill, not here.
+  bool m_saveDiagnosticSnapshots;
+  string m_diagnosticSnapshotFilePath;
+  TFile* m_diagnosticSnapshotFile;
+  TTree* m_diagnosticSnapshotTree;
+  // "current row" scratch space that the tree's branches are bound to -- repopulated and
+  // Fill()'d once per bin/centrality when snapshots are on. TH1D* branch needs its own
+  // pointer slot separate from the struct (see .cxx) since the struct itself isn't a
+  // branch-address target.
+  ZFitterDiagnosticSnapshot m_diagnosticSnapshotRow;
+  TH1D* m_diagnosticSnapshotHistPtr;
+  // bool[3] doesn't get a clean ROOT TTree leaflist type -- this stable-address int[3]
+  // shadow of m_diagnosticSnapshotRow.doFit is what the "doFit" branch is actually bound
+  // to (see ZFitter_DiagnosticSnapshot.cxx).
+  int m_diagnosticSnapshotDoFitInt[3];
 
   bool m_useRootMinimizer; // not yet complete
   bool m_useGeneralETOFFitDataConstraint;

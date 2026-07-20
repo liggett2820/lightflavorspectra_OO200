@@ -97,6 +97,9 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   string spectraFileName = Form("spectra_OO200_%s_%s_RapBin_%d_%d_%d_%d_%d_%d.root",
              partNames[a_partIndex].c_str(),detNames[a_detectorIndex].c_str(),a_rapBin_1,a_rapBin_2,a_rapBin_3,a_rapBin_4,a_rapBin_5,a_rapBin_6);
   string textDirName = a_outputDir + "yieldFits_OO200_text";
+  // 2026-07: see saveDiagnosticSnapshots above -- named off the same imageDirName
+  // convention as everything else in this run.
+  string diagnosticSnapshotFileName = a_outputDir + "diagnosticSnapshots_" + imageDirName + ".root";
 
   cout << "FILES BEING USED:" << endl;
   cout << "  pion yield file:   " << a_pionYieldFile << endl;
@@ -180,6 +183,15 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   // encode for every rapidity/mTm0/centrality/step bin) and does not affect the fitted
   // spectra output at all -- see ZFitter.h's setSaveDiagnosticImages() for details.
   bool saveDiagnosticImages          = true;
+  // Perf 2026-07: independent of saveDiagnosticImages above -- either, both, or neither
+  // can be on. When on, the fit writes a lightweight per-bin "snapshot" (raw histogram +
+  // everything needed to redraw the diagnostic plot) instead of/alongside rendering a
+  // PNG live -- no canvas render, no PNG encode, just a histogram clone + a TTree fill.
+  // Run macros/MakeDiagnosticImagesFromSnapshot.C afterward to turn a snapshot file into
+  // the same PNGs a live saveDiagnosticImages=true run would have produced, without
+  // re-running the fit. Default off -- opt-in, no behavior change for existing callers.
+  // See ZFitter.h's setSaveDiagnosticSnapshots() for details.
+  bool saveDiagnosticSnapshots       = false;
 
   // stop momentum to zoom in and fit with single bump (per particle-space, plus/minus)
   vector<double> a_mom_dEdx_plus      = {0.3, 0.4, 0.8, 0.0, 1.4, 1.4, 0.5, 0.5, 0.1};
@@ -364,6 +376,7 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   fitter->storeFitsNotStatusZero(true);
   fitter->setSaveNoLogImages(false);
   fitter->setSaveDiagnosticImages(saveDiagnosticImages);
+  fitter->setSaveDiagnosticSnapshots(saveDiagnosticSnapshots, diagnosticSnapshotFileName);
   fitter->setConvertInvBetaToMassSquared(convertInvBetaToMassSquared);
 
   fitter->loadBasicDataHistograms(a_pionYieldFile, hasETOF); // PION file must have simple histos in it
@@ -461,7 +474,11 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
     fitter->loadQuickStartFile(a_quickStartFile,9,a_partIndex,a_detectorIndex);
   }
 
-  fitter->setImageDir(a_outputDir, imageDirName);
+  // 2026-07: pass a_detectorIndex through so setImageDir() only creates the
+  // TPC-flavored or BTOF-flavored image subdirectories for whichever detector this
+  // run is actually fitting, instead of both -- see ZFitter.cxx's setImageDir() for
+  // the full explanation of which folders were ever live in the first place.
+  fitter->setImageDir(a_outputDir, imageDirName, a_detectorIndex);
   fitter->setTextFileDir(textDirName);
   fitter->makeFitDataHistos(a_partIndex,a_detectorIndex);
 
@@ -515,6 +532,10 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
 
   cout << "Attempting to make the spectra output file..." << endl;
   fitter->makeSpectra(a_outputDir + spectraFileName);
+  // 2026-07: flush/close the diagnostic snapshot file if saveDiagnosticSnapshots opened
+  // one -- no-op otherwise. See macros/MakeDiagnosticImagesFromSnapshot.C to turn this
+  // into the same PNGs a live saveDiagnosticImages=true run would have produced.
+  fitter->closeDiagnosticSnapshotFile();
   cout << "Done With ZFitter..." << endl;
   return;
 }

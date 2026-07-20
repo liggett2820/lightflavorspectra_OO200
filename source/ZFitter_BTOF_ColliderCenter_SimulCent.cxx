@@ -2412,6 +2412,51 @@ void ZFitter::fitBTOF_SimulCent(int a_partIndexSpace, int a_charge){
       #ifdef _ZFITTER_DEBUG_
         cout << "simultaneous centrality minimizer status: " << status_Minimizer << endl;
       #endif
+
+      // 2026-07: chi^2/ndf fit-quality diagnostic -- BTOF counterpart of the same fix
+      // in ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx (see that file's Minimize()
+      // block for the full explanation). Andrew asked for this to be saved per fit so
+      // PresentZFitterSpectra.C's a_maxChiSqrNdf cut has real data to read -- the
+      // m_ChiSqr_Cent_ZbTOF histograms were booked (ZFitter.cxx) but never filled in
+      // this live joint/simultaneous-centrality fit path, confirmed via
+      // macros/CheckChiSqrValues.C on a real ZFitter run (chi^2/ndf read back as
+      // exactly 0 for every BTOF bin).
+      //
+      // simultaneous_centrality_ZTOF_chisqr (the minimizer's objective function,
+      // defined earlier in this file) is the sum-of-squared-residuals chi^2 passed to
+      // ROOT::Math::Minimizer via the Functor, so minimizer->MinValue() after
+      // Minimize() is exactly the chi^2 at the best-fit point -- same reasoning as the
+      // TPC fix, no separate recomputation needed. ndf = (data points with content>0
+      // within [m_currentLowFitBin,m_currentHighFitBin] for
+      // m_currentHistosToFit_ByCent_InvBeta[centIndex], summed over ALL linked
+      // centralities -- mirroring exactly what the chisqr functor sums over) minus
+      // (minimizer->NFree()).
+      //
+      // CAVEAT: same as the TPC fix -- centralities are fit JOINTLY here (pion+kaon+
+      // proton templates x all centralities in one simultaneous minimization), so this
+      // is ONE chi^2/ndf value per (rapidity bin, mT-m0 bin), not an independent
+      // per-centrality figure. It's written into every centrality's m_ChiSqr_Cent_ZbTOF
+      // slot below (in the centIndex loop further down) so PresentZFitterSpectra.C's
+      // existing per-centrality-indexed read/cut works unchanged, but a bad fit
+      // anywhere shows up identically in every centrality's reported value.
+      double jointFitChiSqr = minimizer->MinValue();
+      int jointFitNDataPoints = 0;
+      for(int centIndexForNdf = 0; centIndexForNdf < m_numCentralities; centIndexForNdf++){
+        for(int binX = m_currentLowFitBin[centIndexForNdf]; binX <= m_currentHighFitBin[centIndexForNdf]; binX++){
+          if(m_currentHistosToFit_ByCent_InvBeta[centIndexForNdf]->GetBinContent(binX) > 0.0) jointFitNDataPoints++;
+        }
+      }
+      int jointFitNDF = jointFitNDataPoints - (int) minimizer->NFree();
+      // ndf<=0 (underconstrained fit) -> write -1 rather than divide by a non-positive
+      // number; suppressBadFitQualityBins() in PresentZFitterSpectra.C already treats
+      // chiSqrNdf<=0 as a failed fit.
+      double jointFitChiSqrNDF = (jointFitNDF > 0) ? (jointFitChiSqr / jointFitNDF) : -1.0;
+      #ifdef _ZFITTER_DEBUG_
+        cout << "simultaneous centrality joint chi^2/ndf: " << jointFitChiSqr << " / " << jointFitNDF
+             << " = " << jointFitChiSqrNDF << "  (nDataPoints=" << jointFitNDataPoints
+             << ", nFree=" << minimizer->NFree() << ")" << endl;
+      #endif
+
       bool okayFitParams = true;
       bool okayPionNu   = true;
       bool okayKaonNu   = true;
@@ -2906,6 +2951,12 @@ void ZFitter::fitBTOF_SimulCent(int a_partIndexSpace, int a_charge){
           HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZbTOF[m_currentPartIndex][2][centIndex][3][m_currentPlusMinusIndex],m_currentRapBin,m_currentMtM0Bin, parameters_simul_cent[10],parameters_simul_cent_errors[10]);
           HistogramUtilities::setBinValues(m_Fit_Data_Cent_ZbTOF[m_currentPartIndex][2][centIndex][4][m_currentPlusMinusIndex],m_currentRapBin,m_currentMtM0Bin, parameters_simul_cent[11],parameters_simul_cent_errors[11]);
         }
+
+        // 2026-07: shared joint-fit chi^2/ndf (computed once above, right after
+        // Minimize()) written into every centrality's slot -- see the CAVEAT comment
+        // there. This is what CheckChiSqrValues.C / PresentZFitterSpectra.C's
+        // a_maxChiSqrNdf cut reads back.
+        m_ChiSqr_Cent_ZbTOF[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, jointFitChiSqrNDF);
 
         #ifdef _CREATE_TEXT_FIT_FILE_
           //if(!outputTextFile.is_open()) cout << "file is no longer open..." << endl;

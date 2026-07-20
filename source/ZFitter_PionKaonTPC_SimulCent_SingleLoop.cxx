@@ -2072,6 +2072,51 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
       cout << "simultaneous centrality minimizer status: " << status_Minimizer << endl;
     #endif
 
+    // 2026-07: chi^2/ndf fit-quality diagnostic (Andrew asked for this to be saved
+    // per fit so PresentZFitterSpectra.C's a_maxChiSqrNdf cut has real data to read --
+    // previously the m_ChiSqr_Cent_ZTPC histograms were booked (see ZFitter.cxx) but
+    // never filled anywhere in this live joint/simultaneous-centrality fit path, so
+    // every bin read back as exactly 0 in the output file; confirmed empirically via
+    // macros/CheckChiSqrValues.C on a real ZFitter run before touching this code).
+    //
+    // The minimizer's objective function (simultaneous_centrality_ZTPC_chisqr_E_K_Ratio_Linked
+    // / _E_Pi_Ratio_Linked, above) IS the sum-of-squared-residuals chi^2 -- it's exactly
+    // what gets passed to ROOT::Math::Minimizer via the Functor, so minimizer->MinValue()
+    // after Minimize() is the chi^2 at the best-fit point, no separate recomputation needed.
+    // ndf = (number of fit data points, i.e. bins with content>0 within [m_currentLowFitBin,
+    // m_currentHighFitBin] for each centrality, summed over ALL linked centralities --
+    // mirroring exactly what the chisqr functor itself sums over) minus (number of free
+    // fit parameters, minimizer->NFree()).
+    //
+    // CAVEAT (important -- flagged to Andrew when this was implemented): because all
+    // centralities are fit JOINTLY in one simultaneous minimization, not independently,
+    // there is only ONE chi^2/ndf value per (rapidity bin, mT-m0 bin) -- not a separate
+    // figure per centrality. The same shared value is written into every centrality's
+    // m_ChiSqr_Cent_ZTPC slot below (inside the centIndex loop further down) purely so
+    // PresentZFitterSpectra.C's existing per-centrality-indexed read/cut works unchanged.
+    // It should NOT be read as an independent per-centrality fit-quality figure: a bad
+    // fit driven by one centrality's data will show up (identically) in every other
+    // centrality's reported chi^2/ndf too, since they all share this one fit.
+    double jointFitChiSqr = minimizer->MinValue();
+    int jointFitNDataPoints = 0;
+    for(int centIndexForNdf = 0; centIndexForNdf < m_numCentralities; centIndexForNdf++){
+      for(int binX = m_currentLowFitBin[centIndexForNdf]; binX <= m_currentHighFitBin[centIndexForNdf]; binX++){
+        if(m_currentHistosToFit_ByCent[centIndexForNdf]->GetBinContent(binX) > 0.0) jointFitNDataPoints++;
+      }
+    }
+    int jointFitNDF = jointFitNDataPoints - (int) minimizer->NFree();
+    // ndf<=0 means the fit is underconstrained (more free parameters than usable data
+    // points) -- chi^2/ndf isn't meaningful there, so write -1 rather than silently
+    // dividing by a non-positive number. suppressBadFitQualityBins() in
+    // PresentZFitterSpectra.C already treats chiSqrNdf<=0 as a failed fit, same as the
+    // pre-existing all-zero-in-file case, so this doesn't need any change on that side.
+    double jointFitChiSqrNDF = (jointFitNDF > 0) ? (jointFitChiSqr / jointFitNDF) : -1.0;
+    #ifdef _ZFITTER_DEBUG_
+      cout << "simultaneous centrality joint chi^2/ndf: " << jointFitChiSqr << " / " << jointFitNDF
+           << " = " << jointFitChiSqrNDF << "  (nDataPoints=" << jointFitNDataPoints
+           << ", nFree=" << minimizer->NFree() << ")" << endl;
+    #endif
+
 
 
     double simulParams[55];
@@ -2124,34 +2169,14 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
       for(int iii = 0; iii < 11; iii++) previousGoodParameters[iii] = -999;
     }
 
-    // Perf 2026-07: canvas creation, and the entire per-bin diagnostic plotting/PNG
-    // block inside the centrality loop below, are gated on m_saveDiagnosticImages
-    // (default true, so behavior is unchanged unless a caller opts out via
-    // setSaveDiagnosticImages(false) -- see RunZFitter.C, and the fuller explanation in
-    // ZFitter_ProtonTPC_SimulCent_SingleLoop.cxx's copy of this same change). The
+    // Perf 2026-07: the entire per-bin diagnostic plotting/PNG block inside the
+    // centrality loop below is gated on m_saveDiagnosticImages / m_saveDiagnosticSnapshots
+    // (see ZFitter_DiagnosticSnapshot.cxx for the full explanation -- the actual
+    // canvas/TF1/text-box/pull-histogram/SaveAs code now lives there, shared with
+    // macros/MakeDiagnosticImagesFromSnapshot.C, rather than inline here). The
     // physics-output SetBinContent/SetBinError calls have been moved to run immediately
     // after numberOfCentEvents below, BEFORE the plotting block, so they execute
     // unconditionally either way.
-    TCanvas* fittingCanvas = nullptr;
-    TPad* topPad = nullptr;
-    TPad* bottomPad = nullptr;
-    if(m_saveDiagnosticImages){
-      fittingCanvas = new TCanvas("fittingCanvas","Fitting Canvas");
-      fittingCanvas->SetWindowSize(1300,700);
-      fittingCanvas->SetCanvasSize(1200,600);
-      fittingCanvas->Draw();
-      topPad = new TPad("topPad_PiKTPC","topPad_PiKTPC",0.0,0.3,1.0,1.0);
-      bottomPad = new TPad("bottomPad_PiKTPC","bottomPad_PiKTPC",0.0,0.0,1.0,0.3);
-      topPad->Draw();
-      bottomPad->Draw();
-      fittingCanvas->cd();
-      topPad->cd();
-      topPad->SetLogy(true);
-      topPad->SetRightMargin(0.4);
-      bottomPad->SetLogy(false);
-      bottomPad->SetRightMargin(0.4);
-      gStyle->SetOptFit(0111);
-    }
 
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
       double numberOfCentEvents = m_centEvents[m_currentPartIndex]->GetBinContent(centIndex+1);
@@ -2208,181 +2233,106 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
         m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, simulParams[8 + 3*centIndex]*numberOfCentEvents);
         m_Spectra_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinError(m_currentRapBin,m_currentMtM0Bin,   simulParamErrors[8 + 3*centIndex]*numberOfCentEvents);
       }
+      // 2026-07: shared joint-fit chi^2/ndf (computed once above, right after
+      // Minimize()) written into every centrality's slot -- see the CAVEAT comment
+      // there. This is what CheckChiSqrValues.C / PresentZFitterSpectra.C's
+      // a_maxChiSqrNdf cut reads back.
+      m_ChiSqr_Cent_ZTPC[m_currentPartIndex][centIndex][m_currentPlusMinusIndex]->SetBinContent(m_currentRapBin,m_currentMtM0Bin, jointFitChiSqrNDF);
 
-      if(!m_saveDiagnosticImages) continue; // skip all plotting below for this centIndex
+      if(!m_saveDiagnosticImages && !m_saveDiagnosticSnapshots) continue; // skip snapshot-build + plotting below for this centIndex
 
-      m_currentHistosToFit_ByCent[centIndex]->SetMarkerStyle(20);
-      m_currentHistosToFit_ByCent[centIndex]->SetMarkerColor(kBlack);
-      m_currentHistosToFit_ByCent[centIndex]->SetMarkerSize(0.5);
-      m_currentHistosToFit_ByCent[centIndex]->SetLineWidth(2);
-      m_currentHistosToFit_ByCent[centIndex]->SetLineColor(kBlack);
+      // 2026-07: build the snapshot struct once, use it for both the (optional) TTree
+      // row and the (optional) live render call -- see ZFitter_DiagnosticSnapshot.cxx
+      // for what actually draws the canvas / builds the PNG now.
+      ZFitterDiagnosticSnapshot snapshot;
+      snapshot.driverType   = 0; // PionKaonTPC: pion skew + kaon/electron Gaussian
+      snapshot.particleName = m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data();
+      snapshot.charge       = m_currentPartCharge;
+      snapshot.centIndex    = centIndex;
+      snapshot.rapBin       = m_currentRapBin;
+      snapshot.mtm0Bin      = m_currentMtM0Bin;
+      snapshot.fittingRound = fitting_round;
+      snapshot.roundTag     = ""; // PionKaonTPC's filename doesn't use roundTag (unlike ProtonTPC's)
 
+      snapshot.lowRange            = lowRange;
+      snapshot.highRange           = highRange;
+      snapshot.currentLowFitRange  = m_currentLowFitRange;
+      snapshot.currentHighFitRange = m_currentHighFitRange;
+      snapshot.sigmaGuess          = sigmaGuess;
+      snapshot.drawInitialSeeds    = m_drawInitialSeedsToFits;
+      snapshot.saveNoLogImages     = m_saveNoLogImages;
 
-      #ifndef _ZFITTER_PHYSMATH_BYPASS_
-        TF1* combinedFunct = PhysMath::getSkewAndTwoGausFunct(Form("ztpc_step%d_fit_%d_%d_%02d_%03d,%04d",fitting_round,
-          m_currentPartIndex, m_currentPlusMinusIndex,centIndex,m_currentRapBin,m_currentMtM0Bin),
-          simulParams[7 + centIndex*3], simulParams[0],simulParams[1],simulParams[2],
-          simulParams[8 + centIndex*3], simulParams[3], simulParams[4],
-          simulParams[9 + centIndex*3], simulParams[5], simulParams[6]);
-        TF1* pionFunct  = PhysMath::skewNormalFunct( simulParams[7 + centIndex*3], simulParams[0], simulParams[1], simulParams[2]);
-        TF1* kaonFunct  = PhysMath::getGaussianFunction(Form("ztpc_step%d_fit_%d_%d_%02d_%03d,%04d_Kaon",fitting_round,
-          m_currentPartIndex, m_currentPlusMinusIndex,centIndex,m_currentRapBin,m_currentMtM0Bin), simulParams[8 + centIndex*3], simulParams[3], simulParams[4]);
-        TF1* electronFunct = PhysMath::getGaussianFunction(Form("ztpc_step%d_fit_%d_%d_%02d_%03d,%04d_Electron",fitting_round,
-          m_currentPartIndex, m_currentPlusMinusIndex,centIndex,m_currentRapBin,m_currentMtM0Bin), simulParams[9 + centIndex*3], simulParams[5], simulParams[6]);
-        pionFunct->SetLineColor(m_partInfo->GetParticleColor(0));
-        pionFunct->SetRange(lowRange,highRange);
-        electronFunct->SetLineColor(m_partInfo->GetParticleColor(3));
-        electronFunct->SetRange(lowRange,highRange);
-        kaonFunct->SetLineColor(m_partInfo->GetParticleColor(1));
-        kaonFunct->SetRange(lowRange,highRange);
-        TF1* pionFunct_init = NULL;
-        TF1* koanFunct_init = NULL;
-        TF1* electronFunct_init = NULL;
-        if(m_drawInitialSeedsToFits){
-          pionFunct_init  = PhysMath::skewNormalFunct( parameters_simul_cent[7 + 3*centIndex], parameters_simul_cent[0], parameters_simul_cent[1], parameters_simul_cent[2]);
-          koanFunct_init  = PhysMath::getGaussianFunction(Form("ztpc_step%d_fit_%d_%d_%02d_%03d,%04d_Kaon_init",fitting_round,
-            m_currentPartIndex, m_currentPlusMinusIndex,centIndex,m_currentRapBin,m_currentMtM0Bin), parameters_simul_cent[8 + 3*centIndex],parameters_simul_cent[3], parameters_simul_cent[4]);
-          double electronN = parameters_simul_cent[9 + 3*centIndex] * parameters_simul_cent[8 + 3*centIndex];
-          if(doElectronPionRatio) electronN = parameters_simul_cent[9 + 3*centIndex] * parameters_simul_cent[7 + 3*centIndex];
-          electronFunct_init = PhysMath::getGaussianFunction(Form("ztpc_step%d_fit_%d_%d_%02d_%03d,%04d_Electron_init",fitting_round,
-            m_currentPartIndex, m_currentPlusMinusIndex,centIndex,m_currentRapBin,m_currentMtM0Bin), electronN, parameters_simul_cent[5], parameters_simul_cent[6]);
-          pionFunct_init->SetLineColor(kYellow+2);
-          pionFunct_init->SetRange(lowRange,highRange);
-          electronFunct_init->SetLineColor(kOrange);
-          electronFunct_init->SetRange(lowRange,highRange);
-          koanFunct_init->SetLineColor(kYellow+1);
-          koanFunct_init->SetRange(lowRange,highRange);
-        }
-      #endif
-      double highestValue  = HistogramUtilities::getMaxInRange(m_currentHistosToFit_ByCent[centIndex],m_currentLowFitRange,m_currentHighFitRange);
-      double lowestValue   = HistogramUtilities::getMinInRange(m_currentHistosToFit_ByCent[centIndex],m_currentLowFitRange,m_currentHighFitRange);
-      TLine* lowRangeLine  = new TLine(m_currentLowFitRange,lowestValue,m_currentLowFitRange,highestValue);
-      TLine* highRangeLine = new TLine(m_currentHighFitRange,lowestValue,m_currentHighFitRange,highestValue);
-      lowRangeLine->SetLineColor(kViolet);
-      highRangeLine->SetLineColor(kViolet);
+      snapshot.N[0]      = simulParams[7 + centIndex*3];      snapshot.N_err[0]     = simulParamErrors[7 + centIndex*3];
+      snapshot.mu[0]     = simulParams[0];                    snapshot.mu_err[0]    = simulParamErrors[0];
+      snapshot.sigma[0]  = simulParams[1];                    snapshot.sigma_err[0] = simulParamErrors[1];
+      snapshot.gamma[0]  = simulParams[2];                    snapshot.gamma_err[0] = simulParamErrors[2];
+      snapshot.N[1]      = simulParams[8 + centIndex*3];      snapshot.N_err[1]     = simulParamErrors[8 + centIndex*3];
+      snapshot.mu[1]     = simulParams[3];                    snapshot.mu_err[1]    = simulParamErrors[3];
+      snapshot.sigma[1]  = simulParams[4];                    snapshot.sigma_err[1] = simulParamErrors[4];
+      snapshot.gamma[1]  = 0.0; snapshot.gamma_err[1] = 0.0; // kaon is Gaussian here, no gamma
+      snapshot.N[2]      = simulParams[9 + centIndex*3];      snapshot.N_err[2]     = simulParamErrors[9 + centIndex*3];
+      snapshot.mu[2]     = simulParams[5];                    snapshot.mu_err[2]    = simulParamErrors[5];
+      snapshot.sigma[2]  = simulParams[6];                    snapshot.sigma_err[2] = simulParamErrors[6];
+      snapshot.gamma[2]  = 0.0; snapshot.gamma_err[2] = 0.0; // electron is Gaussian here, no gamma
 
+      snapshot.color[0] = m_partInfo->GetParticleColor(0); // pion
+      snapshot.color[1] = m_partInfo->GetParticleColor(1); // kaon
+      snapshot.color[2] = m_partInfo->GetParticleColor(3); // electron -- global particle index 3, NOT species-slot 2
+      snapshot.doFit[0] = doFitPion;
+      snapshot.doFit[1] = doFitKaon;
+      snapshot.doFit[2] = doFitElectron;
 
+      // Seed values for the optional "_init" overlay curves -- same
+      // doElectronPionRatio resolution the original inline code did (only actually
+      // used when m_drawInitialSeedsToFits is true, but cheap to always resolve here).
+      snapshot.seedN[0] = parameters_simul_cent[7 + 3*centIndex];
+      snapshot.seedMu[0] = parameters_simul_cent[0]; snapshot.seedSigma[0] = parameters_simul_cent[1]; snapshot.seedGamma[0] = parameters_simul_cent[2];
+      snapshot.seedN[1] = parameters_simul_cent[8 + 3*centIndex];
+      snapshot.seedMu[1] = parameters_simul_cent[3]; snapshot.seedSigma[1] = parameters_simul_cent[4]; snapshot.seedGamma[1] = 0.0;
+      double electronN = parameters_simul_cent[9 + 3*centIndex] * parameters_simul_cent[8 + 3*centIndex];
+      if(doElectronPionRatio) electronN = parameters_simul_cent[9 + 3*centIndex] * parameters_simul_cent[7 + 3*centIndex];
+      snapshot.seedN[2] = electronN;
+      snapshot.seedMu[2] = parameters_simul_cent[5]; snapshot.seedSigma[2] = parameters_simul_cent[6]; snapshot.seedGamma[2] = 0.0;
 
-      topPad->cd();
-      HistogramUtilities::setAxisRanges(m_currentHistosToFit_ByCent[centIndex], lowRange - 0.5*sigmaGuess, highRange + 0.5*sigmaGuess,true);
-      topPad->SetLogy(true);
-      m_currentHistosToFit_ByCent[centIndex]->SetStats(kFALSE);
-      m_currentHistosToFit_ByCent[centIndex]->Draw("E");
-      #ifndef _ZFITTER_PHYSMATH_BYPASS_
-        if(pionFunct_init && doFitPion) pionFunct_init->Draw("same");
-        if(koanFunct_init && doFitKaon) koanFunct_init->Draw("same");
-        if(electronFunct_init && doFitElectron) electronFunct_init->Draw("same");
-        combinedFunct->Draw("same");
-        pionFunct->Draw("same");
-        electronFunct->Draw("same");
-        kaonFunct->Draw("same");
-      #endif
-      lowRangeLine->Draw("same");
-      highRangeLine->Draw("same");
+      // Pre-formatted text-box lines -- captured now, while minimizer/paramNames/limits
+      // are still valid, exactly matching the Form(...) calls the inline code used to
+      // pass straight to AddText(). See ZFitterDiagnosticSnapshot's header comment for
+      // why this is captured rather than re-derived at render time.
+      snapshot.topTextLines.push_back(Form("N_{#pi} \t %e#pm%e %s",simulParams[7 + centIndex*3],simulParamErrors[7 + centIndex*3],minimizer->IsFixedVariable(7 + 3*centIndex) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#mu_{#pi} \t %f#pm%f %s",simulParams[0],simulParamErrors[0],minimizer->IsFixedVariable(0) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#sigma_{#pi} \t %f#pm%f %s",simulParams[1],simulParamErrors[1],minimizer->IsFixedVariable(1) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#gamma_{#pi} \t %f#pm%f %s",simulParams[2],simulParamErrors[2],minimizer->IsFixedVariable(2) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("N_{K} \t %e#pm%e %s",simulParams[8 + centIndex*3], simulParamErrors[8 + centIndex*3],minimizer->IsFixedVariable(8 + 3*centIndex) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#mu_{K} \t %f#pm%f %s",simulParams[3],simulParamErrors[3],minimizer->IsFixedVariable(3) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#sigma_{K} \t %f#pm%f %s",simulParams[4],simulParamErrors[4],minimizer->IsFixedVariable(4) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("N_{e} \t %e#pm%e %s",simulParams[9 + centIndex*3], simulParamErrors[9 + centIndex*3],minimizer->IsFixedVariable(9 + centIndex*3) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#mu_{e} \t %f#pm%f %s",simulParams[5],simulParamErrors[5],minimizer->IsFixedVariable(5) ? "(fixed)" : "       "));
+      snapshot.topTextLines.push_back(Form("#sigma_{e} \t %f#pm%f %s",simulParams[6],simulParamErrors[6],minimizer->IsFixedVariable(6) ? "(fixed)" : "       "));
 
-
-
-
-      TPaveText* fitParsTxt = new TPaveText(0.65,0.05,0.95,0.90,"NDC");
-
-      fitParsTxt->AddText(Form("N_{#pi} \t %e#pm%e %s",simulParams[7 + centIndex*3],simulParamErrors[7 + centIndex*3],minimizer->IsFixedVariable(7 + 3*centIndex) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#mu_{#pi} \t %f#pm%f %s",simulParams[0],simulParamErrors[0],minimizer->IsFixedVariable(0) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#sigma_{#pi} \t %f#pm%f %s",simulParams[1],simulParamErrors[1],minimizer->IsFixedVariable(1) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#gamma_{#pi} \t %f#pm%f %s",simulParams[2],simulParamErrors[2],minimizer->IsFixedVariable(2) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("N_{K} \t %e#pm%e %s",simulParams[8 + centIndex*3], simulParamErrors[8 + centIndex*3],minimizer->IsFixedVariable(8 + 3*centIndex) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#mu_{K} \t %f#pm%f %s",simulParams[3],simulParamErrors[3],minimizer->IsFixedVariable(3) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#sigma_{K} \t %f#pm%f %s",simulParams[4],simulParamErrors[4],minimizer->IsFixedVariable(4) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("N_{e} \t %e#pm%e %s",simulParams[9 + centIndex*3], simulParamErrors[9 + centIndex*3],minimizer->IsFixedVariable(9 + centIndex*3) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#mu_{e} \t %f#pm%f %s",simulParams[5],simulParamErrors[5],minimizer->IsFixedVariable(5) ? "(fixed)" : "       "));
-      fitParsTxt->AddText(Form("#sigma_{e} \t %f#pm%f %s",simulParams[6],simulParamErrors[6],minimizer->IsFixedVariable(6) ? "(fixed)" : "       "));
-      fitParsTxt->SetFillStyle(0);
-      fitParsTxt->SetBorderSize(5);
-      fitParsTxt->Draw("same");
-
-
-
-
-
-      bottomPad->cd();
-      #ifndef _ZFITTER_PHYSMATH_BYPASS_
-      TH1D* pullHisto = HistogramUtilities::makeFitPullHistogram(m_currentHistosToFit_ByCent[centIndex], combinedFunct, true);
-      pullHisto->SetMarkerStyle(20);
-      pullHisto->SetMarkerSize(0.5);
-      pullHisto->SetMarkerColor(kBlack);
-      pullHisto->SetLineColor(kBlack);
-      #endif
-
-      TPaveText* fitTxt = new TPaveText(0.65,0.05,0.95,0.95,"NDC");
-      if(initialParams[7 + 3*centIndex] != 0.0) fitTxt->AddText(Form("N_{#pi} \t %.2e  [ %.2e, %.2e ]",initialParams[7 + 3*centIndex],initialParamLimits[7 + 3*centIndex][0],initialParamLimits[7 + 3*centIndex][1]));
-      if(initialParams[8 + 3*centIndex] != 0.0) fitTxt->AddText(Form("N_{K} \t %.2e  [ %.2e, %.2e ]",  initialParams[8 + 3*centIndex],initialParamLimits[8 + 3*centIndex][0],initialParamLimits[8 + 3*centIndex][1]));
-      if(initialParams[9 + 3*centIndex] != 0.0) fitTxt->AddText(Form("N_{e} \t %.2e  [ %.2e, %.2e ]",  initialParams[9 + 3*centIndex],initialParamLimits[9 + 3*centIndex][0],initialParamLimits[9 + 3*centIndex][1]));
+      if(initialParams[7 + 3*centIndex] != 0.0) snapshot.bottomTextLines.push_back(Form("N_{#pi} \t %.2e  [ %.2e, %.2e ]",initialParams[7 + 3*centIndex],initialParamLimits[7 + 3*centIndex][0],initialParamLimits[7 + 3*centIndex][1]));
+      if(initialParams[8 + 3*centIndex] != 0.0) snapshot.bottomTextLines.push_back(Form("N_{K} \t %.2e  [ %.2e, %.2e ]",  initialParams[8 + 3*centIndex],initialParamLimits[8 + 3*centIndex][0],initialParamLimits[8 + 3*centIndex][1]));
+      if(initialParams[9 + 3*centIndex] != 0.0) snapshot.bottomTextLines.push_back(Form("N_{e} \t %.2e  [ %.2e, %.2e ]",  initialParams[9 + 3*centIndex],initialParamLimits[9 + 3*centIndex][0],initialParamLimits[9 + 3*centIndex][1]));
       for(int iii = 0; iii < 7; iii++){
         if(!minimizer->IsFixedVariable(iii) && paramNames[iii].find("Ignore") == std::string::npos){
           double percent = 100.0*(parameters_simul_cent[iii] - initialParamLimits[iii][0])/(initialParamLimits[iii][1] - initialParamLimits[iii][0]);
           bool atLimit = (percent > 99.9 ||  percent < 0.1);
           string limitStr = "";
           if(atLimit) limitStr = "AT LIMIT";
-          fitTxt->AddText(Form("%s \t %f  [ %f, %f ]  %1.2f %% %s",paramNames[iii].c_str(),initialParams[iii],initialParamLimits[iii][0],initialParamLimits[iii][1], percent,limitStr.c_str() ));
+          snapshot.bottomTextLines.push_back(Form("%s \t %f  [ %f, %f ]  %1.2f %% %s",paramNames[iii].c_str(),initialParams[iii],initialParamLimits[iii][0],initialParamLimits[iii][1], percent,limitStr.c_str() ));
         }
       }
-      fitTxt->SetFillStyle(0);
-      fitTxt->SetBorderSize(5);
 
+      snapshot.hist = m_currentHistosToFit_ByCent[centIndex];
 
-
-      TH1F* frame_pull = bottomPad->DrawFrame(m_currentHistosToFit_ByCent[centIndex]->GetBinLowEdge(m_currentHistosToFit_ByCent[centIndex]->FindBin( lowRange - 0.5*sigmaGuess)),-15.0,
-             m_currentHistosToFit_ByCent[centIndex]->GetBinLowEdge(m_currentHistosToFit_ByCent[centIndex]->FindBin( highRange + 0.5*sigmaGuess)),15.0);
-      frame_pull->SetTitle(Form("; Z_{TPC}; Standardized Pull"));
-      #ifndef _ZFITTER_PHYSMATH_BYPASS_
-      pullHisto->Draw("Same");
-      #endif
-      TLine* oneLine = new TLine(lowRange - 0.5*sigmaGuess,0.0,highRange + 0.5*sigmaGuess,0.0);
-      oneLine->SetLineStyle(7);
-      oneLine->SetLineColor(kBlack);
-      oneLine->Draw("same");
-      fitTxt->Draw("same");
-
-      gPad->Update();
-      gSystem->ProcessEvents();
-      fittingCanvas->SaveAs(Form("%s/%s/%s/dEdxFits_Cent%02d/RapBin_%02d_STEP_%02d_mTm0Bin_%02d.png",m_imagePreDir.c_str(), m_imgDirName.c_str(),
-             m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data(),centIndex, m_currentRapBin, fitting_round, m_currentMtM0Bin));
-
-      if(m_saveNoLogImages){
-        topPad->SetLogy(false);
-        topPad->Update();
-        gSystem->ProcessEvents();
-        fittingCanvas->SaveAs(Form("%s/%s/%s/dEdxFits_Cent%02d/NoLog_RapBin_%02d_STEP_%02d_mTm0Bin_%02d.png",m_imagePreDir.c_str(), m_imgDirName.c_str(),
-               m_partInfo->GetParticleName(m_currentPartIndex,m_currentPartCharge).Data(),centIndex,m_currentRapBin,fitting_round, m_currentMtM0Bin));
-      }
+      if(m_saveDiagnosticSnapshots) fillDiagnosticSnapshotTreeRow(snapshot);
+      if(m_saveDiagnosticImages)    renderPionKaonTPCDiagnosticPlot(snapshot);
       // (SetBinContent/SetBinError physics-output block originally lived here --
-      // moved above the "if(!m_saveDiagnosticImages) continue;" line so it always
-      // runs; see comment near the top of this function for why that's safe.)
-      #ifndef _SAVE_POINTERS_
-        #ifndef _ZFITTER_PHYSMATH_BYPASS_
-          delete combinedFunct;
-          delete pionFunct;
-          delete electronFunct;
-          delete kaonFunct;
-          if(pionFunct_init) delete pionFunct_init;
-          if(koanFunct_init) delete koanFunct_init;
-          if(electronFunct_init) delete electronFunct_init;
-          delete pullHisto;
-        #endif
-
-        delete lowRangeLine;
-        delete highRangeLine;
-        delete oneLine;
-        delete fitParsTxt;
-        delete fitTxt;
-      #endif
+      // moved above the "if(!m_saveDiagnosticImages && !m_saveDiagnosticSnapshots)
+      // continue;" line so it always runs; see comment near the top of this function
+      // for why that's safe.)
     } // end centrality loop
     //minimizer->Clear();
     #ifndef _SAVE_POINTERS_
-      if(m_saveDiagnosticImages){
-        delete topPad;
-        delete bottomPad;
-        delete fittingCanvas;
-      }
       delete chiSqrdFunctor;
       delete minimizer;
     #endif
