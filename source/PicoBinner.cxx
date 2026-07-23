@@ -223,6 +223,21 @@ void PicoBinner(string    a_filelist,
   // dead/noisy padrow region would show a normal nHitsMax ceiling but a depressed
   // nHitsFit relative to other sectors at the same eta.
   TH2I* eta_nHitsFit_bySector[12] = {NULL};
+  // Added 2026-07-23: charge-sign split of eta_nHitsMax, to test the leading
+  // hypothesis for the 2-3 diagonal "streaks" seen along each side of the
+  // eta_nHitsMax trapezoid (visible in PresentNHitsEta.C's middle panel, beyond the
+  // already-understood main ceiling edge / inner-outer-boundary shelf / TPC-corner
+  // smearing -- see ScanNHitsMaxVsEta.C). Those streaks likely aren't 1-padrow steps
+  // (there'd be far too many of those to read as a few bold lines) -- they're more
+  // likely a handful of genuine structural crossings (e.g. field-cage support ribs,
+  // wheel-mount hardware), each smeared from a vertical line into a diagonal streak
+  // by track curvature: a track's charge sign sets which way it bends in STAR's
+  // field, so positive and negative tracks cross the same fixed structural boundary
+  // at slightly different eta. If that's right, this split should show the streaks
+  // shifted between the two charge signs; a purely eta-only geometric effect (no
+  // curvature dependence) would show identical streaks in both.
+  TH2I* eta_nHitsMax_chargePlus  = NULL;
+  TH2I* eta_nHitsMax_chargeMinus = NULL;
   TH2D* eta_fitMaxRatio = NULL;
   TH2I* dEdx_Plus  = NULL;
   TH2I* dEdx_Minus = NULL;
@@ -430,6 +445,16 @@ void PicoBinner(string    a_filelist,
                    a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
                    80,0,80);
     }
+    // Charge-sign split of eta_nHitsMax, same binning/convention (see the
+    // declaration comment above for why this exists).
+    eta_nHitsMax_chargePlus = new TH2I("eta_nHitsMax_chargePlus",";#eta;N_{hits}^{max} (positive tracks)",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 80,0,80);
+    eta_nHitsMax_chargeMinus = new TH2I("eta_nHitsMax_chargeMinus",";#eta;N_{hits}^{max} (negative tracks)",350,
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(1),
+                 a_cutClass->getEtaPtBinStructure(1)->GetBinLowEdge(a_cutClass->getEtaPtBinStructure(1)->GetNbinsX()+1),
+                 80,0,80);
     // 12 phi-sector copies of eta_nHitsFit, same binning/convention as
     // eta_nHitsMax_bySector above (see the declaration comment for why this exists).
     for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
@@ -1712,6 +1737,9 @@ void PicoBinner(string    a_filelist,
         if(sectorIndex > 11) sectorIndex = 11;
         eta_nHitsMax_bySector[sectorIndex]->Fill(eta,track->nHitsMax());
         eta_nHitsFit_bySector[sectorIndex]->Fill(eta,track->nHitsFit());
+        // Charge-sign split (see eta_nHitsMax_chargePlus/Minus declaration comment).
+        if(track->charge() > 0.0) eta_nHitsMax_chargePlus->Fill(eta,track->nHitsMax());
+        else if(track->charge() < 0.0) eta_nHitsMax_chargeMinus->Fill(eta,track->nHitsMax());
         // True double division here (diagnostic only) -- deliberately NOT the
         // truncated integer version isGoodTrack() enforces on the actual cut. See the
         // booking comment above for why.
@@ -1951,6 +1979,8 @@ void PicoBinner(string    a_filelist,
     HistogramUtilities::ConditionalWrite(eta_pT);
     HistogramUtilities::ConditionalWrite(eta_nHitsFit);
     HistogramUtilities::ConditionalWrite(eta_nHitsMax);
+    HistogramUtilities::ConditionalWrite(eta_nHitsMax_chargePlus);
+    HistogramUtilities::ConditionalWrite(eta_nHitsMax_chargeMinus);
     for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){
       HistogramUtilities::ConditionalWrite(eta_nHitsMax_bySector[sectorIndex]);
     }
