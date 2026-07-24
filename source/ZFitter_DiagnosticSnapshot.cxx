@@ -138,6 +138,18 @@ void ZFitter::fillDiagnosticSnapshotTreeRow(const ZFitterDiagnosticSnapshot& a_s
 
 void ZFitter::closeDiagnosticSnapshotFile(){
   if(m_diagnosticSnapshotTree != nullptr){
+    // BUGFIX (2026-07-21): TObject::Write() writes into gDirectory, NOT necessarily the
+    // tree's own file -- by the time this runs, makeSpectra() has already closed the main
+    // spectra outFile, which resets gDirectory back to gROOT ("Rint"). Writing without
+    // first cd()-ing into m_diagnosticSnapshotFile silently failed with
+    // "Error in <TROOT::WriteTObject>: The current directory (Rint) is not associated
+    // with a file. The object () has not been written." -- confirmed via the 2026-07-21
+    // proton TPC run's log. AutoSave() during the fit loop (see fillDiagnosticSnapshotTreeRow
+    // above) still correctly targeted the tree's own file, since gDirectory hadn't been
+    // clobbered yet at that point -- so this bug only risked losing (a) entries filled
+    // since the last AutoSave threshold and (b) a clean final tree header, not the whole
+    // snapshot file. cd() into the right file first so this Write() actually lands there.
+    if(m_diagnosticSnapshotFile != nullptr) m_diagnosticSnapshotFile->cd();
     m_diagnosticSnapshotTree->Write("", TObject::kOverwrite);
   }
   if(m_diagnosticSnapshotFile != nullptr){

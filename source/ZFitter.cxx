@@ -249,6 +249,7 @@ ZFitter::ZFitter(){
   m_doIntegralOfBinForFits = false;
   m_storeFitsNotStatusZero = true;
   m_saveNoLogImages = false;
+  m_maxTPCMomentumToFit = 0.75; // default matches the value this replaced -- see setMaxTPCMomentumToFit() in ZFitter.h
   m_saveDiagnosticImages = true; // default true -- preserves existing behavior unless a caller opts out via setSaveDiagnosticImages(false)
   // 2026-07: default off -- opt-in via setSaveDiagnosticSnapshots(true,...), no behavior
   // change for existing callers. File/tree are opened lazily on first fill, not here.
@@ -530,7 +531,23 @@ ZFitter::ZFitter(){
           m_Fit_Data_ZbTOF[partIndex][iii][jjj][pmIndex] = NULL; // particle rap space, particle , parameter, charge 0=plus 1-minus
           m_Fit_Data_ZeTOF[partIndex][iii][jjj][pmIndex] = NULL; // particle rap space, particle , parameter, charge 0=plus 1-minus
           m_Fit_Data_ZTPC[partIndex][iii][jjj][pmIndex] = NULL;
-          for(int cent_index = 0; cent_index < 9; cent_index++){
+          // 2026-07-20: bumped from < 9 to < 16 -- these three arrays are declared
+          // TH2D*[9][9][16][5][2] (see headers/ZFitter.h), but this loop only zeroed
+          // centIndex 0-8, leaving centIndex 9-15 as UNINITIALIZED garbage pointers
+          // (not NULL). draw_ZVar_mTm0_data_with_fit_data()'s caller unconditionally
+          // loops centIndex 0-15 (source/ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx,
+          // the "for(centIndex=0;centIndex<16;...) draw_ZVar_mTm0_data_with_fit_data(...)"
+          // block after each rapidity bin's mTm0 loop), and only nCentToRun=6
+          // centralities ever get actually booked (RunZFitter.C) -- so centIndex 9-15
+          // were always read as garbage there. Because the null checks in that draw
+          // function (`if(!fitDataMean || !fitDataStdDev) continue;`) only reject an
+          // ACTUAL null pointer, a non-null-looking garbage value slips past the check
+          // and gets dereferenced -- undefined behavior, manifesting as a segfault
+          // whenever the leftover heap garbage at that address happened to look
+          // non-null. This is why the kaon TPC run crashed (2026-07-16 log,
+          // KaonPlus RapBin 6) while the pion TPC run didn't -- same latent bug, just
+          // luck-of-the-heap which run's garbage bytes triggered it.
+          for(int cent_index = 0; cent_index < 16; cent_index++){
             m_Fit_Data_Cent_ZTPC[partIndex][iii][cent_index][jjj][pmIndex] = NULL;
             m_Fit_Data_Cent_ZbTOF[partIndex][iii][cent_index][jjj][pmIndex] = NULL;
             m_Fit_Data_Cent_ZeTOF[partIndex][iii][cent_index][jjj][pmIndex] = NULL;

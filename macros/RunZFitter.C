@@ -77,7 +77,18 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
                 bool   a_loadTextData = false,
                 string a_textFileList = "",
                 int a_rapBin_1=-1,int a_rapBin_2=-1,int a_rapBin_3=-1,
-                int a_rapBin_4=-1,int a_rapBin_5=-1,int a_rapBin_6=-1){
+                int a_rapBin_4=-1,int a_rapBin_5=-1,int a_rapBin_6=-1,
+                // Added 2026-07-21: was a hardcoded 0.75 GeV/c inside
+                // fitTPCPionKaon_SimulCent_ByRapidity() -- confirmed via CheckLastRapBin.C
+                // that this is exactly why the TPC pion+kaon fitted spectrum's rapidity
+                // reach stopped at y=1.3 (raw yield still has counts to y~1.5+). Default
+                // here matches the old hardcoded value, so no behavior change unless you
+                // explicitly pass something higher. Real tradeoff: above ~0.75 GeV/c the
+                // pion/kaon/electron dE/dx bands increasingly overlap, so raising this
+                // trades PID-fit quality at high momentum (i.e. the newly-reachable high-
+                // |y| bins) for a wider rapidity range -- visually check the fits at the
+                // newly-reachable rapidity bins before trusting them.
+                double a_maxTPCMomentumToFit = 0.75){
 
   // ################  FIXED CONFIGURATION FOR THIS REPO (O+O, 200 GeV, ColliderCenter)  ################
   bool convertInvBetaToMassSquared = true; // identical across all 7 entries in the original macro
@@ -182,7 +193,14 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   // is by far the most expensive part of a ZFitter run (a full canvas render + PNG
   // encode for every rapidity/mTm0/centrality/step bin) and does not affect the fitted
   // spectra output at all -- see ZFitter.h's setSaveDiagnosticImages() for details.
-  bool saveDiagnosticImages          = true;
+  // 2026-07-20: flipped to false -- Andrew asked to default new runs to the
+  // snapshot-only path (see saveDiagnosticSnapshots below) after the kaon TPC segfault
+  // fix. NOTE: the BTOF fitter (ZFitter_BTOF_ColliderCenter_SimulCent.cxx) doesn't
+  // check m_saveDiagnosticImages/m_saveDiagnosticSnapshots at all (confirmed via grep --
+  // zero matches) -- it always renders every image regardless of these toggles. So this
+  // change only actually skips rendering for TPC/Proton-TPC runs; a BTOF run (e.g.
+  // kaon BTOF) will still render images every time until that driver is wired up too.
+  bool saveDiagnosticImages          = false;
   // Perf 2026-07: independent of saveDiagnosticImages above -- either, both, or neither
   // can be on. When on, the fit writes a lightweight per-bin "snapshot" (raw histogram +
   // everything needed to redraw the diagnostic plot) instead of/alongside rendering a
@@ -191,7 +209,11 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   // the same PNGs a live saveDiagnosticImages=true run would have produced, without
   // re-running the fit. Default off -- opt-in, no behavior change for existing callers.
   // See ZFitter.h's setSaveDiagnosticSnapshots() for details.
-  bool saveDiagnosticSnapshots       = false;
+  // 2026-07-20: flipped to true alongside saveDiagnosticImages above -- see that
+  // comment. Snapshot file lands at <outputDir>/diagnosticSnapshots_<imageDirName>.root
+  // (see diagnosticSnapshotFileName below); replay via
+  // macros/MakeDiagnosticImagesFromSnapshot.C whenever the PNGs are actually wanted.
+  bool saveDiagnosticSnapshots       = true;
 
   // stop momentum to zoom in and fit with single bump (per particle-space, plus/minus)
   vector<double> a_mom_dEdx_plus      = {0.3, 0.4, 0.8, 0.0, 1.4, 1.4, 0.5, 0.5, 0.1};
@@ -375,6 +397,7 @@ void RunZFitter(int a_partIndex, int a_detectorIndex,
   fitter->massSquaredMode(massSquaredMode);
   fitter->storeFitsNotStatusZero(true);
   fitter->setSaveNoLogImages(false);
+  fitter->setMaxTPCMomentumToFit(a_maxTPCMomentumToFit);
   fitter->setSaveDiagnosticImages(saveDiagnosticImages);
   fitter->setSaveDiagnosticSnapshots(saveDiagnosticSnapshots, diagnosticSnapshotFileName);
   fitter->setConvertInvBetaToMassSquared(convertInvBetaToMassSquared);

@@ -110,6 +110,38 @@
 //              real (yield, chi^2/ndf) pairs so the right threshold (and correctness of
 //              the axis alignment) can be confirmed empirically instead of guessed
 //              again. Pass a positive value once that's known to enable the cut.
+// a_maxDecadeDeviation: (added 2026-07-20) maximum number of orders of magnitude
+//              (decades in log10) a bin's value may differ from the MEDIAN of its
+//              nearby mT-m0 neighbors and still be drawn -- see
+//              suppressLocalTrendOutlierBins() below. This is the "order of magnitude
+//              cut" discussed as an alternative to a_maxChiSqrNdf back when this
+//              dataset's chi^2/ndf histograms turned out to be all zero (unpopulated,
+//              see the a_maxChiSqrNdf note above) -- it needs no per-bin fit-quality
+//              data at all, only the yield values already being plotted, so it works
+//              regardless of whether chi^2/ndf ever gets populated. Targets the same
+//              failure mode a_maxChiSqrNdf was meant to catch (a fit that converges to
+//              a "confidently wrong" value with a small quoted error, so it passes the
+//              significance cut easily but sits well off the smooth trend of its
+//              neighbors) using only local self-consistency of the plotted values.
+//              DEFAULT 1.0 (ENABLED) as of the 2026-07-20 advisor-meeting review, which
+//              concluded the background fluctuations this cut targets (isolated,
+//              tight-error points 1-1.5 decades off the trend of their neighbors, seen
+//              in the high-mT-m0 tail) are insignificant to the analysis -- 1.0 decade
+//              is the conservative end of that observed range, so it catches the
+//              reported outliers without needing to assume the full 1.5. Pass 0 (or
+//              negative) to disable.
+//              UPDATE (2026-07-20, same day): the first rerun with this cut showed the
+//              messy high-mT-m0 tail unchanged -- pixel-diffed the before/after PNGs to
+//              confirm zero bins were actually suppressed. Root cause: the "confidently
+//              wrong" points sitting out past where the rest of their own rapidity
+//              bin's curve has died out have NO other non-zero bins from that same
+//              curve within a_neighborWindow -- suppressLocalTrendOutlierBins() had no
+//              local trend to compare them against, so it left them alone (see its own
+//              header comment below for the original, more conservative rationale).
+//              Andrew's call: an isolated point with fewer than 2 non-zero same-series
+//              neighbors is itself unsupported and should be cut too, not just a point
+//              that visibly disagrees with neighbors that exist -- see
+//              suppressLocalTrendOutlierBins()'s a_nIsolatedSuppressed out-param below.
 //
 // NORMALIZATION (added 2026-07-16, per Andrew's request to normalize/sum-over-2pi/
 // normalize-by-rapidity-bin/rescale axes): each rapidity-bin projection is converted
@@ -198,6 +230,17 @@
 // above or far below any given panel's actual smallest values. The top of the range
 // still auto-scales to 3x the tallest visible bin (globalMaxY*3) so nothing gets
 // clipped off the top -- the same auto-from-data philosophy, just at the other end.
+// UPDATE (2026-07-20): x-axis upper bound now ALSO auto-shrinks, same philosophy as the
+// y-floor above. speciesMaxMtM0GeV[]/a_maxMtM0 is still the fixed per-species physical
+// ceiling (still used to bound the data scan and as a safety clamp), but after Andrew
+// noticed the isolated-point suppression cut (see suppressLocalTrendOutlierBins()'s
+// 2026-07-20 update) removed real tail outliers without changing the visible x-axis
+// range at all, he explicitly chose to have the frame's actual drawn x-max instead
+// track the highest surviving (non-suppressed) bin's upper edge across every curve in
+// the panel (frameMaxMtM0, computed in the same Pass 3 scan as globalMaxY/
+// globalMinPositiveY below). Accepted tradeoff, stated to and confirmed by Andrew: the
+// two charge-sign panels (and different centralities/species) can now end up with
+// different x-axis extents depending on what each one's cuts left standing.
 //
 // COMBINING +-y RAPIDITY BINS (added 2026-07-16, Round 9, per Andrew's request): a
 // symmetric collision system (O+O, like most A+A at a collider) is expected to
@@ -282,6 +325,7 @@
 #include "TMath.h"
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 //_______________________________________________________________________________
@@ -387,6 +431,87 @@ int suppressBadFitQualityBins(TH1D* a_proj, TH2* a_chiSqrHist, int a_rapBin, dou
     if(badFit){
       a_proj->SetBinContent(binY,0.0);
       a_proj->SetBinError(binY,0.0);
+      nSuppressed++;
+    }
+  }
+  return nSuppressed;
+}
+
+//_______________________________________________________________________________
+// Zero out any bin whose value differs from the LOCAL TREND of its neighboring mT-m0
+// bins by more than a_maxDecadeDeviation orders of magnitude (decades in log10),
+// independent of that bin's own quoted significance -- see the a_maxDecadeDeviation
+// header comment above for the full "order of magnitude cut" motivation (an
+// alternative to suppressBadFitQualityBins() above that needs no per-bin fit-quality
+// histogram, since this dataset's chi^2/ndf came back all zero/unpopulated).
+//
+// For each bin with positive content, collects up to a_neighborWindow non-zero bins on
+// EACH side (so up to 2*a_neighborWindow neighbors total), takes the MEDIAN of their
+// log10(content) values as the local reference (median, not mean, so a single other
+// bad neighbor can't drag the reference toward the outlier -- with only 2 neighbors,
+// "median" is just their average, which is still fine), and compares this bin's own
+// log10(content) against that reference. Suppresses the bin if the absolute deviation
+// exceeds a_maxDecadeDeviation decades.
+//
+// UPDATE (2026-07-20, same day as the cut was first added): bins with fewer than 2
+// usable neighbors (e.g. right at the edge of the fit range, or a genuinely isolated
+// straggler -- the sole surviving bin of its rapidity-bin's curve out past where the
+// rest of that curve has already died out) were ORIGINALLY left alone here, since
+// there wasn't enough information to judge a "local trend" one way or the other. A
+// rerun showed this let exactly the isolated "confidently wrong" points that motivated
+// this cut in the first place slip through untouched (confirmed by pixel-diffing the
+// before/after plots -- zero bins suppressed in that region). Andrew's call: a point
+// with no local trend to compare against is itself unsupported, so these are now
+// suppressed too, via the separate a_nIsolatedSuppressed out-param below (kept
+// separate from the ordinary trend-deviation count so the two failure modes -- "point
+// disagrees with neighbors that exist" vs. "point has no neighbors to check against
+// at all" -- can still be reported and reasoned about independently, same rationale as
+// the significance/chi^2/trend split above).
+//
+// a_maxDecadeDeviation<=0 disables the cut entirely (matches the a_maxChiSqrNdf/
+// a_minSignificance convention already used above). a_nIsolatedSuppressed is reset to
+// 0 at the top of every call, regardless of whether the cut is enabled.
+int suppressLocalTrendOutlierBins(TH1D* a_proj, double a_maxDecadeDeviation, int& a_nIsolatedSuppressed, int a_neighborWindow = 2){
+  a_nIsolatedSuppressed = 0;
+  if(!a_proj || a_maxDecadeDeviation <= 0) return 0;
+  int nBins = a_proj->GetNbinsX();
+  int nSuppressed = 0;
+  for(int binX = 1; binX <= nBins; binX++){
+    double content = a_proj->GetBinContent(binX);
+    if(content <= 0) continue; // already empty (or already suppressed by another cut) -- nothing to check
+
+    vector<double> neighborLogs;
+    for(int step = 1; step <= a_neighborWindow; step++){
+      int loBin = binX - step;
+      int hiBin = binX + step;
+      if(loBin >= 1){
+        double loContent = a_proj->GetBinContent(loBin);
+        if(loContent > 0) neighborLogs.push_back(TMath::Log10(loContent));
+      }
+      if(hiBin <= nBins){
+        double hiContent = a_proj->GetBinContent(hiBin);
+        if(hiContent > 0) neighborLogs.push_back(TMath::Log10(hiContent));
+      }
+    }
+    if((int)neighborLogs.size() < 2){
+      // Isolated: no local trend to judge against, so (per Andrew's 2026-07-20 call
+      // above) treat "unsupported" as itself disqualifying rather than leaving it drawn.
+      a_proj->SetBinContent(binX,0.0);
+      a_proj->SetBinError(binX,0.0);
+      a_nIsolatedSuppressed++;
+      continue;
+    }
+
+    sort(neighborLogs.begin(), neighborLogs.end());
+    int nNeighbors = (int)neighborLogs.size();
+    double medianLog = (nNeighbors % 2 == 0)
+                        ? 0.5*(neighborLogs[nNeighbors/2 - 1] + neighborLogs[nNeighbors/2])
+                        : neighborLogs[nNeighbors/2];
+
+    double deviation = TMath::Abs(TMath::Log10(content) - medianLog);
+    if(deviation > a_maxDecadeDeviation){
+      a_proj->SetBinContent(binX,0.0);
+      a_proj->SetBinError(binX,0.0);
       nSuppressed++;
     }
   }
@@ -614,7 +739,7 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
                         TH2* a_tpcChiSqrHist, TH2* a_btofChiSqrHist, TH2* a_etofChiSqrHist,
                         string a_speciesName, string a_chargeLabel, int a_centIndex,
                         double a_tpcNumEvents, double a_btofNumEvents, double a_maxMtM0,
-                        double a_minSignificance, double a_maxChiSqrNdf){
+                        double a_minSignificance, double a_maxChiSqrNdf, double a_maxDecadeDeviation){
 
   gPad->SetLogy();
   gPad->SetRightMargin(0.16); // widened from 0.05 (Round 11) to make room for the |y|
@@ -660,6 +785,11 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   // effects can be reported and reasoned about independently.
   int nTpcSuppressed = 0, nBtofSuppressed = 0, nEtofSuppressed = 0;
   int nTpcChiSqrSuppressed = 0, nBtofChiSqrSuppressed = 0, nEtofChiSqrSuppressed = 0;
+  int nTpcTrendSuppressed = 0, nBtofTrendSuppressed = 0, nEtofTrendSuppressed = 0;
+  // Isolated-point counts (2026-07-20 update -- see suppressLocalTrendOutlierBins()'s
+  // header comment): tracked separately from the trend-deviation counts above so the
+  // two failure modes stay distinguishable in the summary print below.
+  int nTpcIsolatedSuppressed = 0, nBtofIsolatedSuppressed = 0, nEtofIsolatedSuppressed = 0;
 
   // Pass 1: build the per-rapidity-bin projections (one entry per rapBin, possibly
   // NULL), normalized and significance-cut exactly as before Round 9. These get
@@ -704,6 +834,18 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
     if(btofProj) nBtofChiSqrSuppressed += suppressBadFitQualityBins(btofProj, a_btofChiSqrHist, rapBin, a_maxChiSqrNdf);
     if(etofProj) nEtofChiSqrSuppressed += suppressBadFitQualityBins(etofProj, a_etofChiSqrHist, rapBin, a_maxChiSqrNdf);
 
+    // Suppress local-trend outlier bins (see suppressLocalTrendOutlierBins() header
+    // comment / a_maxDecadeDeviation doc above) -- a third, independent cut alongside
+    // significance and chi^2/ndf above: it only needs the yield values already being
+    // plotted, so it works even where chi^2/ndf isn't populated. Same "runs after the
+    // other cuts, does nothing to an already-zeroed bin" ordering independence as
+    // chi^2/ndf above. Also suppresses isolated (no-usable-neighbor) bins as of the
+    // 2026-07-20 update -- see the function's own header comment -- tracked via the
+    // separate nIso out-param so trend-deviation vs. isolated counts stay distinguishable.
+    if(tpcProj){  int nIso = 0; nTpcTrendSuppressed  += suppressLocalTrendOutlierBins(tpcProj,  a_maxDecadeDeviation, nIso); nTpcIsolatedSuppressed  += nIso; }
+    if(btofProj){ int nIso = 0; nBtofTrendSuppressed += suppressLocalTrendOutlierBins(btofProj, a_maxDecadeDeviation, nIso); nBtofIsolatedSuppressed += nIso; }
+    if(etofProj){ int nIso = 0; nEtofTrendSuppressed += suppressLocalTrendOutlierBins(etofProj, a_maxDecadeDeviation, nIso); nEtofIsolatedSuppressed += nIso; }
+
     tpcProjections.push_back(tpcProj);
     btofProjections.push_back(btofProj);
     etofProjections.push_back(etofProj);
@@ -723,6 +865,19 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
     cout << "Suppressed (chi^2/ndf > " << a_maxChiSqrNdf << ") for " << a_speciesName << " " << a_chargeLabel
          << ", Cent" << Form("%02d",a_centIndex) << ": " << nTpcChiSqrSuppressed << " TPC bin(s), "
          << nBtofChiSqrSuppressed << " BTOF bin(s), " << nEtofChiSqrSuppressed << " ETOF bin(s) -- not drawn, "
+         << "not counted toward the y-axis range." << endl;
+  }
+  if(a_maxDecadeDeviation > 0 && (nTpcTrendSuppressed || nBtofTrendSuppressed || nEtofTrendSuppressed)){
+    cout << "Suppressed (>" << a_maxDecadeDeviation << " decade(s) off local trend) for " << a_speciesName << " " << a_chargeLabel
+         << ", Cent" << Form("%02d",a_centIndex) << ": " << nTpcTrendSuppressed << " TPC bin(s), "
+         << nBtofTrendSuppressed << " BTOF bin(s), " << nEtofTrendSuppressed << " ETOF bin(s) -- not drawn, "
+         << "not counted toward the y-axis range." << endl;
+  }
+  if(a_maxDecadeDeviation > 0 && (nTpcIsolatedSuppressed || nBtofIsolatedSuppressed || nEtofIsolatedSuppressed)){
+    cout << "Suppressed (isolated -- fewer than 2 non-zero same-rapidity-bin neighbors, "
+         << "no local trend to judge against, see 2026-07-20 update) for " << a_speciesName << " " << a_chargeLabel
+         << ", Cent" << Form("%02d",a_centIndex) << ": " << nTpcIsolatedSuppressed << " TPC bin(s), "
+         << nBtofIsolatedSuppressed << " BTOF bin(s), " << nEtofIsolatedSuppressed << " ETOF bin(s) -- not drawn, "
          << "not counted toward the y-axis range." << endl;
   }
 
@@ -776,6 +931,17 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   // ones), since those are what's actually drawn below.
   double globalMaxY = 0;
   double globalMinPositiveY = 1e30;
+  // X-AXIS AUTO-SHRINK (added 2026-07-20, per Andrew's explicit choice after the
+  // isolated-point suppression update above): a_maxMtM0 is still the fixed per-species
+  // physical ceiling (see AXIS RANGES header comment), but the frame's actual drawn
+  // x-max is now the upper edge of the highest surviving (non-suppressed) bin across
+  // every combined curve in this panel, so removing tail outliers/stragglers actually
+  // shrinks the visible empty whitespace instead of leaving it fixed at the species
+  // ceiling regardless of what survived. Andrew was told explicitly this means the two
+  // charge-sign panels (and different centralities/species) can end up with different
+  // x-axis extents depending on what each one's cuts left standing -- that's accepted,
+  // not a bug.
+  double globalMaxSurvivingMtM0 = 0;
   for(int g = 1; g <= nGroups; g++){
     for(TH1D* proj : {tpcCombined[g-1],btofCombined[g-1],etofCombined[g-1]}){
       if(!proj) continue;
@@ -786,9 +952,15 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
         if(content <= 0) continue;
         if(content > globalMaxY) globalMaxY = content;
         if(content < globalMinPositiveY) globalMinPositiveY = content;
+        double binUpEdge = proj->GetXaxis()->GetBinUpEdge(b);
+        if(binUpEdge > globalMaxSurvivingMtM0) globalMaxSurvivingMtM0 = binUpEdge;
       }
     }
   }
+  // Clamp to a_maxMtM0 as a safety ceiling (a bin's up-edge can exceed a_maxMtM0 by up
+  // to half a bin width even though its center passed the >a_maxMtM0 scan guard above)
+  // -- never draw past the real per-species physical range regardless of what survived.
+  double frameMaxMtM0 = (globalMaxSurvivingMtM0 > 0) ? TMath::Min(globalMaxSurvivingMtM0, a_maxMtM0) : a_maxMtM0;
 
   if(globalMaxY <= 0){
     TLatex emptyLabel;
@@ -799,7 +971,26 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   }
 
   int nColors = 200;
-  gStyle->SetPalette(kRainBow);
+  // 2026-07-20: replaced kRainBow with a single-hue (blue) light->dark ramp, per
+  // Andrew's report that |y|=0, 0.1, 0.2 were hard to tell apart. A multi-hue rainbow
+  // is the wrong tool for a magnitude value like |y| in the first place -- it isn't
+  // perceptually monotonic (see the internal data-viz color-formula guidance:
+  // "Sequential = one hue, light->dark. Never a rainbow."), so nearby |y| values can
+  // land on visually similar colors even when their positions on the [0,kRapColorMax]
+  // scale are well separated -- exactly what was happening near |y|=0, the dark/violet
+  // end of kRainBow where hue changes compress the most. A single-hue ramp with
+  // strictly monotonic lightness guarantees every step is more distinguishable from
+  // its neighbors than kRainBow could offer at that same spot on the scale.
+  // Stops are the documented blue sequential ramp's steps 250-700 (hex values, not
+  // eyeballed) -- steps 100/150/200 (paler) are skipped because this colors visible
+  // scatter markers on a white canvas, not a filled heatmap area; step 250 is the
+  // documented "ordinal" cutoff for staying above 2:1 contrast on a light surface.
+  const int nRampStops = 10;
+  double rampStops[nRampStops] = {0.0,1.0/9,2.0/9,3.0/9,4.0/9,5.0/9,6.0/9,7.0/9,8.0/9,1.0};
+  double rampRed[nRampStops]   = {0.5255,0.4275,0.3333,0.2235,0.1647,0.1451,0.1098,0.0941,0.0627,0.0510};
+  double rampGreen[nRampStops] = {0.7137,0.6549,0.5961,0.5294,0.4706,0.4157,0.3608,0.3098,0.2588,0.2118};
+  double rampBlue[nRampStops]  = {0.9373,0.9255,0.9059,0.8980,0.8392,0.7490,0.6706,0.5843,0.5059,0.4196};
+  TColor::CreateGradientColorTable(nRampStops,rampStops,rampRed,rampGreen,rampBlue,nColors);
 
   // Fixed |y| color-scale range (Round 12, per Andrew's request), replacing the Round
   // 11 behavior of normalizing color to whatever this particular species/panel's
@@ -824,9 +1015,11 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   // computed from the combined curves instead of the pre-combine ones.
   double yFloor = TMath::Power(10.0, TMath::Floor(TMath::Log10(globalMinPositiveY)));
 
-  // Draw an explicit frame FIRST, fixed to [0,a_maxMtM0] x [yFloor, globalMaxY*3], and
-  // draw every combined curve "SAME" on top of it -- see AXIS RANGES / Round 5 header
-  // comment for why SetRangeUser() can't be used here instead.
+  // Draw an explicit frame FIRST, [0,frameMaxMtM0] x [yFloor, globalMaxY*3], and draw
+  // every combined curve "SAME" on top of it -- see AXIS RANGES / Round 5 header
+  // comment for why SetRangeUser() can't be used here instead. X-max is frameMaxMtM0
+  // (auto-shrunk to the surviving data, see X-AXIS AUTO-SHRINK comment above), not the
+  // raw a_maxMtM0 species ceiling.
   // Y-axis title changed from "1/(2#pi N_evt #Deltay) dN/d(mT-m0)" to the double-
   // differential "dN/dy d(mT-m0)" notation Andrew asked for -- physically the same
   // quantity (the "#Deltay" division is still happening in the Scale(...,"width") call
@@ -843,7 +1036,7 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   // "Pion Plus" -- per Andrew's follow-up ("the actual word pion is still there"), ROOT's
   // histogram/frame titles render the same LaTeX-like markup as axis titles and the
   // legend header, so this is consistent with where the symbol was first introduced.
-  TH1F* frame = gPad->DrawFrame(0,yFloor,a_maxMtM0,globalMaxY*3,
+  TH1F* frame = gPad->DrawFrame(0,yFloor,frameMaxMtM0,globalMaxY*3,
                                  Form("%s, %s, 1/(2#pi N_{evt}) dN/dy d(m_{T}-m_{0}) vs m_{T}-m_{0}, +y/-y rapidity bins combined",
                                       particleSymbolWithCharge(a_speciesName,a_chargeLabel).c_str(),centralityLabel(a_centIndex).c_str()));
   frame->GetXaxis()->SetTitle("m_{T}-m_{0} [GeV/c^{2}]");
@@ -982,7 +1175,7 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
 }
 
 //_______________________________________________________________________________
-void PresentZFitterSpectra(string a_tpcZFitterFile, string a_btofZFitterFile = "", int a_partIndex = 0, int a_centIndex = 0, string a_outDir = ".", string a_yieldFile = "", double a_minSignificance = 5.0, double a_maxChiSqrNdf = 0){
+void PresentZFitterSpectra(string a_tpcZFitterFile, string a_btofZFitterFile = "", int a_partIndex = 0, int a_centIndex = 0, string a_outDir = ".", string a_yieldFile = "", double a_minSignificance = 5.0, double a_maxChiSqrNdf = 0, double a_maxDecadeDeviation = 1.0){
 
   const string speciesNames[3] = {"Pion","Kaon","Proton"}; // matches ParticleInfo's speciesIndex ordering for the 3 species this analysis fits
   if(a_partIndex < 0 || a_partIndex > 2){
@@ -1101,10 +1294,10 @@ void PresentZFitterSpectra(string a_tpcZFitterFile, string a_btofZFitterFile = "
   c->Divide(2,1);
 
   c->cd(1);
-  drawOneChargeSign(tpcPlus,btofPlus,etofPlus,tpcPlusChiSqr,btofPlusChiSqr,etofPlusChiSqr,speciesName,"Plus",a_centIndex,tpcNumEvents,btofNumEvents,maxMtM0,a_minSignificance,a_maxChiSqrNdf);
+  drawOneChargeSign(tpcPlus,btofPlus,etofPlus,tpcPlusChiSqr,btofPlusChiSqr,etofPlusChiSqr,speciesName,"Plus",a_centIndex,tpcNumEvents,btofNumEvents,maxMtM0,a_minSignificance,a_maxChiSqrNdf,a_maxDecadeDeviation);
 
   c->cd(2);
-  drawOneChargeSign(tpcMinus,btofMinus,etofMinus,tpcMinusChiSqr,btofMinusChiSqr,etofMinusChiSqr,speciesName,"Minus",a_centIndex,tpcNumEvents,btofNumEvents,maxMtM0,a_minSignificance,a_maxChiSqrNdf);
+  drawOneChargeSign(tpcMinus,btofMinus,etofMinus,tpcMinusChiSqr,btofMinusChiSqr,etofMinusChiSqr,speciesName,"Minus",a_centIndex,tpcNumEvents,btofNumEvents,maxMtM0,a_minSignificance,a_maxChiSqrNdf,a_maxDecadeDeviation);
 
   string outPath = a_outDir + Form("/PresentZFitterSpectra_%s_Cent%02d.png",speciesName.c_str(),a_centIndex);
   c->SaveAs(outPath.c_str());

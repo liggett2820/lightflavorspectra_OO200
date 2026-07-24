@@ -1132,7 +1132,12 @@ void ZFitter::fitTPCPionKaon_SimulCent_ByRapidity(){
 
   double pionSkewSeed = 0.75;
 
-  double maximumMomentumToFit = 0.75;
+  // CHANGED (2026-07-21): was a hardcoded local `= 0.75`. Now reads the class member
+  // (see ZFitter.h's setMaxTPCMomentumToFit(), default 0.75 -- unchanged behavior unless
+  // RunZFitter.C explicitly opts in to a higher value) so Andrew can extend the TPC
+  // pion+kaon fit's rapidity reach (confirmed capped at y=1.3 by this exact cutoff, via
+  // CheckLastRapBin.C) without another source-level edit each time.
+  double maximumMomentumToFit = m_maxTPCMomentumToFit;
 
 
   //double pionSeedParams[4] = {-0.1155,0.07511,24.85,-14.67};

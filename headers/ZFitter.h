@@ -295,6 +295,21 @@ public:
 
   void setCanvasParameters(int a_windowWidth,int a_windowHeight, int a_canvasWidth, int a_canvasHeight);
   void setSaveNoLogImages(bool a_toggle = true){m_saveNoLogImages = a_toggle;};
+  // Added 2026-07-21: was a hardcoded local `maximumMomentumToFit = 0.75` (GeV/c) inside
+  // fitTPCPionKaon_SimulCent_ByRapidity() (ZFitter_PionKaonTPC_SimulCent_SingleLoop.cxx)
+  // -- any (rapidity, mT-m0) bin whose kinematic total momentum exceeds this is skipped
+  // before fitting, which is why the TPC pion+kaon fitted spectrum's rapidity reach fell
+  // short of the raw yield's reach (confirmed via CheckLastRapBin.C: TPC pion stopped at
+  // y=1.3 while the raw yield still had counts to y~1.5+ -- see the analysis log).
+  // Exposed here (default 0.75, preserving existing behavior for any caller that doesn't
+  // opt in) so it can be raised from RunZFitter.C without another source edit each time
+  // Andrew wants to try extending the TPC rapidity reach. Real tradeoff, not free: above
+  // ~0.75 GeV/c the pion/kaon/electron dE/dx bands increasingly overlap, so raising this
+  // trades PID-fit quality at high momentum (i.e. high |y| at fixed mT-m0) for a wider
+  // rapidity range -- sanity-check the resulting fits at the newly-reachable rapidity
+  // bins before trusting them, the same way the original 0.75 cut was itself a
+  // PID-quality judgment call, not a hard physical limit.
+  void setMaxTPCMomentumToFit(double a_maxMom = 0.75){m_maxTPCMomentumToFit = a_maxMom;};
   // Perf toggle added 2026-07: set false to skip generating the per-bin diagnostic
   // fit-overlay PNGs (TPC Pion/Kaon, TPC Proton, and BTOF fitters) -- this is by far the
   // most expensive part of a ZFitter run (canvas render + PNG encode for every
@@ -542,6 +557,10 @@ private:
   bool m_usePearsonIVinSingle;
   bool m_useIdenticalRangeOfAllCent;
   bool m_saveNoLogImages;
+  // Added 2026-07-21: see setMaxTPCMomentumToFit() above for the full explanation.
+  // Defaults to 0.75 (matching the value this replaced) so existing behavior is
+  // unchanged unless a caller opts in via setMaxTPCMomentumToFit(<higher value>).
+  double m_maxTPCMomentumToFit;
   // Perf toggle added 2026-07: gates the per-bin diagnostic TCanvas/TF1-overlay/PNG
   // generation in the TPC (Pion/Kaon and Proton) and BTOF fitters -- NOT any actual
   // fitting/minimizer/parameter-storage logic, so turning this off does not change the
