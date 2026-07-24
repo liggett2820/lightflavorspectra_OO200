@@ -68,4 +68,14 @@ void makeLibs(TString opt = ""){
   // PhysMath.h, ParticleInfo.h, all already compiled above).
   gSystem->CompileMacro("source/FitUtilities.cxx", "gk");
   gSystem->CompileMacro("source/SpectraFitter.cxx", "gk");
+
+  // EfficiencyFitter dependencies -- ported verbatim from lightflavorspectra_etof
+  // (BTOF-only use case here; see macros/RunEfficiencyFitter.C). headers/
+  // EfficiencyFitter.h includes GraphFitter.h, so GraphFitter.cxx must be compiled
+  // first. Both only depend on headers already compiled above (PhysMath.h,
+  // HistogramUtilities.h, PhysMathHistogramUtilities.h via namespaces.cxx;
+  // ParticleInfo.h; SplineFitter.h) -- no CutClass dependency, matching
+  // RawSpectraModifier.
+  gSystem->CompileMacro("source/GraphFitter.cxx", "gk");
+  gSystem->CompileMacro("source/EfficiencyFitter.cxx", "gk");
 }
