@@ -1,0 +1,991 @@
+BTOF efficiency correction check -- file: /Users/aliggett/data/OO/zfitter_output/spectra_OO200_Proton_Corrected.root
+
+--- Spectra_ProtonPlus ---
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_08: raw=15 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_11: raw=27 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.509893 mean=18.868689 max=77.174397 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_12: raw=49 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.639061 mean=5.370380 max=46.952711 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.595818 mean=2.924095 max=21.024587 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.579952 mean=2.058473 max=10.597424 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_15: raw=87 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.559510 mean=1.790108 max=6.174101 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_16: raw=93 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.564645 mean=1.646558 max=2.131724 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_17: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_17: raw=95 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.586918 mean=1.657929 max=1.783054 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_18: raw=95 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.559230 mean=1.648306 max=1.789336 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_19: raw=95 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.566516 mean=1.646279 max=1.702883 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_20: raw=90 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.782776 mean=1.998234 max=2.402551 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.498319 mean=1.551244 max=1.626603 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_22: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.472346 mean=1.547888 max=1.629262 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_23: raw=92 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.436977 mean=1.531726 max=1.603927 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_24: raw=91 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.456112 mean=1.554827 max=1.999646 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_25: raw=85 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.465476 mean=1.690742 max=6.028153 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.506690 mean=1.946293 max=10.478536 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.545991 mean=2.793916 max=21.588554 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.488996 mean=5.262951 max=48.438564 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_29: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.760339 mean=19.807474 max=81.712592 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_32: raw=16 corrected=16 -- 16 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=16 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent00_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent00_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_08: raw=15 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_11: raw=27 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.652107 mean=17.687282 max=73.076408 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_12: raw=49 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.619977 mean=5.323254 max=46.433150 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.578553 mean=2.898919 max=20.990290 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.600288 mean=2.050840 max=10.343572 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_15: raw=87 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.430701 mean=1.788545 max=6.241571 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_16: raw=93 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.577744 mean=1.645581 max=2.131093 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_17: raw=27 corrected=27 -- 27 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=27 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_17: raw=95 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.567783 mean=1.641443 max=1.721888 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_18: raw=95 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.573637 mean=1.642226 max=1.720119 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_19: raw=95 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.579865 mean=1.653341 max=1.762570 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_20: raw=90 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.773428 mean=1.995573 max=2.457530 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.307713 mean=1.528989 max=1.597103 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_22: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.469267 mean=1.547738 max=1.643959 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_23: raw=92 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.426353 mean=1.536817 max=1.674461 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_24: raw=91 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.333869 mean=1.534328 max=1.965839 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_25: raw=85 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.493440 mean=1.684961 max=5.866836 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.456813 mean=1.930342 max=10.151938 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.405913 mean=2.808076 max=21.999647 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.495480 mean=5.099213 max=45.353769 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_29: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=4.903433 mean=20.938396 max=90.954948 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_32: raw=16 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent01_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent01_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_08: raw=15 corrected=13 -- 13 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=13 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_11: raw=27 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.247747 mean=18.119137 max=67.913083 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_12: raw=49 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.682712 mean=5.271739 max=45.166843 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.649926 mean=2.943418 max=21.413379 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.604903 mean=2.048768 max=10.438597 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_15: raw=87 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.590998 mean=1.781182 max=5.851083 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_16: raw=93 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.504114 mean=1.639159 max=2.128181 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_17: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_17: raw=95 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.552250 mean=1.641066 max=1.722592 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_18: raw=95 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.583769 mean=1.635699 max=1.709064 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_19: raw=95 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.571982 mean=1.638103 max=1.729056 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_20: raw=90 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.764853 mean=1.991858 max=2.425942 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.461096 mean=1.545244 max=1.794715 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_22: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.449258 mean=1.536928 max=1.645708 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_23: raw=92 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.355037 mean=1.522047 max=1.587945 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_24: raw=91 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.470765 mean=1.544092 max=1.998721 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_25: raw=85 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.448694 mean=1.677055 max=5.816549 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.475492 mean=1.928953 max=10.093640 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.499345 mean=2.775773 max=21.404849 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.499297 mean=5.173958 max=46.886136 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_29: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=5.654648 mean=19.465948 max=74.864020 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_32: raw=16 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent02_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent02_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_08: raw=15 corrected=14 -- 14 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=14 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_11: raw=27 corrected=11 -- 11 matched&comparable point(s) -- corrected/raw ratio: min=5.112402 mean=37.554421 max=233.860959 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_12: raw=49 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.662050 mean=5.489621 max=46.865788 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.552818 mean=2.918287 max=21.060020 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.605288 mean=2.053668 max=10.551730 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_15: raw=87 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.575787 mean=1.785431 max=6.222695 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_16: raw=93 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.575795 mean=1.640346 max=2.134695 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_17: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_17: raw=95 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.562950 mean=1.636124 max=1.710479 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_18: raw=95 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.497667 mean=1.628434 max=1.714336 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_19: raw=95 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.531795 mean=1.641072 max=1.814713 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_20: raw=90 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.768411 mean=1.988635 max=2.317648 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.485543 mean=1.541668 max=1.604319 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_22: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.434844 mean=1.535754 max=1.625127 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_23: raw=92 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.463623 mean=1.526977 max=1.602152 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_24: raw=91 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.475889 mean=1.534318 max=1.973149 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_25: raw=85 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.476057 mean=1.673816 max=5.909649 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.535734 mean=1.927258 max=10.029927 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.453570 mean=2.778369 max=21.635848 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.555500 mean=4.948488 max=40.773307 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_29: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.114164 mean=18.572745 max=72.087359 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_32: raw=16 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent03_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent03_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_08: raw=15 corrected=13 -- 13 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=13 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_11: raw=27 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.277207 mean=18.063615 max=72.800948 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_12: raw=49 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.709116 mean=5.461963 max=40.259558 | unchanged(<0.1%% diff)=0 | dropped(no X match)=21 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.619703 mean=2.943097 max=21.500171 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.628333 mean=2.052855 max=10.414270 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_15: raw=87 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.532405 mean=1.783048 max=6.024246 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_16: raw=93 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.571268 mean=1.649923 max=2.128898 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_17: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_17: raw=95 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.562183 mean=1.647465 max=1.773327 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_18: raw=95 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.495428 mean=1.634532 max=1.770025 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_19: raw=95 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.593023 mean=1.650890 max=1.743895 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_20: raw=90 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.761403 mean=1.993898 max=2.312871 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.493240 mean=1.546946 max=1.630543 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_22: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.471201 mean=1.547270 max=1.685903 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_23: raw=92 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.471670 mean=1.538068 max=1.678334 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_24: raw=91 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.475407 mean=1.542577 max=1.978422 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_25: raw=85 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.487298 mean=1.681195 max=5.848902 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.539556 mean=1.937691 max=10.281987 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.510802 mean=2.805084 max=21.916918 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.540179 mean=5.122995 max=45.831957 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_29: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.163597 mean=17.877147 max=70.020841 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_32: raw=16 corrected=16 -- 16 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=16 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent04_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent04_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_08: raw=15 corrected=15 -- 15 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=15 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_11: raw=27 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=7.316997 mean=17.357939 max=42.620277 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_12: raw=23 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=22 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_12: raw=49 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.755429 mean=6.860285 max=63.118670 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_13: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_13: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.465923 mean=3.409097 max=27.753851 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_14: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_14: raw=78 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.515323 mean=2.244087 max=12.355528 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_15: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_15: raw=86 corrected=71 -- 71 matched&comparable point(s) -- corrected/raw ratio: min=1.538360 mean=1.947795 max=7.489227 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_16: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_16: raw=92 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.565178 mean=1.802526 max=2.383335 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_17: raw=27 corrected=27 -- 27 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=27 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_17: raw=93 corrected=78 -- 78 matched&comparable point(s) -- corrected/raw ratio: min=1.595027 mean=1.811796 max=2.141876 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_18: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_18: raw=94 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.669563 mean=1.826292 max=2.092706 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_19: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_19: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.640580 mean=1.796605 max=1.952104 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_20: raw=31 corrected=30 -- 30 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=30 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_20: raw=89 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.963726 mean=2.253452 max=3.128205 | unchanged(<0.1%% diff)=0 | dropped(no X match)=9 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_21: raw=31 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=31 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_21: raw=94 corrected=80 -- 80 matched&comparable point(s) -- corrected/raw ratio: min=1.566661 mean=1.704957 max=1.921374 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_22: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_22: raw=93 corrected=79 -- 79 matched&comparable point(s) -- corrected/raw ratio: min=1.289912 mean=1.653391 max=1.860753 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_23: raw=28 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=28 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_23: raw=92 corrected=77 -- 77 matched&comparable point(s) -- corrected/raw ratio: min=1.547025 mean=1.673971 max=2.025185 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_24: raw=29 corrected=29 -- 29 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=29 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_24: raw=89 corrected=76 -- 76 matched&comparable point(s) -- corrected/raw ratio: min=1.312512 mean=1.681086 max=2.150456 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_25: raw=26 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=26 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_25: raw=85 corrected=72 -- 72 matched&comparable point(s) -- corrected/raw ratio: min=1.385864 mean=1.941383 max=11.768017 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_26: raw=35 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=33 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_26: raw=77 corrected=62 -- 62 matched&comparable point(s) -- corrected/raw ratio: min=1.524462 mean=2.124783 max=12.329020 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_27: raw=41 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=35 | dropped(no X match)=6 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_27: raw=67 corrected=49 -- 49 matched&comparable point(s) -- corrected/raw ratio: min=1.509804 mean=3.236925 max=28.679779 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_28: raw=23 corrected=23 -- 23 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=23 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_28: raw=50 corrected=31 -- 31 matched&comparable point(s) -- corrected/raw ratio: min=1.626633 mean=6.107920 max=59.020214 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_29: raw=25 corrected=5 -- 5 matched&comparable point(s) -- corrected/raw ratio: min=8.062891 mean=16.889418 max=35.137102 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_32: raw=16 corrected=13 -- 13 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=13 | dropped(no X match)=3 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Plus_Cent05_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Plus_Cent05_yIndex_40: both empty (0 points) -- nothing to compare
+
+--- Spectra_ProtonMinus ---
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_08: raw=4 corrected=4 -- 4 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=4 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_11: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.838874 mean=21.909913 max=102.951291 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_12: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.573854 mean=2.740205 max=11.631292 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.568832 mean=1.987239 max=6.414439 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.632290 mean=1.902429 max=6.462722 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_15: raw=50 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.618360 mean=1.721273 max=2.344695 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_16: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.616465 mean=1.695114 max=1.863898 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_17: raw=54 corrected=41 -- 41 matched&comparable point(s) -- corrected/raw ratio: min=1.516288 mean=1.703834 max=1.814975 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_18: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.560129 mean=1.699877 max=1.861994 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_19: raw=54 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.546772 mean=1.707461 max=1.896479 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_20: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.946210 mean=2.122874 max=2.421892 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_21: raw=57 corrected=44 -- 44 matched&comparable point(s) -- corrected/raw ratio: min=1.483696 mean=1.598074 max=1.750231 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_22: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.529093 mean=1.607261 max=1.721630 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_23: raw=56 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.554330 mean=1.603282 max=1.678014 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_24: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.366467 mean=1.572130 max=1.694587 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_25: raw=53 corrected=35 -- 35 matched&comparable point(s) -- corrected/raw ratio: min=1.423939 mean=1.600952 max=2.159924 | unchanged(<0.1%% diff)=0 | dropped(no X match)=18 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_26: raw=48 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.504518 mean=1.748761 max=5.853291 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_27: raw=47 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.495576 mean=1.839219 max=6.038356 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_28: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.551749 mean=2.570125 max=11.515515 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_29: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=5.339115 mean=12.587911 max=37.910888 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent00_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent00_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_08: raw=4 corrected=4 -- 4 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=4 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_11: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=5.506711 mean=23.389734 max=102.168480 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_12: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.739484 mean=2.796161 max=11.948484 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.531129 mean=1.971102 max=6.454523 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.611701 mean=1.882014 max=6.288810 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_15: raw=50 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.576681 mean=1.710848 max=2.316102 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_16: raw=52 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.513955 mean=1.684617 max=1.892563 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_17: raw=54 corrected=41 -- 41 matched&comparable point(s) -- corrected/raw ratio: min=1.594184 mean=1.704449 max=1.805844 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_18: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.596317 mean=1.701124 max=1.840394 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_19: raw=54 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.494050 mean=1.684971 max=1.892506 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_20: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.842044 mean=2.110042 max=2.523183 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_21: raw=57 corrected=44 -- 44 matched&comparable point(s) -- corrected/raw ratio: min=1.500566 mean=1.599100 max=1.739852 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_22: raw=53 corrected=41 -- 41 matched&comparable point(s) -- corrected/raw ratio: min=1.547792 mean=1.611352 max=1.828635 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_23: raw=56 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.467451 mean=1.578635 max=1.672607 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_24: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.372502 mean=1.580796 max=1.726248 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_25: raw=53 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.426162 mean=1.587944 max=2.098885 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_26: raw=48 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.536169 mean=1.750582 max=6.005185 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_27: raw=47 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.501305 mean=1.845776 max=6.097635 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_28: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.534052 mean=2.592605 max=11.454908 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_29: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=5.253980 mean=13.303686 max=39.397988 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent01_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent01_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_08: raw=4 corrected=4 -- 4 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=4 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_11: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=5.945651 mean=13.078402 max=36.690500 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_12: raw=41 corrected=21 -- 21 matched&comparable point(s) -- corrected/raw ratio: min=1.714137 mean=2.841868 max=12.105049 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.605119 mean=1.987874 max=6.475756 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.589609 mean=1.871863 max=6.338034 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_15: raw=50 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.441013 mean=1.686694 max=2.305517 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_16: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.504621 mean=1.687574 max=1.876875 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_17: raw=54 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.624494 mean=1.706960 max=1.797297 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_18: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.596788 mean=1.695699 max=1.839265 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_19: raw=54 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.575529 mean=1.700181 max=1.864410 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_20: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.948355 mean=2.104778 max=2.227952 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_21: raw=57 corrected=44 -- 44 matched&comparable point(s) -- corrected/raw ratio: min=1.445874 mean=1.581531 max=1.746345 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_22: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.536805 mean=1.607103 max=1.711648 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_23: raw=56 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.485278 mean=1.581805 max=1.669744 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_24: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.443408 mean=1.572275 max=1.733167 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_25: raw=53 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.492576 mean=1.595981 max=2.128319 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_26: raw=48 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.534565 mean=1.758727 max=5.843487 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_27: raw=47 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.518371 mean=1.836603 max=6.035161 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_28: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.561033 mean=2.554402 max=11.170878 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_29: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=4.863741 mean=12.585921 max=39.840371 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent02_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent02_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_08: raw=4 corrected=4 -- 4 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=4 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_11: raw=25 corrected=10 -- 10 matched&comparable point(s) -- corrected/raw ratio: min=6.218472 mean=22.178687 max=99.185453 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_12: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.733197 mean=2.784145 max=11.966209 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.597776 mean=1.983497 max=6.554120 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.625684 mean=1.878229 max=6.324742 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_15: raw=50 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.566192 mean=1.694840 max=2.306077 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_16: raw=52 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.586604 mean=1.683142 max=1.877156 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_17: raw=54 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.611387 mean=1.694179 max=1.788526 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_18: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.491921 mean=1.687268 max=1.842068 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_19: raw=54 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.558961 mean=1.694549 max=1.888676 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_20: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.929599 mean=2.089306 max=2.255304 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_21: raw=57 corrected=44 -- 44 matched&comparable point(s) -- corrected/raw ratio: min=1.478659 mean=1.582060 max=1.753379 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_22: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.561235 mean=1.608570 max=1.721769 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_23: raw=56 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.511673 mean=1.586308 max=1.660611 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_24: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.518759 mean=1.582259 max=1.727849 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_25: raw=53 corrected=36 -- 36 matched&comparable point(s) -- corrected/raw ratio: min=1.457056 mean=1.581559 max=2.135500 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_26: raw=48 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.496402 mean=1.739652 max=5.729624 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_27: raw=47 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.515680 mean=1.832987 max=6.018324 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_28: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.530418 mean=2.563528 max=11.437637 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_29: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=4.754574 mean=13.443868 max=45.297341 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent03_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent03_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_08: raw=4 corrected=4 -- 4 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=4 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_11: raw=25 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=5.589797 mean=14.855860 max=45.751494 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_12: raw=41 corrected=21 -- 21 matched&comparable point(s) -- corrected/raw ratio: min=1.685237 mean=2.836767 max=11.826828 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.617609 mean=1.980943 max=6.497973 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.550684 mean=1.873760 max=6.381696 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_15: raw=50 corrected=36 -- 36 matched&comparable point(s) -- corrected/raw ratio: min=1.566594 mean=1.695350 max=2.317293 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_16: raw=52 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.613112 mean=1.704675 max=1.879094 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_17: raw=54 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.608760 mean=1.715212 max=2.037979 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_18: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.619953 mean=1.711115 max=1.863355 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_19: raw=54 corrected=41 -- 41 matched&comparable point(s) -- corrected/raw ratio: min=1.578444 mean=1.697584 max=1.889605 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_20: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.947115 mean=2.125630 max=2.353110 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_21: raw=57 corrected=44 -- 44 matched&comparable point(s) -- corrected/raw ratio: min=1.480012 mean=1.587326 max=1.756514 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_22: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.515445 mean=1.596757 max=1.720423 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_23: raw=56 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.421308 mean=1.577347 max=1.677381 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_24: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.468632 mean=1.578778 max=1.716311 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_25: raw=53 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.470427 mean=1.589128 max=2.116754 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_26: raw=48 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.533680 mean=1.751983 max=5.874204 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_27: raw=47 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.511592 mean=1.840947 max=6.106421 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_28: raw=41 corrected=22 -- 22 matched&comparable point(s) -- corrected/raw ratio: min=1.616116 mean=2.562709 max=11.253345 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_29: raw=25 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=6.305681 mean=14.646912 max=41.651657 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent04_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent04_yIndex_40: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_00: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_00: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_01: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_01: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_02: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_02: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_03: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_03: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_04: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_04: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_05: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_05: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_06: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_06: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_07: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_07: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_08: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_08: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_09: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_09: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_10: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_10: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_11: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_11: raw=25 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=5.897604 mean=17.931434 max=47.161206 | unchanged(<0.1%% diff)=0 | dropped(no X match)=17 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_12: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_12: raw=41 corrected=21 -- 21 matched&comparable point(s) -- corrected/raw ratio: min=1.641431 mean=3.162343 max=14.039669 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_13: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_13: raw=44 corrected=28 -- 28 matched&comparable point(s) -- corrected/raw ratio: min=1.673044 mean=2.188864 max=7.600650 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_14: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_14: raw=49 corrected=34 -- 34 matched&comparable point(s) -- corrected/raw ratio: min=1.591314 mean=2.012780 max=7.240626 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_15: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_15: raw=50 corrected=36 -- 36 matched&comparable point(s) -- corrected/raw ratio: min=1.565120 mean=1.851653 max=2.558330 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_16: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_16: raw=51 corrected=39 -- 39 matched&comparable point(s) -- corrected/raw ratio: min=1.497094 mean=1.826478 max=2.070735 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_17: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_17: raw=52 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.485047 mean=1.853400 max=2.068663 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_18: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_18: raw=53 corrected=41 -- 41 matched&comparable point(s) -- corrected/raw ratio: min=1.681099 mean=1.956461 max=2.530567 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_19: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_19: raw=53 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.479319 mean=1.897862 max=2.162937 | unchanged(<0.1%% diff)=0 | dropped(no X match)=10 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_20: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_20: raw=53 corrected=42 -- 42 matched&comparable point(s) -- corrected/raw ratio: min=1.986506 mean=2.380014 max=2.785758 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_21: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_21: raw=56 corrected=43 -- 43 matched&comparable point(s) -- corrected/raw ratio: min=1.511139 mean=1.739426 max=2.017667 | unchanged(<0.1%% diff)=0 | dropped(no X match)=13 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_22: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_22: raw=52 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.383247 mean=1.777022 max=1.924352 | unchanged(<0.1%% diff)=0 | dropped(no X match)=12 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_23: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_23: raw=54 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.594183 mean=1.757770 max=2.069483 | unchanged(<0.1%% diff)=0 | dropped(no X match)=14 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_24: raw=8 corrected=8 -- 8 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=8 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_24: raw=51 corrected=40 -- 40 matched&comparable point(s) -- corrected/raw ratio: min=1.497164 mean=1.746497 max=2.122897 | unchanged(<0.1%% diff)=0 | dropped(no X match)=11 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_25: raw=7 corrected=7 -- 7 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=7 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_25: raw=53 corrected=37 -- 37 matched&comparable point(s) -- corrected/raw ratio: min=1.207095 mean=1.643249 max=2.335505 | unchanged(<0.1%% diff)=0 | dropped(no X match)=16 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_26: raw=9 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_26: raw=48 corrected=33 -- 33 matched&comparable point(s) -- corrected/raw ratio: min=1.533592 mean=1.877592 max=6.614564 | unchanged(<0.1%% diff)=0 | dropped(no X match)=15 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_27: raw=11 corrected=9 -- 9 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=9 | dropped(no X match)=2 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_27: raw=47 corrected=26 -- 26 matched&comparable point(s) -- corrected/raw ratio: min=1.611442 mean=2.042543 max=7.128537 | unchanged(<0.1%% diff)=0 | dropped(no X match)=21 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_28: raw=6 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=6 | dropped(no X match)=0 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_28: raw=41 corrected=21 -- 21 matched&comparable point(s) -- corrected/raw ratio: min=1.557043 mean=2.935287 max=13.075667 | unchanged(<0.1%% diff)=0 | dropped(no X match)=20 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_29: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_29: raw=25 corrected=6 -- 6 matched&comparable point(s) -- corrected/raw ratio: min=8.712067 mean=25.816930 max=67.957196 | unchanged(<0.1%% diff)=0 | dropped(no X match)=19 | matched-but-raw<=0=0 | extra-in-corrected=0
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_30: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_30: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_31: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_31: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_32: raw=4 corrected=3 -- 3 matched&comparable point(s) -- corrected/raw ratio: min=1.000000 mean=1.000000 max=1.000000 | unchanged(<0.1%% diff)=3 | dropped(no X match)=1 | matched-but-raw<=0=0 | extra-in-corrected=0
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_32: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_33: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_33: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_34: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_34: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_35: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_35: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_36: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_36: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_37: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_37: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_38: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_38: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_39: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_39: both empty (0 points) -- nothing to compare
+  dEdxSpectra_Proton_Minus_Cent05_yIndex_40: both empty (0 points) -- nothing to compare
+  InvBetaBTOFSpectra_Proton_Minus_Cent05_yIndex_40: both empty (0 points) -- nothing to compare
+
+TOTAL: 984 raw/corrected pair(s) compared, 0 raw graph(s) had no corrected_ counterpart.
