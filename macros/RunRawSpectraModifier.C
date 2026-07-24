@@ -67,8 +67,25 @@ void RunRawSpectraModifier(string a_pionYieldFile, string a_kaonYieldFile, strin
                             bool   a_doHybridFeedDown = false, // true requires a HybridFeedDownMaker output -- see loadAndApplyHybridFeedDownCorrections
                             vector<double> a_startMom_bTOF = {0.55, 0.4, 0.8},  // pi/K/p -- most common value across the original's 7 energies
                             vector<double> a_stopMom_bTOF  = {4.0, 4.0, 4.0},   // pi/K/p -- most common value across the original's 7 energies
-                            vector<double> a_lowRapCut  = {-1.05, -0.95, -0.95}, // pi/K/p -- widest (least restrictive) value seen in the original
-                            vector<double> a_highRapCut = { 1.05,  0.95,  0.95}, // pi/K/p -- widest (least restrictive) value seen in the original
+                            // CHANGED (2026-07-21): previously {-1.05,-0.95,-0.95}/{1.05,0.95,0.95}
+                            // (pi/K/p), inherited from the original 7-energy scan macro's "widest
+                            // (least restrictive) value seen" across ITS 7 energies -- not derived
+                            // for O+O 200 GeV at all. Confirmed via RawSpectraModifier::cleanSpectra()
+                            // (source/RawSpectraModifier.cxx, the a_minRapidity[partIndex] >
+                            // rapCenter / a_maxRapidity[partIndex] < rapCenter checks) that any
+                            // rapidity bin whose center falls outside [a_lowRapCut,a_highRapCut] has
+                            // ALL its points removed from that bin's TGraphErrors -- with the old
+                            // +-1.05 pion window, this silently emptied 20 of the 41 raw bins
+                            // configured in SetCutClass.C (which spans -2.05 to 2.05), leaving only
+                            // 21 populated. This analysis wants as wide a rapidity range as possible,
+                            // so these are now set past the actual configured bin edges (+-2.05 for
+                            // all three species per SetCutClass.C's setVariableRapMtM0BinningInfo
+                            // calls) -- i.e. effectively disabled, matching the "+-5 = no-op" no-cut
+                            // convention already used for lowEtaCutTPC/highEtaCutTPC etc. below. No
+                            // bin center can exist past +-2.0 given the current binning, so +-5 keeps
+                            // every bin the histogram axis actually has without clipping anything.
+                            vector<double> a_lowRapCut  = {-5.0, -5.0, -5.0}, // pi/K/p -- effectively disabled; see comment above
+                            vector<double> a_highRapCut = { 5.0,  5.0,  5.0}, // pi/K/p -- effectively disabled; see comment above
                             vector< vector<double> > a_trimData = {},
                             vector< vector<double> > a_pointByPointData = {}){
 
@@ -138,13 +155,21 @@ void RunRawSpectraModifier(string a_pionYieldFile, string a_kaonYieldFile, strin
   // null-check around its "dca" histogram lookup when a file doesn't have the
   // species-specific centEvents<Species> histogram it's looking for (a per-species
   // PicoBinner yield file only has e.g. centEventsProton, not centEventsPion) --
-  // calling it on a file that doesn't actually contain that species segfaults. If you
-  // only have a Proton yields file, leave a_pionYieldFile/a_kaonYieldFile empty ("")
-  // rather than passing the Proton file in for them -- this skips those species'
-  // loads entirely instead of crashing on them.
-  if(a_pionYieldFile != "") mod->loadDataFile(a_pionYieldFile, 0, nCentBins, converted16CentBinsTo9CentBins);
-  if(a_kaonYieldFile != "") mod->loadDataFile(a_kaonYieldFile, 1, nCentBins, converted16CentBinsTo9CentBins);
-  mod->loadDataFile(a_protonYieldFile, 2, nCentBins, converted16CentBinsTo9CentBins);
+  // calling it on a file that doesn't actually contain that species segfaults. Leave
+  // ANY of a_pionYieldFile/a_kaonYieldFile/a_protonYieldFile empty ("") to skip that
+  // species' load entirely instead of crashing on it -- e.g. pass "" for
+  // a_protonYieldFile when producing pion-only (or pion+kaon) corrected spectra.
+  //
+  // FIX (2026-07-21): the guard above was only actually applied to the pion and
+  // kaon lines below -- the proton line called mod->loadDataFile(a_protonYieldFile,...)
+  // unconditionally, so passing "" for a_protonYieldFile (exactly the case this
+  // comment already told you to use) still attempted to open an empty filename and
+  // segfaulted the same way the comment describes for pion/kaon. Added the matching
+  // `if(a_protonYieldFile != "")` guard so all three species are now genuinely
+  // independently optional, matching what the comment always said should be possible.
+  if(a_pionYieldFile   != "") mod->loadDataFile(a_pionYieldFile,   0, nCentBins, converted16CentBinsTo9CentBins);
+  if(a_kaonYieldFile   != "") mod->loadDataFile(a_kaonYieldFile,   1, nCentBins, converted16CentBinsTo9CentBins);
+  if(a_protonYieldFile != "") mod->loadDataFile(a_protonYieldFile, 2, nCentBins, converted16CentBinsTo9CentBins);
 
   mod->loadSpectraFile(a_spectraFile.c_str());
   mod->convertSpectraToInvariant(overallEfficiency, overallEfficiencyErr);

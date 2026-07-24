@@ -664,21 +664,29 @@ void RawSpectraModifier::loadSpectraFile(string a_filename){
 
     for(int centIndex = 0; centIndex < m_numCentralities; centIndex++){
 
-      // Fixed 2026-07-15: these Form() strings were missing the underscore before
-      // Plus/Minus that ZFitter.cxx's makeSpectra() actually writes (e.g.
-      // "dEdxSpectra_Pion_Plus_Cent00", not "dEdxSpectra_PionPlus_Cent00" -- see
-      // ZFitter.cxx's SetName(Form("dEdxSpectra_%s_Plus_Cent%02d",...)) and the
-      // InvBetaBTOFSpectra_/InvBetaETOFSpectra_ equivalents). TFile::Get() silently
-      // returns NULL on a name mismatch rather than erroring, so every one of these
-      // six lookups was quietly returning NULL and would have surfaced later as a
-      // null-pointer use rather than a clear "not found" message. Added the missing
-      // underscores so these actually match what gets written.
-      m_dEdxSpectraPlus[partIndex][centIndex]         = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
-      m_dEdxSpectraMinus[partIndex][centIndex]        = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaBTOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaBTOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaETOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%s_Plus_Cent%02d",partName,partName,centIndex));
-      m_InvBetaETOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%s_Minus_Cent%02d",partName,partName,centIndex));
+      // REVERTED 2026-07-16: on 2026-07-15 an underscore was mistakenly added before
+      // Plus/Minus here, based on a SetName() call in ZFitter.cxx's makeFitDataHistos()
+      // booking loop (structHisto Clone block, ~line 2513) that does use
+      // Form("dEdxSpectra_%s_Plus_Cent%02d", GetParticleName(partBaseIndex,0), ...) --
+      // i.e. bare species name + literal "_Plus_". That call turned out to be an
+      // earlier, non-final naming: the SAME m_Spectra_Cent_ZTPC element gets
+      // SetName()'d again later in that same booking function (~line 2269, inside the
+      // pmIndex/chargePM loop) via Form("dEdxSpectra_%s_Cent%02d",
+      // GetParticleName(partBaseIndex,chargePM), ...) -- GetParticleName with a
+      // nonzero charge already returns "PionPlus"/"PionMinus" as ONE string, so this
+      // final call produces "dEdxSpectra_PionPlus_Cent00", no separate underscore.
+      // Confirmed directly against a real ZFitter output file's TFile::ls() (2026-07-16):
+      // actual on-disk key is "dEdxSpectra_PionPlus_Cent00". Restored the original
+      // no-underscore form here to match. Lesson: when a class has more than one
+      // SetName() call touching the same object in sequence, the LAST one at runtime
+      // is what's on disk -- grep hits earlier in a function are not automatically the
+      // ones that matter.
+      m_dEdxSpectraPlus[partIndex][centIndex]         = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
+      m_dEdxSpectraMinus[partIndex][centIndex]        = (TH2D*) inFile->Get(Form("DeDx_FitData/%s/dEdxSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaBTOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaBTOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("BTOF_FitData/%s/InvBetaBTOFSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaETOFSpectraPlus[partIndex][centIndex]  = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%sPlus_Cent%02d",partName,partName,centIndex));
+      m_InvBetaETOFSpectraMinus[partIndex][centIndex] = (TH2D*) inFile->Get(Form("ETOF_FitData/%s/InvBetaETOFSpectra_%sMinus_Cent%02d",partName,partName,centIndex));
 
       if(centIndex == 0){
         if(m_dEdxSpectraPlus[partIndex][centIndex]){
@@ -818,8 +826,35 @@ void RawSpectraModifier::loadAndApplyTPCEffAndEnergyLossAndBTOFEffFile(string a_
   bool enbed_needed = (a_doEnergyLoss || a_doTPCEff);
 
   //###################    make the TH2D of the efficiencies  #################################
+  // FIX (2026-07-21): this loop only ever checked m_particleLoaded[partIndex] (set
+  // by loadDataFile() when a species' raw PicoBinner yield file was loaded), but
+  // loadSpectraFile() -- called earlier in RunRawSpectraModifier.C's fixed call
+  // sequence, right after loadDataFile() -- unconditionally overwrites
+  // m_dEdxSpectraPlus[partIndex][centIndex] with whatever inFile->Get(...) returns
+  // for that species in a_spectraFile (RawSpectraModifier.cxx ~line 684), INCLUDING
+  // a null pointer if that species simply isn't present there. That's exactly what
+  // happens when a_spectraFile is a species-specific merge (e.g.
+  // MergeDetectorSpectraFiles.C's Pion-only output): the yield file for a second
+  // species (e.g. Kaon) can still be loaded via loadDataFile() -- e.g. because
+  // pion+kaon yields are loaded together for a combined run -- so m_particleLoaded
+  // is true for it, even though its DeDx_FitData section doesn't exist in this
+  // particular a_spectraFile and m_dEdxSpectraPlus[partIndex][0] is therefore NULL.
+  // The unconditional ->Clone() below then segfaults. Same class of bug as the two
+  // other missing-guard fixes made this session (RunZFitter.C / RunRawSpectraModifier.C's
+  // proton load) -- a per-species pointer that's only sometimes populated needs an
+  // explicit null check before use, not just a "was this species loaded at all" flag.
+  // Added the missing check so a species with no spectra in THIS a_spectraFile is
+  // skipped for the efficiency/energy-loss correction step instead of crashing --
+  // this matches a_rawOnly's existing precedent of species not going through this
+  // function's corrections at all.
   for(int partIndex = 0; partIndex < m_numParticles; partIndex++){
     if(!m_particleLoaded[partIndex]) continue;
+    if(!m_dEdxSpectraPlus[partIndex][0]){
+      cout << "WARNING: RawSpectraModifier::loadAndApplyTPCEffAndEnergyLossAndBTOFEffFile: "
+           << "no dEdx spectra found for particle index " << partIndex
+           << " in " << a_filename << " -- skipping TPC/energy-loss/BTOF efficiency corrections for this species." << endl;
+      continue;
+    }
     #ifdef _RAWSPECMOD_DEBUG_
       cout << "Histogram Structure = m_dEdxSpectraPlus[" << partIndex << "][0]: " << m_dEdxSpectraPlus[partIndex][0] << endl;
     #endif
@@ -924,8 +959,43 @@ void RawSpectraModifier::loadAndApplyTPCEffAndEnergyLossAndBTOFEffFile(string a_
   #endif
 
   //###############     PARICLE LOOP        ####################
-  for(int partIndex = 0; partIndex < m_numParticles; partIndex++){   
-    if(!m_particleLoaded[partIndex] || !m_picoBinner_rapidity_structure[partIndex][0] || (enbed_needed &&!m_embedding_rapidity_structure[partIndex])){
+  // FIX (2026-07-21): added the "!m_dEdxSpectraPlus[partIndex][0]" check to this
+  // guard too -- see the FIX note on the first loop above for the full explanation.
+  // m_picoBinner_rapidity_structure[partIndex][0] alone is NOT a reliable stand-in
+  // for "this species has spectra in a_spectraFile": it's set the first time
+  // loadDataFile() OR loadSpectraFile() sees a non-null m_dEdxSpectraPlus for this
+  // species/centrality (RawSpectraModifier.cxx lines ~546-550 and ~692-696), and
+  // once set it is never cleared -- so if loadDataFile() set it from a species'
+  // raw yield data and loadSpectraFile() then clobbers m_dEdxSpectraPlus with NULL
+  // for that species (because a_spectraFile doesn't have it), this rapidity
+  // structure pointer stays non-null and this loop would NOT have skipped that
+  // species on its own.
+  for(int partIndex = 0; partIndex < m_numParticles; partIndex++){
+    // FIX (2026-07-21): this guard previously required m_embedding_rapidity_structure
+    // whenever enbed_needed (a_doEnergyLoss || a_doTPCEff) was true, REGARDLESS of
+    // whether a_doBTOFEff was also true and BTOF data was actually loaded. Since
+    // RunRawSpectraModifier.C leaves doEnergyLoss/doTPCEff at their default `true`
+    // (meaning "apply these IF the data for them is available", not "I have confirmed
+    // this run has embedding data") even for a BTOF-only run with no embedding sample,
+    // this `continue` fired for EVERY species on EVERY such run -- silently skipping
+    // this entire per-species loop body (TPC eff, energy loss, AND BTOF eff alike),
+    // with zero warning printed (the one clue, "Trying Part Index ... but continuing",
+    // is itself gated behind #ifdef _RAWSPECMOD_DEBUG_, so this was completely silent
+    // in a normal build). Confirmed this is exactly what happened in the run behind
+    // spectra_OO200_Pion_Corrected.root: its full run log had zero "Now Modifying"
+    // lines anywhere, meaning this loop body never executed even once for pion or
+    // kaon -- so NO correction of any kind was applied, not just BTOF, despite a
+    // valid BTOF efficiency file being passed in and a_doBTOFEff defaulting true.
+    // Fix: only bail on missing embedding data if BTOF correction isn't even being
+    // requested either -- i.e. skip this species only if there is truly nothing this
+    // function could apply to it. The embedding-needing per-detector work (TPC
+    // efficiency, energy loss) still gracefully no-ops with a WARNING via the
+    // existing, more granular checks further down (doEnergyLoss/doTPCEfficiency,
+    // ~line 1385-1397) when embedding data isn't available -- this fix just lets
+    // execution actually REACH those checks instead of bailing out before them.
+    bool haveEmbeddingForThisSpecies = m_embedding_rapidity_structure[partIndex] != NULL;
+    if(!m_particleLoaded[partIndex] || !m_dEdxSpectraPlus[partIndex][0] || !m_picoBinner_rapidity_structure[partIndex][0]
+       || (enbed_needed && !haveEmbeddingForThisSpecies && !a_doBTOFEff)){
       #ifdef _RAWSPECMOD_DEBUG_
         cout << "Trying Part Index " << partIndex << " but continuing because don't have all stuff" << endl;
       #endif
@@ -942,16 +1012,29 @@ void RawSpectraModifier::loadAndApplyTPCEffAndEnergyLossAndBTOFEffFile(string a_
       int yBin_etof = 0;
       if(m_loadedETOF) yBin_etof = m_picoBinner_rapidity_structure[partIndex][2]->FindBin(rapidity);
       int yBin_embedding = 0;
-      if(enbed_needed) yBin_embedding = m_embedding_rapidity_structure[partIndex]->FindBin(rapidity);
+      // FIX (2026-07-21): added the "&& haveEmbeddingForThisSpecies" guard -- the
+      // per-species continue above no longer guarantees this pointer is non-null when
+      // enbed_needed is true (see that FIX comment), so this can no longer assume it
+      // safely dereferences. yBin_embedding correctly stays 0 (-> yIndex_embedding -1)
+      // when embedding data is missing, which the existing per-detector TPC-eff/
+      // energy-loss lookups further down already handle gracefully (TFile::Get() on a
+      // yIndex-embedding-derived name just returns NULL, caught by their own checks).
+      if(enbed_needed && haveEmbeddingForThisSpecies) yBin_embedding = m_embedding_rapidity_structure[partIndex]->FindBin(rapidity);
 
       int yIndex_tpc = yBin_tpc - 1;
       int yIndex_btof = yBin_btof - 1;
       int yIndex_etof = yBin_etof - 1;
       int yIndex_embedding = yBin_embedding - 1;
-  
-      if(   HistogramUtilities::outsideHistogramRange(m_picoBinner_rapidity_structure[partIndex][0],rapidity) 
+
+      if(   HistogramUtilities::outsideHistogramRange(m_picoBinner_rapidity_structure[partIndex][0],rapidity)
          && HistogramUtilities::outsideHistogramRange(m_picoBinner_rapidity_structure[partIndex][1],rapidity)
-         && (!enbed_needed || (enbed_needed && HistogramUtilities::outsideHistogramRange(m_embedding_rapidity_structure[partIndex],rapidity)))){
+         && (!enbed_needed || !haveEmbeddingForThisSpecies || HistogramUtilities::outsideHistogramRange(m_embedding_rapidity_structure[partIndex],rapidity))){
+        // FIX (2026-07-21): added "|| !haveEmbeddingForThisSpecies" so this condition's
+        // evaluation itself can't dereference a null m_embedding_rapidity_structure
+        // pointer (short-circuits before reaching outsideHistogramRange(NULL,...) when
+        // embedding data is missing) -- this whole if-body's continue is already dead
+        // code outside #ifdef _RAWSPECMOD_DEBUG_ builds, so this only prevents a latent
+        // crash in a debug build, not a behavior change in production.
         #ifdef _RAWSPECMOD_DEBUG_
           cout << " Not Computing rapidity = " << rapidity << " becasue it is not in bounds of any histogram..." << endl;
           continue;
