@@ -35,3 +35,12 @@ spectrafit_images/
 
 # OS cruft
 .DS_Store
+
+# Ad-hoc scratch/backup copies made while iterating on a macro or source file (manual
+# "before I edit this, save a copy" snapshots, e.g. _to_delete_recheck_*.C,
+# _to_delete_rev5base_*.C) -- never meant to be committed, just kept around long enough
+# to diff against. Ignore both the loose files (in case one gets created directly in
+# place again) and the _to_delete/ holding folder they get swept into before manual
+# deletion.
+_to_delete_*
+_to_delete/
