@@ -22,6 +22,14 @@
 //
 // setInvBetaWidth_bTOF/eTOF calls (previously present here, absent from the SDCC file)
 // were dropped 2026-07-03 to match SDCC exactly.
+//
+// UPDATED 2026-07-24: trigger ID changed again, from 860002 to 860003. This one is NOT
+// from the SDCC reconciliation above -- Andrew confirmed 860003 directly with his
+// advisor as the trigger this analysis should actually be using. Note this makes the
+// trigger ID diverge from the SDCC file that produced yieldHistos_OOGeV_proton_2026_07_01.root
+// (which used 860002) -- that file's own baked-in centIndex/yields were produced under
+// the old trigger, so treat it as a config snapshot from before this change, not
+// something to re-derive edges against going forward.
 
 #include "../headers/CutClass.h"
 #include <iostream>
@@ -66,7 +74,7 @@ void SetCutClass(CutClass *cuts){
   cuts->setBeamEnergy(100);
   cuts->setBeamLocation(0.0,0.0);
   cuts->setPileUpCut(260); // added 2026-07-03 -- absent here before, present in the SDCC file
-  unsigned int trigs[1] = {860002}; // was trigs[6]={860001} -- both size and ID were wrong, fixed 2026-07-03
+  unsigned int trigs[1] = {860003}; // was 860002 -- changed 2026-07-24 per Andrew's advisor-confirmed trigger ID; before that, was trigs[6]={860001} (both size and ID wrong, fixed 2026-07-03)
   cuts->setTriggers(1, &trigs[0]);
 
   //cut on nToFT0, number of ToF tracks used for T0 Calibration

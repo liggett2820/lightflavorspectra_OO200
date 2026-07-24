@@ -1362,7 +1362,15 @@ void PicoBinner(string    a_filelist,
       }//end track loop
     }//end if mCalcT0
 
-    if(!a_cutClass->isGoodEvent(event->primaryVertex().X(), event->primaryVertex().Y(), event->primaryVertex().Z(), event->nBTOFMatch(), event->nTofT0() )){
+    // FIX 2026-07-24: was calling isGoodEvent(x,y,z,nBTOFMatch,nTofT0) -- the scalar-args
+    // overload (CutClass.cxx ~line 1329) that never receives the StPicoEvent* and so
+    // structurally cannot check triggers. CutClass here is configured with a trigger
+    // requirement (see macros/SetCutClass.C: setTrigToggle(true), now trigs[0]=860003)
+    // that was therefore silently never enforced -- every event passed regardless of its
+    // trigger bits. Switched to the StPicoEvent*-based overload (CutClass.cxx ~line 1066),
+    // which does the identical vertex/radial/tofMatch/T0 checks PLUS the trigger check, so
+    // this is a pure bugfix, not a new/different cut.
+    if(!a_cutClass->isGoodEvent(event)){
      continue;
     }
     TVector3 eventVertex = event->primaryVertex();
