@@ -1063,103 +1063,6 @@ bool CutClass::isEToFEvent(StPicoEvent* a_event){
 }
 #endif
 
-bool CutClass::isGoodEvent(StPicoEvent* a_event){
-  //Vertex
-  double z =(double) a_event->primaryVertex().Z();
-  double r = TMath::Sqrt( pow(a_event->primaryVertex().X()-m_beamXCenter,2) + pow(a_event->primaryVertex().Y()-m_beamYCenter,2) );
-
-  #ifdef _CUTCLASS_DEBUG_
-    cout << "isGoodEvent(): zVertex " << z << "=?["<< m_ZLowCut <<","<< m_ZHighCut <<"]" << endl;
-    cout << "               rVertex " << r << " > " << m_radialCut << endl;
-    cout << "               tofMatch " << a_event->nBTOFMatch() << " < " << m_tofMatchCut << endl;
-    if(m_useT0){
-      cout << "               nTofT0 " <<  a_event->nTofT0() << " < " <<  m_nTofT0Cut << endl;
-    }
-    cout << "               triggers:" << endl;
-    for(int eventTrigIndex = 0; eventTrigIndex < (int)a_event->triggerIds().size(); eventTrigIndex++){
-     cout << "     " << a_event->triggerIds()[eventTrigIndex];
-   }
-   cout << "\n               in Req Trigs: " << endl;
-   for(int reqTrigIndex = 0; reqTrigIndex < (int)m_triggers.size(); reqTrigIndex++){
-    cout << "    " << m_triggers[reqTrigIndex];
-  }
-  cout << endl;
-  #endif
-
-  if (z < m_ZLowCut){
-     m_rejectedEvents->Fill(0.5);
-     #ifdef _CUTCLASS_DEBUG_
-      cout << " Rejected because of z Vertex = " << z << " < " << m_ZLowCut << endl;
-     #endif
-
-     return false;
-  }
-  if (z > m_ZHighCut){
-     m_rejectedEvents->Fill(0.5);
-    #ifdef _CUTCLASS_DEBUG_
-      cout << " Rejected because of z Vertex = " << z << " > " << m_ZHighCut << endl;
-    #endif
-     return false;
-  }
-  if (r > m_radialCut){
-     m_rejectedEvents->Fill(1.5);
-    #ifdef _CUTCLASS_DEBUG_
-      cout << " Rejected because of radius  = " << r << " > " << m_radialCut << endl;
-    #endif
-     return false;
-  }
-  if (m_tofMatchCut > a_event->nBTOFMatch()){
-     m_rejectedEvents->Fill(2.5);
-     #ifdef _CUTCLASS_DEBUG_
-      cout << " Rejected because of tofMatch = " << a_event->nBTOFMatch() << " < " << m_tofMatchCut << endl;
-     #endif
-
-     return false;
-  }
-  if(m_useT0){
-    if (a_event->nTofT0() < m_nTofT0Cut){
-       m_rejectedEvents->Fill(3.5);
-      #ifdef _CUTCLASS_DEBUG_
-       cout << " Rejected because of nTOFT0= " << a_event->nTofT0() << " < " << m_nTofT0Cut << endl;
-      #endif
-       return false;
-    }
-  }
-    // Trigger
-  bool goodEvent = true;
-  if(m_cutOnTriggers){
-    bool foundInTriggers = false;
-    vector <unsigned int> trigIDs = a_event->triggerIds();
-    for(int reqTrigIndex = 0; reqTrigIndex < (int)m_triggers.size(); reqTrigIndex++){
-        //foundInTriggers = false;
-      for(int eventTrigIndex = 0; eventTrigIndex < (int)trigIDs.size(); eventTrigIndex++){
-          //    cout << trigIDs[eventTrigIndex] << " to " << m_triggers[reqTrigIndex] << endl;
-        if(trigIDs[eventTrigIndex] == m_triggers[reqTrigIndex]) foundInTriggers = true;
-        if(foundInTriggers) break;
-      }
-      if(foundInTriggers) break;
-    }
-
-    if(!foundInTriggers) goodEvent = false;
-  }
-  #ifdef _CUTCLASS_DEBUG_
-  if(!goodEvent) {
-    #ifdef _CUTCLASS_DEBUG_
-     cout << " Rejected because of Triggers " << endl;
-    #endif
-    m_rejectedEvents->Fill(4.5);
-
-  }else{
-    #ifdef _CUTCLASS_DEBUG_
-      cout << "Passed Triggers" << endl;
-    #endif
-  }
-  #endif
-  m_rejectedEvents->Fill(8.5);
-  return goodEvent;
-}
-
-
 
 
 
@@ -1277,13 +1180,109 @@ bool CutClass::isGoodTrack_GivenBTOFBetaGamma(double a_dEdx, double a_betaGamma)
 
 #endif // mac osx not defined --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// Pulled out from the _MAC_OSX_ gate above -- see the matching comment in
-// headers/CutClass.h. This function's body only touches plain member variables
-// (m_etof_match_flag_cut, m_rejectedTracks, m_etof_max_cluster_size,
-// m_etofDetlaXY_Center_X/Y, m_etofDeltaX_Ellipse_Cut/Y) plus the
-// StPicoETofPidTraits/StPicoETofHit types it's declared with -- nothing here
-// actually depends on _MAC_OSX_ being undefined. Logic is otherwise byte-for-byte
-// identical to the original.
+// Pulled out from the _MAC_OSX_ gate above (2026-07-27) -- see the matching
+// comment in headers/CutClass.h next to this function's declaration.
+// makefile_toggles.h hardcodes _MAC_OSX_ on every build, SDCC included, so this
+// function never actually compiled anywhere until now; PicoBinner.cxx's trigger-
+// cut fix needs it live. Logic is otherwise byte-for-byte identical to the
+// original (which lived inside the "#ifndef _MAC_OSX_ // no StPicoDst stuff"
+// block above, right after isHLTEvent/isEToFEvent).
+bool CutClass::isGoodEvent(StPicoEvent* a_event){
+  //Vertex
+  double z =(double) a_event->primaryVertex().Z();
+  double r = TMath::Sqrt( pow(a_event->primaryVertex().X()-m_beamXCenter,2) + pow(a_event->primaryVertex().Y()-m_beamYCenter,2) );
+
+  #ifdef _CUTCLASS_DEBUG_
+    cout << "isGoodEvent(): zVertex " << z << "=?["<< m_ZLowCut <<","<< m_ZHighCut <<"]" << endl;
+    cout << "               rVertex " << r << " > " << m_radialCut << endl;
+    cout << "               tofMatch " << a_event->nBTOFMatch() << " < " << m_tofMatchCut << endl;
+    if(m_useT0){
+      cout << "               nTofT0 " <<  a_event->nTofT0() << " < " <<  m_nTofT0Cut << endl;
+    }
+    cout << "               triggers:" << endl;
+    for(int eventTrigIndex = 0; eventTrigIndex < (int)a_event->triggerIds().size(); eventTrigIndex++){
+     cout << "     " << a_event->triggerIds()[eventTrigIndex];
+   }
+   cout << "\n               in Req Trigs: " << endl;
+   for(int reqTrigIndex = 0; reqTrigIndex < (int)m_triggers.size(); reqTrigIndex++){
+    cout << "    " << m_triggers[reqTrigIndex];
+  }
+  cout << endl;
+  #endif
+
+  if (z < m_ZLowCut){
+     m_rejectedEvents->Fill(0.5);
+     #ifdef _CUTCLASS_DEBUG_
+      cout << " Rejected because of z Vertex = " << z << " < " << m_ZLowCut << endl;
+     #endif
+
+     return false;
+  }
+  if (z > m_ZHighCut){
+     m_rejectedEvents->Fill(0.5);
+    #ifdef _CUTCLASS_DEBUG_
+      cout << " Rejected because of z Vertex = " << z << " > " << m_ZHighCut << endl;
+    #endif
+     return false;
+  }
+  if (r > m_radialCut){
+     m_rejectedEvents->Fill(1.5);
+    #ifdef _CUTCLASS_DEBUG_
+      cout << " Rejected because of radius  = " << r << " > " << m_radialCut << endl;
+    #endif
+     return false;
+  }
+  if (m_tofMatchCut > a_event->nBTOFMatch()){
+     m_rejectedEvents->Fill(2.5);
+     #ifdef _CUTCLASS_DEBUG_
+      cout << " Rejected because of tofMatch = " << a_event->nBTOFMatch() << " < " << m_tofMatchCut << endl;
+     #endif
+
+     return false;
+  }
+  if(m_useT0){
+    if (a_event->nTofT0() < m_nTofT0Cut){
+       m_rejectedEvents->Fill(3.5);
+      #ifdef _CUTCLASS_DEBUG_
+       cout << " Rejected because of nTOFT0= " << a_event->nTofT0() << " < " << m_nTofT0Cut << endl;
+      #endif
+       return false;
+    }
+  }
+    // Trigger
+  bool goodEvent = true;
+  if(m_cutOnTriggers){
+    bool foundInTriggers = false;
+    vector <unsigned int> trigIDs = a_event->triggerIds();
+    for(int reqTrigIndex = 0; reqTrigIndex < (int)m_triggers.size(); reqTrigIndex++){
+        //foundInTriggers = false;
+      for(int eventTrigIndex = 0; eventTrigIndex < (int)trigIDs.size(); eventTrigIndex++){
+          //    cout << trigIDs[eventTrigIndex] << " to " << m_triggers[reqTrigIndex] << endl;
+        if(trigIDs[eventTrigIndex] == m_triggers[reqTrigIndex]) foundInTriggers = true;
+        if(foundInTriggers) break;
+      }
+      if(foundInTriggers) break;
+    }
+
+    if(!foundInTriggers) goodEvent = false;
+  }
+  #ifdef _CUTCLASS_DEBUG_
+  if(!goodEvent) {
+    #ifdef _CUTCLASS_DEBUG_
+     cout << " Rejected because of Triggers " << endl;
+    #endif
+    m_rejectedEvents->Fill(4.5);
+
+  }else{
+    #ifdef _CUTCLASS_DEBUG_
+      cout << "Passed Triggers" << endl;
+    #endif
+  }
+  #endif
+  m_rejectedEvents->Fill(8.5);
+  return goodEvent;
+}
+
 #ifdef _HAS_ETOF_
 bool CutClass::isGoodETof(StPicoETofPidTraits* a_traits, StPicoETofHit* a_hit){
   if(m_etof_match_flag_cut < 0){

@@ -113,6 +113,11 @@
   #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
 #endif
 
+// isGoodEvent(StPicoEvent*) below (declared further down, ungated -- see the
+// comment next to its declaration) needs StPicoEvent's real definition
+// regardless of _MAC_OSX_, same reasoning as the isGoodETof pull-out above.
+#include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+
 #include "TH1D.h"
 
 
@@ -285,7 +290,6 @@ public:
 
   #ifndef _MAC_OSX_
     bool isHLTEvent(StPicoEvent* a_event);
-    bool isGoodEvent(StPicoEvent* a_event);
     #ifdef _HAS_ETOF_
       bool isEToFEvent(StPicoEvent* a_event);
     #endif
@@ -298,6 +302,19 @@ public:
   #ifdef _HAS_ETOF_
     bool isGoodETof(StPicoETofPidTraits* a_traits, StPicoETofHit* a_hit = NULL);
   #endif
+
+  // Pulled out from the _MAC_OSX_ gate above (2026-07-27), same reasoning as the
+  // isGoodETof pull-out just above: makefile_toggles.h hardcodes _MAC_OSX_ on
+  // EVERY build (SDCC included -- see that file's comment), so the whole
+  // "#ifndef _MAC_OSX_" block above compiled to nothing everywhere, on the real
+  // STAR/SDCC toolchain as well as locally. That's fine for isHLTEvent/
+  // isEToFEvent/isGoodTrack(pointer)/isGoodBTof(pointer), which nothing in this
+  // repo actually calls, but PicoBinner.cxx DOES call isGoodEvent(StPicoEvent*)
+  // (source/PicoBinner.cxx, the trigger-cut fix) so it must always be visible.
+  // StPicoEvent's real definition is pulled in unconditionally below (right above
+  // the TH1D.h include) so this declaration has a complete type to work with
+  // regardless of _MAC_OSX_.
+  bool isGoodEvent(StPicoEvent* a_event);
 
 
 
