@@ -78,4 +78,18 @@ void makeLibs(TString opt = ""){
   // RawSpectraModifier.
   gSystem->CompileMacro("source/GraphFitter.cxx", "gk");
   gSystem->CompileMacro("source/EfficiencyFitter.cxx", "gk");
+
+  // EmbeddingBinner/HybridFeeddownMaker dependencies -- ported verbatim from
+  // lightflavorspectra_etof for the embedding-correction pipeline (see
+  // macros/RunEmbeddingBinner.C, macros/RunEfficiencyFitter_Embedding.C). headers/
+  // EmbeddingBinner.h includes MattMcTrack.h and MattMcEvent.h (the TTree schema
+  // StMuAnalysisMaker writes at RCF), so those must be compiled first.
+  // headers/HybridFeeddownMaker.h only needs PhysMath.h/HistogramUtilities.h (via
+  // namespaces.cxx)/Helix.h (also via namespaces.cxx)/ParticleInfo.h, all already
+  // compiled above -- no MattMc* dependency at the header level, confirmed by reading
+  // its #include list directly (unlike EmbeddingBinner.h).
+  gSystem->CompileMacro("source/MattMcEvent.cxx", "gk");
+  gSystem->CompileMacro("source/MattMcTrack.cxx", "gk");
+  gSystem->CompileMacro("source/EmbeddingBinner.cxx", "gk");
+  gSystem->CompileMacro("source/HybridFeeddownMaker.cxx", "gk");
 }

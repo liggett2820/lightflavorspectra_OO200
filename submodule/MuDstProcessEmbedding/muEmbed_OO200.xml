@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  muEmbed_OO200.xml -- lightflavorspectra_OO200/submodule/MuDstProcessEmbedding
+
+  Ported from lightflavorspectra_etof/submodule/MuDstProcessEmbedding/muEmbed_Collider.xml
+  (that file is itself energy-agnostic -- it's parameterized by &energy;/&part;/&requestID;/
+  &starver; entities filled in by runSchedSubmission_OO200.bash's star-submit-template call).
+
+  WHAT CHANGED FROM THE ORIGINAL, AND WHY:
+    - The only real content change needed is the hardcoded /star/data03/... paths below,
+      which are the ORIGINAL AUTHOR's (harasty's) personal RCF scratch/pwg directories.
+      TODO: replace every /star/data03/scratch/harasty/... and /star/data03/pwg/harasty/...
+      path below with your own RCF scratch/pwg directory (e.g. /star/data03/pwg/<your
+      RCF username>/embedding/). runSchedSubmission_OO200.bash's $OutputDir must match
+      whatever you put in the <output>/<stdout>/<stderr> URLs here.
+    - Left the &energy;/&part;/&requestID;/&starver;/&filesPerProcess;/&nFiles;/&motherID;
+      entities as-is -- these get filled in per-job by star-submit-template, driven by
+      runSchedSubmission_OO200.bash. &motherID; is passed as 0 here (this template is for
+      the plain TPC-efficiency embedding, not hybrid feed-down, which needs its own
+      mother-ID-bearing request/template -- not ported yet, see compile.bash's header note).
+-->
+<job maxFilesPerProcess="&filesPerProcess;" fileListSyntax="paths" copyInputLocally="true">
+
+  <Generator>
+    <!-- TODO: replace with your own RCF scratch directory -->
+    <Location>/star/data03/scratch/REPLACE_WITH_YOUR_RCF_USERNAME/tmp/muEmb/</Location>
+  </Generator>
+
+  <command>
+        root4star -q -b doMuDst.C\(\"$FILELIST\",\"muEmbed_${JOBID}.root\",\"&part;\",1000000000,&motherID;\)
+        source /afs/rhic.bnl.gov/star/ROOT/6.20.08/build/bin/thisroot.csh
+        /afs/rhic.bnl.gov/star/ROOT/6.20.08/build/bin/hadd -f6 ${SCRATCH}/muEmbed_${JOBID}_f6.root ${SCRATCH}/muEmbed_${JOBID}.root
+        mv ${SCRATCH}/muEmbed_${JOBID}_f6.root /star/data03/pwg/REPLACE_WITH_YOUR_RCF_USERNAME/embedding/&part;/&energy;_&requestID;/muEmbed_${JOBID}_f6.root
+        rm ${SCRATCH}/muEmbed_${JOBID}_f6.root
+        rm ${SCRATCH}/muEmbed_${JOBID}.root
+  </command>
+
+  <SandBox installer="ZIP">
+        <Package name="MuDstEmbeddingPackage_pi_K_p_OO200_&energy;">
+              	<File>file:./doMuDst.C</File>
+	 	<File>file:./StRoot</File>
+		<File>file:./.sl73_gcc485</File>
+                <File>file:./headers</File>
+                <File>file:./submodule</File>
+                <File>file:./bin_temp</File>
+                <File>file:./makefile_toggles.h</File>
+        </Package>
+  </SandBox>
+
+  <input URL="filelist:&filelistdir;/&energy;GeV_&part;_&requestID;.list" nFiles="&nFiles;" />
+  <stdout URL="file:/star/data03/scratch/REPLACE_WITH_YOUR_RCF_USERNAME/tmp/muEmb/&energy;_&part;_&requestID;_$JOBID.out"/>
+  <stderr URL="file:/star/data03/scratch/REPLACE_WITH_YOUR_RCF_USERNAME/tmp/muEmb/&energy;_&part;_&requestID;_$JOBID.err"/>
+  <output fromScratch="*.root" toURL="file:/star/data03/pwg/REPLACE_WITH_YOUR_RCF_USERNAME/embedding/&part;/&energy;_&requestID;/" />
+  <output fromScratch="*.txt" toURL="file:/star/data03/pwg/REPLACE_WITH_YOUR_RCF_USERNAME/embedding/&part;/&energy;_&requestID;/" />
+</job>
