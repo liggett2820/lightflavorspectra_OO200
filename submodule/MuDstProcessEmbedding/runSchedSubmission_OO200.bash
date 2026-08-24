@@ -5,9 +5,10 @@
 # Usage: runSchedSubmission_OO200.bash <partIndex 0=pi/1=K/2=p> <charge +1/-1> <requestID> <energy tag, e.g. 200> <starver, e.g. SL23c>
 #
 # WHAT CHANGED FROM THE ORIGINAL, AND WHY:
-#   - $OutputDir and FileListDir below are the ORIGINAL AUTHOR's (harasty's) personal
-#     RCF directories. TODO: replace both with your own RCF paths -- OutputDir must
-#     match the /star/data03/pwg/... path you used in muEmbed_OO200.xml's <output> URLs.
+#   - $OutputDir and FileListDir below were the ORIGINAL AUTHOR's (harasty's) personal
+#     RCF directories. Filled in with Andrew's RCF username (liggett2820) 2026-08-06 --
+#     OutputDir matches the /star/data03/pwg/liggett2820/... path used in
+#     muEmbed_OO200.xml's <output> URLs; if you ever change one, change both.
 #   - Trimmed the part1==4/5/6/7 (deuteron/triton/helion/alpha) and part1==9..14
 #     (Lambda/Xi/Omega/K0S/Phi) branches -- this repo's scope is pion/kaon/proton only
 #     (matches ParticleInfo's 3-species convention used everywhere else in this repo).
@@ -18,11 +19,10 @@
 NumFiles=all
 FilePerProcess=16
 XMLSCRIPTNAME=muEmbed_OO200.xml
-# TODO: replace REPLACE_WITH_YOUR_RCF_USERNAME with your actual RCF username/path
-FileListDir=/star/u/REPLACE_WITH_YOUR_RCF_USERNAME/lightflavorspectra_OO200/submodule/MuDstProcessEmbedding/fileLists/${4}GeV_OO200/full/
-OutputDir=/star/data03/pwg/REPLACE_WITH_YOUR_RCF_USERNAME/embedding/
+FileListDir=/star/u/liggett2820/lightflavorspectra_OO200/submodule/MuDstProcessEmbedding/fileLists/${4}GeV_OO200/full/
+OutputDir=/star/data03/pwg/liggett2820/embedding/
 
-mkdir -p /star/data03/scratch/REPLACE_WITH_YOUR_RCF_USERNAME/tmp/muEmb
+mkdir -p /star/data03/scratch/liggett2820/tmp/muEmb
 
 mkdir -p $OutputDir/pip/logs/
 mkdir -p $OutputDir/pim/logs/
