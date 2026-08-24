@@ -2,7 +2,7 @@
 # rebuild_libs.sh -- lightflavorspectra_OO200
 #
 # WHY THIS EXISTS:
-# `root -l -q -b macros/makeLibs.C` compiles most of this repo via ACLiC's
+# `root -l -q -b macros/makeLibs_SL24y.C` compiles most of this repo via ACLiC's
 # gSystem->CompileMacro(), which only recompiles a file if it thinks the source is newer
 # than the .so already sitting in bin/. If an updated source file (e.g. SetCutClass.C)
 # reaches SDCC in a way that preserves an older mtime (rsync/scp -p, etc.), that check
@@ -11,11 +11,18 @@
 # README's "Centrality binning" section, "UPDATE 2026-07-07").
 #
 # This script forces a real rebuild every time by default: it wipes bin/* via
-# `makeLibs.C("clean")` before recompiling, so there's no stale-.so ambiguity to debug.
-# It also handles the one build step makeLibs.C does NOT do itself -- the PicoDst reader
-# submodule has its own Makefile and its output (libStPicoDst.so) just gets
-# gSystem->Load()'ed from bin/, so it has to be rebuilt and copied back in every time
-# bin/ gets wiped, or makeLibs.C fails immediately with "libStPicoDst.so does not exist".
+# `makeLibs_SL24y.C("clean")` before recompiling, so there's no stale-.so ambiguity to
+# debug. It also handles the one build step makeLibs_SL24y.C does NOT do itself -- the
+# PicoDst reader submodule has its own Makefile and its output (libStPicoDst.so) just
+# gets gSystem->Load()'ed from bin/, so it has to be rebuilt and copied back in every
+# time bin/ gets wiped, or makeLibs_SL24y.C fails immediately with "libStPicoDst.so does
+# not exist".
+#
+# NOTE (2026-08-24): this script is SL24y-specific (renamed from macros/makeLibs.C to
+# macros/makeLibs_SL24y.C the same day, alongside a new macros/makeLibs_SL23c.C for the
+# RCF embedding pipeline -- see that file's own header comment). There is no equivalent
+# rebuild_libs script for SL23c yet; that build is currently driven by hand via the
+# steps in macros/makeLibs_SL23c.C's own header comment.
 #
 # That submodule's own Makefile only tracks libStPicoDst.so as a target -- if it's
 # already sitting in submodule/PicoDstReader_SL24y/ from a previous build, plain `make`
@@ -52,8 +59,8 @@ echo "=== [1/4] Building PicoDstReader_SL24y submodule ==="
 ( cd submodule/PicoDstReader_SL24y && make clean && make )
 
 if [ $CLEAN -eq 1 ]; then
-  echo "=== [2/4] Clearing bin/ (root -l -q -b 'macros/makeLibs.C(\"clean\")') ==="
-  root -l -q -b 'macros/makeLibs.C("clean")'
+  echo "=== [2/4] Clearing bin/ (root -l -q -b 'macros/makeLibs_SL24y.C(\"clean\")') ==="
+  root -l -q -b 'macros/makeLibs_SL24y.C("clean")'
 else
   echo "=== [2/4] Skipped (--no-clean) ==="
 fi
@@ -68,8 +75,8 @@ else
   echo "    (no StPicoDst_Dict_rdict.pcm produced here -- expected on SDCC, not needed)"
 fi
 
-echo "=== [4/4] Compiling everything else (root -l -q -b macros/makeLibs.C) ==="
-root -l -q -b macros/makeLibs.C
+echo "=== [4/4] Compiling everything else (root -l -q -b macros/makeLibs_SL24y.C) ==="
+root -l -q -b macros/makeLibs_SL24y.C
 
 echo ""
 echo "Done. Contents of bin/ (check that .so timestamps all match this run):"

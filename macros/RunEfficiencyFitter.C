@@ -25,7 +25,7 @@
 //     background fitting is needed, port that piece the same way as the others.
 // If/when an O+O 200 embedding sample exists, those pieces can be ported the same way
 // this one was: read the *_Collider.C block for that fit mode, confirm its actual repo-
-// specific dependencies, port verbatim, wire into makeLibs.C.
+// specific dependencies, port verbatim, wire into makeLibs_SL24y.C.
 //
 // WHAT CHANGED FROM THE ORIGINAL, AND WHY:
 //   - a_numCentBins defaults to 6, NOT the original's numCentBins_picoBinner=9 --

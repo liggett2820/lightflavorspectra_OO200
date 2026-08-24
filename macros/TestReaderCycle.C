@@ -5,7 +5,7 @@
 // file, crash on its own -- independent of any PicoBinner histogram/analysis code?
 //
 // This only loads libStPicoDst.so (must already be built into ./bin/ by the
-// submodule's own Makefile -- same prerequisite as makeLibs.C) and touches a couple
+// submodule's own Makefile -- same prerequisite as makeLibs_SL24y.C) and touches a couple
 // of StPicoEvent/StPicoDst fields per event, just enough to force real memory reads.
 //
 // Run from the REPO ROOT:

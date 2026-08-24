@@ -42,14 +42,14 @@ corrected (edge order reversed, values not re-derived) as part of the 2026-07-02
 **UPDATE 2026-07-07**: the `{44,37,28,17,5,0}` refMult values are the official cuts from a
 separate, already-validated analysis -- not something to re-derive. The observed skew
 (most events landing in the 40-80% bin, values that looked like the old `{300,150,100,
-70,0}` scheme) turned out to be a stale build, not wrong cut values: `macros/makeLibs.C`
+70,0}` scheme) turned out to be a stale build, not wrong cut values: `macros/makeLibs_SL24y.C`
 compiles `SetCutClass.C` via `gSystem->CompileMacro()`, which only recompiles when it
 sees the source as newer than the existing `bin/SetCutClass_C.so`. If the updated
 `SetCutClass.C` reaches SDCC in a way that preserves an older mtime (e.g. `rsync`/`scp
 -p`), that check silently passes and SDCC keeps running the previously-compiled (old-cut)
 binary even though the source text is correct. Fix: `root -l -q -b
-'macros/makeLibs.C("clean")'` (wipes `bin/*`) then rebuild with `root -l -q -b
-macros/makeLibs.C` before re-running PicoBinner. `macros/DeriveCentralityEdges.C` (reads
+'macros/makeLibs_SL24y.C("clean")'` (wipes `bin/*`) then rebuild with `root -l -q -b
+macros/makeLibs_SL24y.C` before re-running PicoBinner. `macros/DeriveCentralityEdges.C` (reads
 a yield file's `refMult` histogram and reports the refMult value at each percentile
 boundary) is available as an independent sanity check against the official cuts, not a
 replacement for them.
@@ -133,8 +133,12 @@ links.
    SDCC. `scripts/rebuild_libs.sh` handles this automatically.
 2. Compile everything else via ACLiC (run from the repo root):
    ```
-   root -l -q -b macros/makeLibs.C
+   root -l -q -b macros/makeLibs_SL24y.C
    ```
+   (Renamed 2026-08-24 from `macros/makeLibs.C` -- this is the SL24y-STAR_LEVEL build
+   macro, used both here on a laptop and on SDCC for stage-1 PicoBinner batch jobs. The
+   embedding pipeline's RCF-side build macro is the separate `macros/makeLibs_SL23c.C`,
+   run under `starver SL23c` -- see that file's own header comment.)
    This compiles, in dependency order: `namespaces.cxx` (Helix/PhysMath/HistogramUtilities/
    PhysMathHistogramUtilities combined, matching the original's own build), `ParticleInfo.cxx`,
    `CutClass.cxx`, `CalibrationClass.cxx`, `PicoBinner.cxx`, `SetCutClass.C`, `GausMixModel.cxx`
@@ -143,7 +147,7 @@ links.
    several minutes the first time (ZFitter.cxx and SpectraFitter.cxx are each tens of
    thousands of lines once their `#include` chains are counted).
 
-   Re-run `root -l -q -b 'macros/makeLibs.C("clean")'` then re-run the build if you ever need
+   Re-run `root -l -q -b 'macros/makeLibs_SL24y.C("clean")'` then re-run the build if you ever need
    a clean rebuild (e.g. after editing a header any class depends on).
 
 ## Pipeline stages
@@ -345,10 +349,10 @@ template, every `/liggett` path needs updating to their own account first.
    repo (see `.gitignore`) because a laptop build produces macOS/arm64 binaries that
    will not load on BNL's Linux nodes. After `git pull` on an SDCC/RCF interactive node,
    run the "One-time build setup" steps above (build `submodule/PicoDstReader_SL24y`,
-   then `root -l -q -b macros/makeLibs.C`) there -- the `<SandBox>` packages whatever's
+   then `root -l -q -b macros/makeLibs_SL24y.C`) there -- the `<SandBox>` packages whatever's
    actually in `bin/` at submission time, so it needs to already be genuine Linux
    binaries built from the code you just pulled. If in doubt whether a change actually
-   recompiled, force it: `root -l -q -b 'macros/makeLibs.C("clean")'` then rebuild (see
+   recompiled, force it: `root -l -q -b 'macros/makeLibs_SL24y.C("clean")'` then rebuild (see
    "Centrality binning" above for a case where a stale `.so` silently kept running old
    cut values even though the source was correct).
 3. **If you're not liggett2820, update every `/liggett` path in the XML** -- the scratch

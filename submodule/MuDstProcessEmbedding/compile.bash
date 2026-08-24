@@ -17,11 +17,25 @@
 #     ./bin_temp/` pattern. This is real STAR-run-period info I don't have -- check
 #     with your run's centrality/refmult documentation or ask in your working group.
 #   - submodule/ copies trimmed to what this repo actually has (ParticleInfo,
-#     PicoDstReader_SL24y) instead of the original's PicoDstReader_SL19b/SL22b/SL22c/
+#     PicoDstReader_SL23c) instead of the original's PicoDstReader_SL19b/SL22b/SL22c/
 #     SL23a/SL23d + a generic submodule/StRoot (StRefMultCorr source) -- none of those
 #     exist in this repo. If the StRefMultCorr TODO above needs its source (not just a
 #     compiled .so), you'll need to vendor in whatever submodule/StRoot equivalent
 #     provides it.
+#   - Added 2026-08-24: copies submodule/PicoDstReader_SL23c/ here, NOT the
+#     submodule/PicoDstReader_SL24y/ this repo's LOCAL/Mac build (macros/makeLibs_SL24y.C)
+#     uses. This step only needs PicoDstReader's *header* declarations (see
+#     ../../headers/CutClass.h's own #include of StPicoEvent.h -- CutClass::isGoodEvent
+#     (StPicoEvent*) needs the real type regardless of _MAC_OSX_), which are identical
+#     text in both directories -- but this compile.bash ALSO drags along whatever build
+#     artifacts (.o/.so/dict files) happen to be sitting in the source directory at
+#     `cp -r` time, so pointing this at the same directory the Mac rebuilds locally
+#     risked silently bundling a mismatched-ROOT-version binary here too (the same class
+#     of bug macros/makeLibs_SL23c.C (renamed 2026-08-24 from makeLibs_RCF.C) hit and
+#     fixed by loading a STAR_LEVEL-tagged bin/libStPicoDst_SL23c.so instead of the
+#     generic name). PicoDstReader_SL23c/ is a dedicated copy for this RCF/SL23c
+#     pipeline, built independently -- see PicoDstReader_SL23c/Makefile and
+#     macros/makeLibs_SL23c.C's own header comment.
 #   - IMPORTANT: this maker runs under STAR's official offline software (root4star,
 #     StChain, StMuDstMaker) at RCF/SDCC -- a fundamentally different runtime than the
 #     rest of this repo, which ../../makefile_toggles.h deliberately hardcodes to a
@@ -64,7 +78,7 @@ cp ../../headers/Helix.h ./headers/
 
 mkdir -p ./submodule/
 cp -r ../../submodule/ParticleInfo ./submodule/
-cp -r ../../submodule/PicoDstReader_SL24y ./submodule/
+cp -r ../../submodule/PicoDstReader_SL23c ./submodule/
 # NOTE: StMuDstMaker itself (StChain/StMuDstMaker/StMuTrack/...) comes from the STAR
 # software environment via `starver`, not from this repo -- nothing to copy for that.
 

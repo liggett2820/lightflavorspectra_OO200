@@ -81,19 +81,19 @@ basic: setup ./bin/StRefMultCorr_SL21a.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader/
 	cp -f ./submodule/PicoDstReader/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 basic_SL22dev: setup ./bin/StRefMultCorr_SL22dev.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader/
 	cp -f ./submodule/PicoDstReader/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 basic_SL22c: setup ./bin/StRefMultCorr_SL22dev.so
 	$(MAKE) libStPicoDst.so --directory=submodule/PicoDstReader_SL22c/
 	cp -f ./submodule/PicoDstReader_SL22c/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL22c/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 # COLLIDER options for RCF
 col27: setup ./bin/StRefMultCorr_SL19b.so
@@ -101,43 +101,43 @@ col27: setup ./bin/StRefMultCorr_SL19b.so
 	$(MAKE) libStPicoDst.so --directory=submodule/PicoDstReader_SL19b/
 	cp -f ./submodule/PicoDstReader_SL19b/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL19b/libStPicoDst.so ./macros/
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col19p6: setup ./bin/StRefMultCorr_SL21a.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL23d/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col17p3: setup ./bin/StRefMultCorr_9p2_11p5_17p3GeV.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL23d/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col14p6: setup ./bin/StRefMultCorr_SL22dev.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL23d/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL23d/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col11p5: setup ./bin/StRefMultCorr_9p2_11p5_17p3GeV.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL23a/
 	cp -f ./submodule/PicoDstReader_SL23a/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL23a/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col9p2: setup ./bin/StRefMultCorr_9p2_11p5_17p3GeV.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL23a/
 	cp -f ./submodule/PicoDstReader_SL23a/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL23a/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 col7p7: setup ./bin/StRefMultCorr_7p7GeV.so
 	$(MAKE) libStPicoDst_WO_C11.so --directory=submodule/PicoDstReader_SL22b/
 	cp -f ./submodule/PicoDstReader_SL22b/libStPicoDst.so ./bin/
 	cp -f ./submodule/PicoDstReader_SL22b/libStPicoDst.so ./macros
-	root -l -q -b macros/makeLibs_RCF.C
+	root -l -q -b macros/makeLibs_SL23c.C
 
 ./bin/StRefMultCorr_SL19b.so:
 	$(CXX) -c $(CXXFLAGS) submodule/StRoot/StRefMultCorr_SL19b/StRefMultCorr.cxx -o ./bin/StRefMultCorr.o
@@ -268,7 +268,7 @@ clean:
 	rm -f -r $(BIN_DIR)
 	rm -f ./libStPicoDst.so
 	rm -f ./StPicoDst_Dict_rdict.pcm
-	root -l -q -b macros/makeLibs.C\(\"clean\"\)
+	root -l -q -b macros/makeLibs_SL24y.C\(\"clean\"\)
 	$(MAKE) clean --directory=submodule/PicoDstReader/
 	$(MAKE) clean --directory=submodule/PicoDstReader_SL19b/
 	$(MAKE) clean --directory=submodule/PicoDstReader_SL22b/
