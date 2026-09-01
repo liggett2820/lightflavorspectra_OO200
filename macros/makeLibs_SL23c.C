@@ -58,7 +58,23 @@ void makeLibs_SL23c(TString opt=""){
     gSystem->MakeDirectory("bin");
 
   gSystem->SetBuildDir("$PWD/bin/",true);
-  gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers",gSystem->pwd()));
+  // FIXED 2026-09-01: added "-std=c++11" here. ACLiC's CompileMacro() builds each
+  // compile command from root-config --cflags plus whatever's in this include-path
+  // string -- and SDCC's ROOT 5.34.38 root-config supplies NO -std= flag at all, so
+  // GCC 4.8.5 fell back to its gnu++98 default. That broke every file here using real
+  // C++11 syntax: PhysMath.cxx's lambda in SimultaneousSortDoubleInt ("lambda
+  // expressions only available with -std=c++11"), HistogramUtilities.cxx's and
+  // macros/SetCutClass.C's brace-initialized vectors ("must be initialized by
+  // constructor, not by '{...}'") -- and cascaded into link failures for CutClass/
+  // CalibrationClass/PicoBinner/MattMcTrack, which never actually had a C++11 problem
+  // themselves, just depended on symbols namespaces.cxx failed to produce. Same root
+  // cause, same fix, as submodule/PicoDstReader_SL23c/Makefile's own -std=c++11 fix --
+  // see that file's header comment. makefile_toggles_RCF.h already #defines _CPP11_
+  // for exactly this purpose, but nothing ever checked it (grepped the whole repo:
+  // zero #ifdef _CPP11_ references) -- hardcoded here instead of wiring up that
+  // #ifdef, since makefile_toggles_RCF.h defines it unconditionally for this build
+  // anyway, so there's no case where it should be left off.
+  gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers -std=c++11",gSystem->pwd()));
 
   // Loads a STARVER-tagged copy (e.g. bin/libStPicoDst_SL23c.so), NOT the generic
   // bin/libStPicoDst.so name a plain `make` produces.
