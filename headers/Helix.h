@@ -55,7 +55,25 @@
 // includes that same SystemOfUnits.h (guarded by its own HEP_SYSTEM_OF_UNITS_H,
 // so it's a no-op if already included) instead of redefining the constants --
 // same numbers, one definition.
-#include "../submodule/PicoDstReader_SL24y/SystemOfUnits.h"
+//
+// Added 2026-09-02: this include was unconditionally hardcoded to PicoDstReader_SL24y
+// regardless of which reader variant the build actually stages -- fine for the local
+// Mac build (which really does use PicoDstReader_SL24y and, per the reasoning above,
+// needs the interpreter-symbol-collision fix this file exists for in the first
+// place), but a real path-not-found for the RCF/embedding build (compile.bash stages
+// PicoDstReader_SL23c only -- this is the exact same bug class already fixed in
+// CutClass.h, see that file's own header comment). `cons` at RCF compiles each .cxx
+// into its own object file with no shared cling/interpreter symbol table, so the
+// ACLiC-session collision this file's inline-vs-include tradeoff was originally about
+// doesn't apply there anyway -- PicoDstReader_SL23c/SystemOfUnits.h is a plain,
+// ordinary include for that build, no special handling needed beyond picking the
+// right directory. Same _PICO_READER_SL23c_ toggle as CutClass.h; local Mac build
+// (which never defines it) is unchanged.
+#ifdef _PICO_READER_SL23c_
+  #include "../submodule/PicoDstReader_SL23c/SystemOfUnits.h"
+#else
+  #include "../submodule/PicoDstReader_SL24y/SystemOfUnits.h"
+#endif
 
 // c_light isn't defined in SystemOfUnits.h's units namespace, but Helix.cxx uses it
 // (setCurvature() and momentum()), so it stays here on its own -- no collision risk
