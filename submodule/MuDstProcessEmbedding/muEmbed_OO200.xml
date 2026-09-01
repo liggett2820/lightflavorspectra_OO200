@@ -18,8 +18,26 @@
       runSchedSubmission_OO200.bash. &motherID; is passed as 0 here (this template is for
       the plain TPC-efficiency embedding, not hybrid feed-down, which needs its own
       mother-ID-bearing request/template -- not ported yet, see compile.bash's header note).
+    - Added 2026-09-02: <shell> line below, matching the one already added to
+      xml/runPicoBinner_OO200_SDCC_template.xml for the same reason (see that file's own
+      header comment) -- SDCC's farm/worker nodes have moved to AlmaLinux 9, but STAR's
+      official software (root4star included) still needs the old SL7 environment, so the
+      job's own <command> now runs inside the SL7-compatible singularity container on
+      whatever worker node picks it up, the same way compile.bash needed it wrapped
+      around `cons` at the terminal. This file had no <shell> line at all before -- worth
+      double-checking after the first job runs that this was actually the missing piece,
+      since it wasn't verified by an actual failed/succeeded submission before adding it.
+    - NOT changed here, flagged instead: &starver; is accepted as an entity (passed by
+      runSchedSubmission_OO200.bash as SL23c) but is never actually referenced anywhere in
+      this file's <command> or elsewhere -- root4star is invoked directly with no `starver
+      &starver;` call first. Unclear whether that's already handled some other way (e.g.
+      via the packaged .sl73_gcc485/ SandBox entry, or a scheduler-level default) or a
+      real gap -- ported as-is from the reference job, not something to silently patch
+      without knowing which.
 -->
 <job maxFilesPerProcess="&filesPerProcess;" fileListSyntax="paths" copyInputLocally="true">
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
 
   <Generator>
     <Location>/star/data03/scratch/liggett2820/tmp/muEmb/</Location>
