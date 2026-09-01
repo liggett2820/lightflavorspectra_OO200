@@ -12,7 +12,18 @@ CFLAGS_WO_C11 = $(shell root-config --cflags) -O2 -fPIC -Wall -W -Woverloaded-vi
 # that forced c++11 back on top of a ROOT install that hard-requires c++17,
 # producing "ROOT requires support for C++17 or higher." Dropped it so root-config
 # decides the standard, matching your actual ROOT install.
-CFLAGS = $(CFLAGS_WO_C11)
+# FIXED 2026-09-01 (RCF/SL23c only -- do NOT copy this back into the SL24y sibling
+# Makefile, whose whole point is letting root-config decide): SDCC's ROOT 5.34.38
+# root-config --cflags supplies NO -std= flag at all (unlike a modern ROOT, which
+# hard-requires e.g. c++17 and supplies it itself -- that's the case the NOTE above
+# is about). Without any -std= flag, GCC 4.8.5 defaults to gnu++98, where `auto` is
+# the old C++98 storage-class keyword instead of C++11 type inference -- breaking
+# StPicoBEmcPidTraits.cxx's `auto getConstrainedShort = [](float x) {...}` lambda
+# with "'auto' changes meaning in C++11" / "does not name a type". Re-added
+# -std=c++11 here specifically, appended after root-config's own (empty-for-this-
+# ROOT) --cflags, so there's nothing for it to override -- confirmed by a clean
+# `make distclean && make` at RCF under `starver SL23c` after this change.
+CFLAGS = $(CFLAGS_WO_C11) -std=c++11
 
 LIBS = $(shell root-config --libs)
 INCS = $(shell root-config --incdir)
