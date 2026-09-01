@@ -50,6 +50,21 @@
     #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
   #endif
 
+  // Added 2026-09-01: this repo's own real reader variant for the RCF/embedding build
+  // (submodule/MuDstProcessEmbedding/compile.bash stages submodule/PicoDstReader_SL23c,
+  // NOT PicoDstReader_SL24y or PicoDstReader_SL23a -- neither of which this repo even
+  // has a submodule/ directory for; see that file's own header comment). Nothing else
+  // in this repo defines/uses _PICO_READER_SL23a_ -- that toggle and its SL24y-pointing
+  // includes above are dead code here, left alone rather than touched by this addition.
+  #ifdef _PICO_READER_SL23c_
+    #include "../submodule/PicoDstReader_SL23c/StPicoEvent.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoTrack.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoBTofHit.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoBTofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoETofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoETofHit.h"
+  #endif
+
   #ifdef _PICO_READER_SL23d_
     #include "../submodule/PicoDstReader_SL23d/StPicoEvent.h"
     #include "../submodule/PicoDstReader_SL23d/StPicoTrack.h"
@@ -108,15 +123,34 @@
 // Since this repo needs real eTOF PID locally, these two includes and the
 // isGoodETof() declaration are pulled out from behind that gate -- gated only on
 // _HAS_ETOF_, matching how PicoBinner.cxx itself gates its ETOF code.
-#ifdef _HAS_ETOF_
-  #include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
-  #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
-#endif
+//
+// Added 2026-09-01: these two includes (plus StPicoEvent.h just below) were
+// unconditionally hardcoded to PicoDstReader_SL24y regardless of which reader variant
+// the build actually stages -- fine for the local Mac build (which really does use
+// PicoDstReader_SL24y), but a real path-not-found risk for the RCF/embedding build,
+// which stages PicoDstReader_SL23c only (see compile.bash) and never has a
+// PicoDstReader_SL24y/ directory to include from. Now switches on _PICO_READER_SL23c_
+// (defined by makefile_toggles_RCF.h) so the RCF build pulls from the directory it
+// actually stages, while the local build (which never defines that toggle) is
+// unchanged -- still SL24y, same as before this fix.
+#ifdef _PICO_READER_SL23c_
+  #ifdef _HAS_ETOF_
+    #include "../submodule/PicoDstReader_SL23c/StPicoETofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL23c/StPicoETofHit.h"
+  #endif
 
-// isGoodEvent(StPicoEvent*) below (declared further down, ungated -- see the
-// comment next to its declaration) needs StPicoEvent's real definition
-// regardless of _MAC_OSX_, same reasoning as the isGoodETof pull-out above.
-#include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+  // isGoodEvent(StPicoEvent*) below (declared further down, ungated -- see the
+  // comment next to its declaration) needs StPicoEvent's real definition
+  // regardless of _MAC_OSX_, same reasoning as the isGoodETof pull-out above.
+  #include "../submodule/PicoDstReader_SL23c/StPicoEvent.h"
+#else
+  #ifdef _HAS_ETOF_
+    #include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
+    #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
+  #endif
+
+  #include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+#endif
 
 #include "TH1D.h"
 
