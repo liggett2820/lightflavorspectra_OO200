@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-  muEmbed_OO200.xml -- lightflavorspectra_OO200/submodule/MuDstProcessEmbedding
+  muEmbed_OO200.xml: lightflavorspectra_OO200/submodule/MuDstProcessEmbedding
 
   Ported from lightflavorspectra_etof/submodule/MuDstProcessEmbedding/muEmbed_Collider.xml
-  (that file is itself energy-agnostic -- it's parameterized by &energy;/&part;/&requestID;/
+  (that file is itself energy-agnostic: it's parameterized by &energy;/&part;/&requestID;/
   &starver; entities filled in by runSchedSubmission_OO200.bash's star-submit-template call).
 
   WHAT CHANGED FROM THE ORIGINAL, AND WHY:
@@ -12,28 +12,36 @@
       Filled in with Andrew's RCF username (liggett2820) 2026-08-06, replacing every
       /star/data03/scratch/.../liggett2820/... and /star/data03/pwg/.../liggett2820/...
       path below. runSchedSubmission_OO200.bash's $OutputDir matches the
-      <output>/<stdout>/<stderr> URLs here -- if you ever change one, change both.
+      <output>/<stdout>/<stderr> URLs here: if you ever change one, change both.
     - Left the &energy;/&part;/&requestID;/&starver;/&filesPerProcess;/&nFiles;/&motherID;
-      entities as-is -- these get filled in per-job by star-submit-template, driven by
+      entities as-is: these get filled in per-job by star-submit-template, driven by
       runSchedSubmission_OO200.bash. &motherID; is passed as 0 here (this template is for
       the plain TPC-efficiency embedding, not hybrid feed-down, which needs its own
-      mother-ID-bearing request/template -- not ported yet, see compile.bash's header note).
+      mother-ID-bearing request/template, not ported yet; see compile.bash's header note).
     - Added 2026-09-02: <shell> line below, matching the one already added to
       xml/runPicoBinner_OO200_SDCC_template.xml for the same reason (see that file's own
-      header comment) -- SDCC's farm/worker nodes have moved to AlmaLinux 9, but STAR's
+      header comment). SDCC's farm/worker nodes have moved to AlmaLinux 9, but STAR's
       official software (root4star included) still needs the old SL7 environment, so the
       job's own <command> now runs inside the SL7-compatible singularity container on
       whatever worker node picks it up, the same way compile.bash needed it wrapped
-      around `cons` at the terminal. This file had no <shell> line at all before -- worth
+      around `cons` at the terminal. This file had no <shell> line at all before; worth
       double-checking after the first job runs that this was actually the missing piece,
       since it wasn't verified by an actual failed/succeeded submission before adding it.
     - NOT changed here, flagged instead: &starver; is accepted as an entity (passed by
       runSchedSubmission_OO200.bash as SL23c) but is never actually referenced anywhere in
-      this file's <command> or elsewhere -- root4star is invoked directly with no `starver
+      this file's <command> or elsewhere: root4star is invoked directly with no `starver
       &starver;` call first. Unclear whether that's already handled some other way (e.g.
       via the packaged .sl73_gcc485/ SandBox entry, or a scheduler-level default) or a
-      real gap -- ported as-is from the reference job, not something to silently patch
+      real gap. Ported as-is from the reference job, not something to silently patch
       without knowing which.
+    - FIXED 2026-09-02: this whole comment block (both the pre-existing text above and
+      the <shell>/&starver; notes just added above it) used a double hyphen as an em
+      dash throughout. XML comments cannot contain that two-character sequence anywhere
+      inside them (only as part of the closing delimiter), and star-submit-template
+      enforces that strictly: the very first submission attempt against this file failed
+      for all six species with a "string not permitted within comments" parse error.
+      Every double-hyphen in this comment (old and new) has been replaced with a colon,
+      semicolon, or plain period instead.
 -->
 <job maxFilesPerProcess="&filesPerProcess;" fileListSyntax="paths" copyInputLocally="true">
 
