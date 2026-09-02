@@ -74,7 +74,27 @@ void makeLibs_SL23c(TString opt=""){
   // zero #ifdef _CPP11_ references) -- hardcoded here instead of wiring up that
   // #ifdef, since makefile_toggles_RCF.h defines it unconditionally for this build
   // anyway, so there's no case where it should be left off.
-  gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers -std=c++11",gSystem->pwd()));
+  // FIXED 2026-09-02: added "-D_PICO_READER_SL23c_" here too, alongside the existing
+  // -std=c++11 fix (same mechanism, same reasoning as that fix's own comment above --
+  // ACLiC's CompileMacro() builds its compile command from whatever's in this
+  // include-path string). headers/CutClass.h and headers/Helix.h were already fixed
+  // (2026-09-01/02) to switch their PicoDstReader includes on #ifdef
+  // _PICO_READER_SL23c_ instead of hardcoding PicoDstReader_SL24y -- but nothing
+  // actually DEFINED _PICO_READER_SL23c_ for THIS build path, so those fixes were
+  // silently inert here; only the embedding submodule (submodule/MuDstProcessEmbedding,
+  // which gets its own separate, copied-in makefile_toggles_RCF.h at build time -- not
+  // this file) ever actually defined it. Real symptom: PicoBinner_cxx.so failing to
+  // link with undefined references to StPicoDstReader/StPicoTrack/StPicoDst::picoArrays/
+  // etc, because source/PicoBinner.cxx's own hardcoded includes (see that file, fixed
+  // the same way alongside this) pulled PicoDstReader_SL24y's declarations while
+  // bin/libStPicoDst_SL23c.so (the library actually gSystem->Load()ed just below) was
+  // built from PicoDstReader_SL23c -- two not-quite-identical copies. Deliberately does
+  // NOT touch _MAC_OSX_ (still defined via makefile_toggles.h for this build, unchanged)
+  // -- the _PICO_READER_SL23c_-conditional blocks that matter here (in CutClass.h/
+  // Helix.h/PicoBinner.cxx) don't check _MAC_OSX_, and leaving it alone avoids waking up
+  // a bunch of other "#ifndef _MAC_OSX_" RCF-only code paths never exercised by this
+  // build script before, which is a bigger, riskier change than this bug needs.
+  gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers -std=c++11 -D_PICO_READER_SL23c_",gSystem->pwd()));
 
   // Loads a STARVER-tagged copy (e.g. bin/libStPicoDst_SL23c.so), NOT the generic
   // bin/libStPicoDst.so name a plain `make` produces.

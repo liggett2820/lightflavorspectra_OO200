@@ -76,21 +76,52 @@
 
 #include "../makefile_toggles.h"
 
-// PicoDst headers -- SL24y only (matches the real production data's STAR library;
-// changed from SL23a on 2026-07-02, see makefile_toggles.h's header comment)
-#include "../submodule/PicoDstReader_SL24y/StPicoDstReader.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoDst.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoTrack.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoBTofHit.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoBTowHit.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoEmcTrigger.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoBTofPidTraits.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoTrackCovMatrix.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoEpdHit.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoBbcHit.h"
-#include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
+// PicoDst headers -- SL24y for the local/Mac build (matches the real production
+// data's STAR library; changed from SL23a on 2026-07-02, see makefile_toggles.h's
+// header comment).
+// FIXED 2026-09-02: this list was unconditionally hardcoded to PicoDstReader_SL24y
+// regardless of which reader variant the build actually stages -- fine for the local
+// Mac build (macros/makeLibs_SL24y.C, which really does use PicoDstReader_SL24y),
+// but wrong for the RCF build (macros/makeLibs_SL23c.C), which loads
+// bin/libStPicoDst_SL23c.so (built from PicoDstReader_SL23c) yet was compiling THIS
+// file against PicoDstReader_SL24y's declarations instead -- two not-quite-identical
+// copies, producing undefined references at link time (StPicoDstReader::..., 
+// StPicoTrack::helix/gDCA, StPicoDst::picoArrays, etc) rather than a compile error.
+// Same root cause, same fix, as headers/CutClass.h's/headers/Helix.h's own
+// 2026-09-01/02 fixes (see those files' header comments) -- applied here too since it
+// was missed there. Switches on _PICO_READER_SL23c_, now defined for the RCF build via
+// -D_PICO_READER_SL23c_ in macros/makeLibs_SL23c.C's ACLiC include-path string (see
+// that file's own comment for the full chain); the local Mac build never defines that
+// macro, so it's unchanged -- still SL24y, same as before this fix.
+#ifdef _PICO_READER_SL23c_
+  #include "../submodule/PicoDstReader_SL23c/StPicoDstReader.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoDst.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoEvent.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoTrack.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoBTofHit.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoBTowHit.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoEmcTrigger.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoBTofPidTraits.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoETofPidTraits.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoTrackCovMatrix.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoEpdHit.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoBbcHit.h"
+  #include "../submodule/PicoDstReader_SL23c/StPicoETofHit.h"
+#else
+  #include "../submodule/PicoDstReader_SL24y/StPicoDstReader.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoDst.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoEvent.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoTrack.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoBTofHit.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoBTowHit.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoEmcTrigger.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoBTofPidTraits.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoETofPidTraits.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoTrackCovMatrix.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoEpdHit.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoBbcHit.h"
+  #include "../submodule/PicoDstReader_SL24y/StPicoETofHit.h"
+#endif
 
 #include "../submodule/ParticleInfo/ParticleInfo/ParticleInfo.h"
 #include "../headers/HistogramUtilities.h"
