@@ -94,7 +94,7 @@ void makeLibs_SL23c(TString opt=""){
   // Helix.h/PicoBinner.cxx) don't check _MAC_OSX_, and leaving it alone avoids waking up
   // a bunch of other "#ifndef _MAC_OSX_" RCF-only code paths never exercised by this
   // build script before, which is a bigger, riskier change than this bug needs.
-  gSystem->SetIncludePath(TString::Format("-I$ROOTSYS/include -I%s/headers -std=c++11 -D_PICO_READER_SL23c_",gSystem->pwd()));
+  gSystem->SetIncludePath(TString::Format("-std=c++11 -D_PICO_READER_SL23c_ -I$ROOTSYS/include -I%s/headers",gSystem->pwd()));
 
   // Loads a STARVER-tagged copy (e.g. bin/libStPicoDst_SL23c.so), NOT the generic
   // bin/libStPicoDst.so name a plain `make` produces.
