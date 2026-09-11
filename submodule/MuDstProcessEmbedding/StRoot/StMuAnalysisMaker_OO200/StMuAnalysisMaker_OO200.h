@@ -1,14 +1,14 @@
 /*!
- * \class  StMuAnalysisMaker
+ * \class  StMuAnalysisMaker_OO200
  * \brief  A typical Analysis Class for MuDst
  * \author Wei-Ming Zhang, KSU, Mar 2004
  *
  * This is an example of a maker to perform analysis using MuDst.
  *
- * $Id: StMuAnalysisMaker.h,v 1.2 2014/08/06 11:43:31 jeromel Exp $
+ * $Id: StMuAnalysisMaker_OO200.h,v 1.2 2014/08/06 11:43:31 jeromel Exp $
  *
  * -------------------------------------------------------------------------
- * $Log: StMuAnalysisMaker.h,v $
+ * $Log: StMuAnalysisMaker_OO200.h,v $
  * Revision 1.2  2014/08/06 11:43:31  jeromel
  * Suffix on literals need to be space (later gcc compiler makes it an error) - first wave of fixes
  *
@@ -62,10 +62,10 @@ using std::string;
 
 //
 //  The class declaration. It innherits from StMaker.
-class StMuAnalysisMaker : public StMaker{
+class StMuAnalysisMaker_OO200 : public StMaker{
 public:
-   StMuAnalysisMaker(const Char_t *name = "muDstEmbeddingAnalysis"); // constructor
-   ~StMuAnalysisMaker();                                 // destructor
+   StMuAnalysisMaker_OO200(const Char_t *name = "muDstEmbeddingAnalysis"); // constructor
+   ~StMuAnalysisMaker_OO200();                                 // destructor
 
    void   Clear(Option_t *option = ""); // called after every event to cleanup
    Int_t  Init();                   // called once at the beginning of your job
@@ -86,7 +86,7 @@ public:
    void setCutClass(CutClass* a_Cuts){ m_cuts = a_Cuts; };
 
    virtual const char *GetCVS() const{
-      static const char cvs[] = "Tag $Name:  $ $Id: StMuAnalysisMaker.h,v 1.2 2014/08/06 11:43:31 jeromel Exp $ built " __DATE__ " " __TIME__ ;
+      static const char cvs[] = "Tag $Name:  $ $Id: StMuAnalysisMaker_OO200.h,v 1.2 2014/08/06 11:43:31 jeromel Exp $ built " __DATE__ " " __TIME__ ;
       return cvs;
    }
 
@@ -141,6 +141,6 @@ private:
 
   #endif
 
-  ClassDef(StMuAnalysisMaker, 0)
+  ClassDef(StMuAnalysisMaker_OO200, 0)
 };
 #endif

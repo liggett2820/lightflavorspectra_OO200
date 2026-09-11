@@ -27,13 +27,62 @@
       around `cons` at the terminal. This file had no <shell> line at all before; worth
       double-checking after the first job runs that this was actually the missing piece,
       since it wasn't verified by an actual failed/succeeded submission before adding it.
-    - NOT changed here, flagged instead: &starver; is accepted as an entity (passed by
-      runSchedSubmission_OO200.bash as SL23c) but is never actually referenced anywhere in
-      this file's <command> or elsewhere: root4star is invoked directly with no `starver
-      &starver;` call first. Unclear whether that's already handled some other way (e.g.
-      via the packaged .sl73_gcc485/ SandBox entry, or a scheduler-level default) or a
-      real gap. Ported as-is from the reference job, not something to silently patch
-      without knowing which.
+    - RESOLVED 2026-09-09: the &starver; gap flagged above was a real bug, confirmed at
+      RCF. Without an explicit `starver &starver;` call, the job's csh session picked up
+      whatever STAR_LEVEL its login shell defaults to (observed to be SL24c on the actual
+      worker node, via the library search path in a job's own dlopen diagnostic), not the
+      SL23c this repo's StMuAnalysisMaker_OO200.so/bin_temp/*.so are compiled against.
+      Fixed by adding `starver &starver;` as the first line of <command>, matching the
+      reference lightflavorspectra_etof/.../muEmbed_Collider.xml this file was ported from
+      (that file already has `starver &starver;` as its first <command> line; this
+      repo's port had silently dropped it). This was a real, independently-confirmed
+      fix (before/after comparison of the job's own library search path showed SL24c
+      paths disappear and SL23c paths appear), but it turned out NOT to be the cause of
+      the setOutputName crash below; that crash persisted identically after this fix
+      too. Keeping this fix regardless; see 2026-09-11 note for the actual cause.
+
+    - RESOLVED 2026-09-11: the real cause of
+      `Error: Can't call StMuAnalysisMaker::setOutputName(a_outputFileName) in current
+      scope` (followed by a segfault) was a NAME COLLISION: this repo's own custom
+      StMuAnalysisMaker Maker class shares its name with a real, generic example Maker
+      that ships as part of STAR's official software distribution
+      (/star/nfs4/AFS/star/packages/SL23c/.sl73_x8664_gcc485/lib/StMuAnalysisMaker.so),
+      which lacks the setOutputName(string) method this repo's version defines. On the
+      worker node, gSystem->Load("StMuAnalysisMaker") was resolving to STAR's official
+      library instead of this repo's own; confirmed via a one-off diagnostic print of
+      the loaded class's GetDeclFileName() and gSystem->GetLibraries() in doMuDst.C,
+      which showed the official SL23c packages path, not this repo's own StRoot path.
+      A SECOND, independent bug made this worse: this repo's own compiled Maker library
+      was never actually being shipped to the worker node in the SandBox zip AT ALL, in
+      any submission, ever; the <SandBox> <File> list below referenced
+      `./.sl73_gcc485`, but `cons` (via compile.bash) actually builds into
+      `.sl73_x8664_gcc485` (note the missing _x8664). SUMS's own packaging step silently
+      warned "The existence of the file or directory './.sl73_gcc485' could not be
+      validated" and skipped it on every single submission, meaning gSystem->Load() on
+      the worker could only ever find STAR's official same-named Maker, never this
+      repo's own, regardless of any renaming. Fixed two ways together: (1) renamed the
+      class, its source directory, AND its source files all to StMuAnalysisMaker_OO200
+      (class name, file basename, and StRoot/ subdirectory name must all three match for
+      `cons`'s Conscript-standard build + gSystem->Load(bare name) to resolve correctly),
+      and (2) corrected the <SandBox> <File> entry below to `./.sl73_x8664_gcc485`, so
+      the compiled Maker library actually reaches the worker node now. Also fixed the
+      downstream hadd/output step: the <command> block's
+      `source /afs/rhic.bnl.gov/star/ROOT/6.20.08/build/bin/thisroot.csh` line pointed at
+      a path that does not exist at this site at all; removed it and pointed `hadd`
+      directly at the one already provided by `starver &starver;`'s own
+      $ROOTSYS/bin (confirmed it supports the `-f6` flag the <command> block wants). Confirmed the
+      full fix end-to-end with a 16-file test job (requestID 20232003, part=pip):
+      DIAG prints showed the class loading from this repo's own StRoot path, the run
+      completed "Finished Event Loop"/"Completed Finish() with total number of events
+      16783" (previously 0), zero StChain errors, and a real non-empty
+      muEmbed_*_f6.root landed in the destination directory with real histograms and an
+      eventTree inside. NOTE FOR FUTURE SUBMISSIONS: star-submit-template caches the
+      SandBox zip (MuDstEmbeddingPackage_pi_K_p_OO200_200.zip) and does NOT always
+      rebuild it fresh; confirmed empirically that two consecutive submissions after
+      fixes above kept failing identically (shipping a stale pre-fix zip) until the zip
+      was manually `rm -f`'d. Always delete that zip before resubmitting whenever
+      doMuDst.C, StRoot/, .sl73_x8664_gcc485/, headers/, submodule/, bin_temp/, or
+      makefile_toggles.h change, even if SUMS does not warn you.
     - FIXED 2026-09-02: this whole comment block (both the pre-existing text above and
       the <shell>/&starver; notes just added above it) used a double hyphen as an em
       dash throughout. XML comments cannot contain that two-character sequence anywhere
@@ -52,9 +101,9 @@
   </Generator>
 
   <command>
+        starver &starver;
         root4star -q -b doMuDst.C\(\"$FILELIST\",\"muEmbed_${JOBID}.root\",\"&part;\",1000000000,&motherID;\)
-        source /afs/rhic.bnl.gov/star/ROOT/6.20.08/build/bin/thisroot.csh
-        /afs/rhic.bnl.gov/star/ROOT/6.20.08/build/bin/hadd -f6 ${SCRATCH}/muEmbed_${JOBID}_f6.root ${SCRATCH}/muEmbed_${JOBID}.root
+        hadd -f6 ${SCRATCH}/muEmbed_${JOBID}_f6.root ${SCRATCH}/muEmbed_${JOBID}.root
         mv ${SCRATCH}/muEmbed_${JOBID}_f6.root /star/data03/pwg/liggett2820/embedding/&part;/&energy;_&requestID;/muEmbed_${JOBID}_f6.root
         rm ${SCRATCH}/muEmbed_${JOBID}_f6.root
         rm ${SCRATCH}/muEmbed_${JOBID}.root
@@ -64,7 +113,7 @@
         <Package name="MuDstEmbeddingPackage_pi_K_p_OO200_&energy;">
               	<File>file:./doMuDst.C</File>
 	 	<File>file:./StRoot</File>
-		<File>file:./.sl73_gcc485</File>
+		<File>file:./.sl73_x8664_gcc485</File>
                 <File>file:./headers</File>
                 <File>file:./submodule</File>
                 <File>file:./bin_temp</File>

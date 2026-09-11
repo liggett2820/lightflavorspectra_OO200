@@ -16,7 +16,7 @@
 #include "StMuDSTMaker/COMMON/StMuDst.h"
 #include "StMuDSTMaker/COMMON/StMuDebug.h"
 #include "StBTofHeader.h"
-#include "StMuAnalysisMaker.h"
+#include "StMuAnalysisMaker_OO200.h"
 
 
 /*     ##########    INFORMATION ON SOME OF THE EMBEDDING DATA STRUCTURES ###############
@@ -48,7 +48,7 @@
 
 
 
-ClassImp(StMuAnalysisMaker)
+ClassImp(StMuAnalysisMaker_OO200)
 
 //__________________________________________________________________________________________________________________________________________________________
 
@@ -101,7 +101,7 @@ double dca_from_decay_helix(double a_magnetic_field, int a_charge_sign, double a
 
 
 
-bool StMuAnalysisMaker::isQualityEmbeddingMatch(StMuTrack* a_track){
+bool StMuAnalysisMaker_OO200::isQualityEmbeddingMatch(StMuTrack* a_track){
     //if(   primaryTrack->type() != 1
     if( a_track->flag() <= 0
        || abs(a_track->charge()) != 1) return false; 
@@ -120,7 +120,7 @@ bool StMuAnalysisMaker::isQualityEmbeddingMatch(StMuTrack* a_track){
 
 
 // Default Constructor
-StMuAnalysisMaker::StMuAnalysisMaker(const Char_t *name) : StMaker(name){
+StMuAnalysisMaker_OO200::StMuAnalysisMaker_OO200(const Char_t *name) : StMaker(name){
    m_EventCounter = 0;
    m_File = 0;
    m_nCentBins = 16;
@@ -131,15 +131,15 @@ StMuAnalysisMaker::StMuAnalysisMaker(const Char_t *name) : StMaker(name){
 //__________________________________________________________________________________________________________________________________________________________
 
 
-StMuAnalysisMaker::~StMuAnalysisMaker(){}; // no destructor
+StMuAnalysisMaker_OO200::~StMuAnalysisMaker_OO200(){}; // no destructor
 
 //__________________________________________________________________________________________________________________________________________________________
 
 
 //  Called once at the beginning of each job to Setup Histograms
-Int_t StMuAnalysisMaker::Init(){
+Int_t StMuAnalysisMaker_OO200::Init(){
   #ifdef _MuEmbDebug_
-    cout << "Call to StMuAnalysisMaker::Init()" << endl;
+    cout << "Call to StMuAnalysisMaker_OO200::Init()" << endl;
   #endif
 
   //Setup TTree
@@ -207,7 +207,7 @@ Int_t StMuAnalysisMaker::Init(){
 
 
 // This funciton is called every event after Make().
-void StMuAnalysisMaker::Clear(Option_t *opt){
+void StMuAnalysisMaker_OO200::Clear(Option_t *opt){
    StMaker::Clear();
 }
 
@@ -219,9 +219,9 @@ void StMuAnalysisMaker::Clear(Option_t *opt){
 
 
 //  Called once after all events have been processed by Make()
-Int_t StMuAnalysisMaker::Finish(){
+Int_t StMuAnalysisMaker_OO200::Finish(){
   #ifdef _MuEmbDebug_
-    cout << "StMuAnalysisMaker::Finish()\n";
+    cout << "StMuAnalysisMaker_OO200::Finish()\n";
     cout << "\tProcessed " << m_EventCounter << " events." << endl;
     cout <<  "\tOutput File Name :" << m_FileName.c_str() << endl;
   #endif
@@ -275,9 +275,9 @@ Int_t StMuAnalysisMaker::Finish(){
 //__________________________________________________________________________________________________________________________________________________________
 
 //  This method is called every event.
-Int_t StMuAnalysisMaker::Make(){
+Int_t StMuAnalysisMaker_OO200::Make(){
   #ifdef _MuEmbDebug_
-    cout << "\n#####################################################################\nCall to StMuAnalysisMaker::Make() with Event Index " << m_EventCounter << endl;
+    cout << "\n#####################################################################\nCall to StMuAnalysisMaker_OO200::Make() with Event Index " << m_EventCounter << endl;
   #endif
   m_EventCounter++;  // increase the event counter
   m_numMakeCalls++;
@@ -1067,7 +1067,7 @@ Int_t StMuAnalysisMaker::Make(){
 
 
 #ifdef _FEEDDOWN_EMBEDDING_TOGGLE_
-bool StMuAnalysisMaker::isValidFeedDownID(int a_geantId){
+bool StMuAnalysisMaker_OO200::isValidFeedDownID(int a_geantId){
   return (a_geantId == 8 
        || a_geantId == 9 
        || a_geantId == 11 
@@ -1076,7 +1076,7 @@ bool StMuAnalysisMaker::isValidFeedDownID(int a_geantId){
        || a_geantId == 15);
 }
 
-bool StMuAnalysisMaker::isValidDecayChain(vector<int> a_decay_chain){
+bool StMuAnalysisMaker_OO200::isValidDecayChain(vector<int> a_decay_chain){
   //cout << "DECAY CHAIN: ";
   //for(int iii = 0; iii < a_decay_chain.size(); iii++){
   //  cout << "  " << a_decay_chain[iii];
@@ -1146,7 +1146,7 @@ bool StMuAnalysisMaker::isValidDecayChain(vector<int> a_decay_chain){
 
 #else
 
-bool StMuAnalysisMaker::isParticleOfInterest(int a_geantID){
+bool StMuAnalysisMaker_OO200::isParticleOfInterest(int a_geantID){
   int partIndex = -1;
   int charge = 0;
   if     (a_geantID == 8 ) {partIndex = 0; charge =  1;} // pion
@@ -1166,7 +1166,7 @@ bool StMuAnalysisMaker::isParticleOfInterest(int a_geantID){
 }
 
 
-void StMuAnalysisMaker::setPart(string partCStr){
+void StMuAnalysisMaker_OO200::setPart(string partCStr){
   TString partStr = Form("%s",partCStr.c_str());
   if( partStr.EqualTo("pip",TString::kIgnoreCase) ){
     m_partIndex = 0;

@@ -39,7 +39,7 @@ void doMuDst(const Char_t *  a_inputFileList, const Char_t* a_outputFileName, Ch
   gSystem->Load("./bin_temp/MattMcFDTrack_cxx.so");
 
   gROOT->Macro("loadMuDst.C");
-  gSystem->Load("StMuAnalysisMaker");
+  gSystem->Load("StMuAnalysisMaker_OO200");
   
   CutClass *cuts = new CutClass();
   SetCutClass(cuts);
@@ -55,7 +55,7 @@ void doMuDst(const Char_t *  a_inputFileList, const Char_t* a_outputFileName, Ch
   // MuDstMaker->SetStatus("StMuMc*", 1); 
   // MuDstMaker->SetStatus("BTof*", 1);
    
-  StMuAnalysisMaker* anaMaker = new StMuAnalysisMaker();
+  StMuAnalysisMaker_OO200* anaMaker = new StMuAnalysisMaker_OO200();
   anaMaker->setOutputName(a_outputFileName);
   cout << " SetOutputName : " << a_outputFileName << endl;
   anaMaker->setCutClass(cuts);
@@ -70,7 +70,7 @@ void doMuDst(const Char_t *  a_inputFileList, const Char_t* a_outputFileName, Ch
   //You can give an integer argument and it will multiply the number of bins by that number (default of 1)
   //anaMaker->setMtM0(1); // will only work if using CutClass MtM0 edges
   #endif
-  cout << "Finished with StMuAnalysisMaker initialization" << endl;
+  cout << "Finished with StMuAnalysisMaker_OO200 initialization" << endl;
 
   int init_status = chain->Init();
   if(init_status) cout << "ERROR: Chain->Init() returned bad status" << endl;
