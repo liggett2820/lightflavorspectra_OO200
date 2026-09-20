@@ -4492,6 +4492,17 @@ double EfficiencyFitter::getChiSquared_DCA(const double* a_params){
   }
   return chiSqr;
 }
+//_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+// STUB: declared in headers/EfficiencyFitter.h but never implemented, and not called
+// anywhere in this file (fitProtonKnockout uses getChiSquared_DCA above via
+// ROOT::Math::Functor instead) -- only needed so ACLiC's CINT dictionary generation for
+// this whole class links. Added to unblock building EfficiencyFitter_cxx.so; not used by
+// any current code path, so it has no effect on loadEmbeddingFiles/fitEfficiency/
+// fitEnergyLoss. If proton DCA fitting ever actually calls this, it needs a real
+// implementation first.
+double EfficiencyFitter::protonDCAOperator(double* a_x, double* a_params){
+  return 0.0;
+}
 
 
 
