@@ -1308,15 +1308,13 @@ void EfficiencyFitter::loadEmbeddingFiles(string a_inFileName, string a_inFileNa
       energyLossAllCent->GetXaxis()->SetRange(rapBin,rapBin);
       //TH2D* proj2DTemp = (TH2D*) energyLossAllCent->Project3D("zy");
       TH2D* proj2DTemp = pT2DProjections[rapBin - 1];
-      for(int mTm0Bin = 1; mTm0Bin <= energyLossAllCent->GetNbinsY(); mTm0Bin++){
-        m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex] = proj2DTemp->ProfileX(Form("energyLossProfile_%s_yIndex%02d",m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),rapIndex),mTm0Bin,mTm0Bin);
-        if(m_pTLossMode){
-          m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex]->SetTitle(Form("Energy Loss %s Centrality Integrated y=[%1.2f,%1.2f]; p_{T} (GeV/c); p_{T}^{Emb}-p_{T}^{Reco} (GeV/c)",
-                 m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin+1)));
-        }else{
-          m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex]->SetTitle(Form("Energy Loss %s Centrality Integrated y=[%1.2f,%1.2f]; m_{T} (GeV/c^{2}); m_{T}^{Emb}-m_{T}^{Reco} (GeV/c^{2})",
-                 m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin+1)));
-        }
+      m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex] = proj2DTemp->ProfileX(Form("energyLossProfile_%s_yIndex%02d",m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),rapIndex));
+      if(m_pTLossMode){
+        m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex]->SetTitle(Form("Energy Loss %s Centrality Integrated y=[%1.2f,%1.2f]; p_{T} (GeV/c); p_{T}^{Emb}-p_{T}^{Reco} (GeV/c)",
+               m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin+1)));
+      }else{
+        m_EnergyLossProfile_AllCent[a_partIndex][rapIndex][pmIndex]->SetTitle(Form("Energy Loss %s Centrality Integrated y=[%1.2f,%1.2f]; m_{T} (GeV/c^{2}); m_{T}^{Emb}-m_{T}^{Reco} (GeV/c^{2})",
+               m_partInfo->GetParticleName(a_partIndex,a_charge).Data(),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin),energyLossAllCent->GetXaxis()->GetBinLowEdge(rapBin+1)));
       }
 
     }else{
