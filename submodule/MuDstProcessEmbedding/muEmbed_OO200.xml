@@ -92,6 +92,7 @@
       Every double-hyphen in this comment (old and new) has been replaced with a colon,
       semicolon, or plain period instead.
 -->
+
 <job maxFilesPerProcess="&filesPerProcess;" fileListSyntax="paths" copyInputLocally="true">
 
   <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>

@@ -92,6 +92,7 @@ EmbeddingBinner::EmbeddingBinner(string a_particleName, CutClass* a_cuts){
   }
   m_emb_weights_y_mTm0_DCA = nullptr;
   m_data_weights_y_mTm0_DCA = nullptr; // this is read-in
+  m_dca_eff_y_mTm0_data = nullptr;
 
 }
 
@@ -534,7 +535,14 @@ void EmbeddingBinner::fillHistograms(){
 
   int numEvents = m_tree->GetEntries();
   for(int eventIndex = 0; eventIndex < numEvents; eventIndex++){
-    m_tree->GetEntry(eventIndex);
+    int nb = m_tree->GetEntry(eventIndex);
+    if(nb <= 0){
+      cout << "WARNING: GetEntry(" << eventIndex << ") returned " << nb << " -- skipping likely-corrupt entry" << std::flush << endl;
+      continue;
+    }
+    if(eventIndex % 500000 == 0){
+      ProcInfo_t procInfo; gSystem->GetProcInfo(&procInfo);
+    }
     if(!m_event){
       cerr << "ERROR: No MattEvent!    Ptr: " << m_event << endl;
       continue;
@@ -592,6 +600,7 @@ void EmbeddingBinner::fillHistograms(){
 
       if(!m_track){
         cout << "ERROR: Track not found! Index: " << trackIndex << endl;
+        continue;
       }
 
       double mTm0_emb = m_track->mTm0_emb(m_mass);
@@ -740,6 +749,7 @@ void EmbeddingBinner::fillWeightedHistograms(){
 
       if(!m_track){
         cout << "ERROR: Track not found! Index: " << trackIndex << endl;
+        continue;
       }
 
       //bool passedTrackCuts = m_track->wasReconstructed() && m_cuts->isGoodTrack(true,m_track->nHitsFit(), m_track->nHitsFit()/m_track->nHitsRatio(), m_track->nHitsDeDx(),m_track->gDCA(), m_track->phi());
@@ -809,7 +819,7 @@ void EmbeddingBinner::write(string a_outFileName){
   }  
   m_embTrackHisto_byRefMult->Write();
   m_matchTrackHisto_byRefMult->Write();
-  m_dca_eff_y_mTm0_data->Write();
+  HistogramUtilities::ConditionalWrite(m_dca_eff_y_mTm0_data);
   for(int centIndex = 0; centIndex < m_nCentBins; centIndex++){
     HistogramUtilities::ConditionalWrite(m_unweighted_eff_y_mTm0[centIndex]);
     HistogramUtilities::ConditionalWrite(m_weighted_eff_y_mTm0[centIndex]);

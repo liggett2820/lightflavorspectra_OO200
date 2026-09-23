@@ -40,29 +40,70 @@
 
 #include "../makefile_toggles.h"
 #include "../headers/EmbeddingBinner.h"
-#include "../macros/SetCutClass.C"
+void SetCutClass(CutClass* a_cuts); // impl loaded via LoadEmbeddingBinnerLibs.C
 
 void RunEmbeddingBinner(string a_mattDstAnalysisFile = ""){
 
   // TODO: fill in your actual hadd'd StMuAnalysisMaker output files, one entry per
   // RequestID, for each species/charge you've processed at RCF so far. Species/charge
   // with an empty vector are skipped entirely below.
-  vector<string> inputFiles_pip  = { /* "muEmbed_200_pip_REPLACE_WITH_REQUESTID_f6.root", */ };
-  vector<string> inputFiles_pim  = { /* "muEmbed_200_pim_REPLACE_WITH_REQUESTID_f6.root", */ };
-  vector<string> inputFiles_Kp   = { /* "muEmbed_200_Kp_REPLACE_WITH_REQUESTID_f6.root", */ };
-  vector<string> inputFiles_Km   = { /* "muEmbed_200_Km_REPLACE_WITH_REQUESTID_f6.root", */ };
-  vector<string> inputFiles_pro  = { /* "muEmbed_200_pro_REPLACE_WITH_REQUESTID_f6.root", */ };
-  vector<string> inputFiles_pbar = { /* "muEmbed_200_pbar_REPLACE_WITH_REQUESTID_f6.root", */ };
+  vector<string> inputFiles_pip;
+  inputFiles_pip.push_back("/star/data03/pwg/liggett2820/embedding/pip/200_20232003/muEmbed_pip_200_20232003_merged.root");
+  vector<string> inputFiles_pim;
+  inputFiles_pim.push_back("/star/data03/pwg/liggett2820/embedding/pim/200_20232003/muEmbed_pim_200_20232003_merged.root");
+  vector<string> inputFiles_Kp;
+  inputFiles_Kp.push_back("/star/data03/pwg/liggett2820/embedding/Kp/200_20232003/muEmbed_Kp_200_20232003_merged.root");
+  vector<string> inputFiles_Km;
+  inputFiles_Km.push_back("/star/data03/pwg/liggett2820/embedding/Km/200_20232003/muEmbed_Km_200_20232003_merged.root");
+  vector<string> inputFiles_pro;
+  inputFiles_pro.push_back("/star/data03/pwg/liggett2820/embedding/pro/200_20232003/muEmbed_pro_200_20232003_merged.root");
+  vector<string> inputFiles_pbar;
+  inputFiles_pbar.push_back("/star/data03/pwg/liggett2820/embedding/pbar/200_20232003/muEmbed_pbar_200_20232003_merged.root");
 
-  string outDir = "./"; // TODO: point this at wherever you want the reprocessed output written
+  string outDir = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed";
 
-  vector<string> partNames  = {"pip","pim","Kp","Km","pro","pbar"};
-  vector< vector<string> > inputFilesBySpecies = {
-    inputFiles_pip, inputFiles_pim, inputFiles_Kp, inputFiles_Km, inputFiles_pro, inputFiles_pbar
-  };
+  vector<string> partNames;
+    partNames.push_back("pip");
+    partNames.push_back("pim");
+    partNames.push_back("Kp");
+    partNames.push_back("Km");
+    partNames.push_back("pro");
+    partNames.push_back("pbar");
+  vector< vector<string> > inputFilesBySpecies;
+    inputFilesBySpecies.push_back(inputFiles_pip);
+    inputFilesBySpecies.push_back(inputFiles_pim);
+    inputFilesBySpecies.push_back(inputFiles_Kp);
+    inputFilesBySpecies.push_back(inputFiles_Km);
+    inputFilesBySpecies.push_back(inputFiles_pro);
+    inputFilesBySpecies.push_back(inputFiles_pbar);
 
   CutClass* cuts = new CutClass();
   SetCutClass(cuts);
+  const char* envSpeciesC = gSystem->Getenv("EMBED_SPECIES");
+  const char* envInputFileC = gSystem->Getenv("EMBED_INPUTFILE");
+  string envSpecies = (envSpeciesC != 0) ? envSpeciesC : "";
+  string envInputFile = (envInputFileC != 0) ? envInputFileC : "";
+  if(envSpecies != "" && envInputFile != ""){
+    string outPartialDir = outDir + "/partials";
+    string base = envInputFile.substr(envInputFile.find_last_of("/") + 1);
+    size_t dotPos = base.find_last_of(".");
+    if(dotPos != string::npos) base = base.substr(0, dotPos);
+    string outputFileName = Form("%s/embed_OO200_%s_%s_partial.root", outPartialDir.c_str(), envSpecies.c_str(), base.c_str());
+    cout << "-------------------------------   PROCESSING (per-file) " << envSpecies << "    ------------------------------------" << endl;
+    EmbeddingBinner* obj = new EmbeddingBinner(envSpecies, cuts);
+    obj->makeHistograms();
+    cout << "  Loading: " << envInputFile << endl;
+    obj->loadEmbeddingOutput(envInputFile);
+    if(a_mattDstAnalysisFile != "") obj->loadDataWeightHistograms(a_mattDstAnalysisFile, 3);
+    obj->fillHistograms();
+    obj->fillWeightedHistograms();
+    obj->closeInputFile();
+    obj->write(outputFileName);
+    cout << "  Wrote: " << outputFileName << endl;
+    delete obj;
+    cout << "-------------  End of RunEmbeddingBinner (per-file)  -------------" << endl;
+    return;
+  }
 
   for(unsigned int specIndex = 0; specIndex < partNames.size(); specIndex++){
     if(inputFilesBySpecies[specIndex].empty()){
@@ -78,8 +119,8 @@ void RunEmbeddingBinner(string a_mattDstAnalysisFile = ""){
       cout << "  Loading: " << inputFilesBySpecies[specIndex][fileIndex] << endl;
       obj->loadEmbeddingOutput(inputFilesBySpecies[specIndex][fileIndex]);
       if(a_mattDstAnalysisFile != "") obj->loadDataWeightHistograms(a_mattDstAnalysisFile, 3);
-      obj->fillWeightedHistograms();
       obj->fillHistograms();
+      obj->fillWeightedHistograms();
       obj->closeInputFile();
     }
     obj->write(outputFileName);

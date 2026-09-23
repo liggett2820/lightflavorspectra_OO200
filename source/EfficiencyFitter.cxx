@@ -9743,10 +9743,7 @@ void EfficiencyFitter::fitEnergyLoss(int a_partIndex, int a_charge, int a_centIn
     }
 
     #ifdef _EFFICIENCY_FITTER_DEBUG_
-      cout << "Fitting energy loss graph ptr: " << mTm0LossGraph << endl;
-      cout << "   Name: " << mTm0LossGraph->GetName() << endl;
-      cout << "   Title: " << mTm0LossGraph->GetTitle() << endl;
-      mTm0LossGraph->Print();
+    if(!m_useEnergyLossTProfiles && mTm0LossGraph){ cout << "Fitting energy loss graph ptr: " << mTm0LossGraph << endl; cout << "   Name: " << mTm0LossGraph->GetName() << endl; cout << "   Title: " << mTm0LossGraph->GetTitle() << endl; mTm0LossGraph->Print(); }else if(mTm0LossHisto){ cout << "Fitting energy loss histo ptr: " << mTm0LossHisto << endl; HistogramUtilities::printHistoInfo(mTm0LossHisto); }
     #endif
 
     if(a_lowRangeExcludeRegionPt.size() > 0 || a_lowRangeExcludeRegionEta.size() > 0){

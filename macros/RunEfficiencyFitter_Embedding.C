@@ -38,12 +38,12 @@ void RunEfficiencyFitter_Embedding(string a_outFileName = "efficiency_OO200_Embe
   // (RunEmbeddingBinner.C's output, e.g. "embed_OO200_pip_Reprocessed.root"). Leave a
   // species/charge as "" to skip it -- loadEmbeddingFiles/fitEfficiency/fitEnergyLoss are
   // only called below if the corresponding path is non-empty.
-  string embFile_pip  = "";
-  string embFile_pim  = "";
-  string embFile_Kp   = "";
-  string embFile_Km   = "";
-  string embFile_pro  = "";
-  string embFile_pbar = "";
+  string embFile_pip  = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_pip_Reprocessed.root";
+  string embFile_pim  = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_pim_Reprocessed.root";
+  string embFile_Kp   = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_Kp_Reprocessed.root";
+  string embFile_Km   = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_Km_Reprocessed.root";
+  string embFile_pro  = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_pro_Reprocessed.root";
+  string embFile_pbar = "/star/u/liggett2820/lightflavorspectra_OO200/embedding_reprocessed/embed_OO200_pbar_Reprocessed.root";
 
   int nCentBins = 6; // matches SetCutClass.C / RunRawSpectraModifier.C / RunEfficiencyFitter.C
   bool convert16to9CentBins = false;
@@ -63,42 +63,43 @@ void RunEfficiencyFitter_Embedding(string a_outFileName = "efficiency_OO200_Embe
   const int PION   = 0;
   const int KAON   = 1;
   const int PROTON = 2;
+vector<int>    job_partIndex;
+vector<int>    job_charge;
+vector<string> job_file;
+vector<string> job_label;
+job_partIndex.push_back(PION);   job_charge.push_back(1);  job_file.push_back(embFile_pip);  job_label.push_back("pi+");
+job_partIndex.push_back(PION);   job_charge.push_back(-1); job_file.push_back(embFile_pim);  job_label.push_back("pi-");
+job_partIndex.push_back(KAON);   job_charge.push_back(1);  job_file.push_back(embFile_Kp);   job_label.push_back("K+");
+job_partIndex.push_back(KAON);   job_charge.push_back(-1); job_file.push_back(embFile_Km);   job_label.push_back("K-");
+job_partIndex.push_back(PROTON); job_charge.push_back(1);  job_file.push_back(embFile_pro);  job_label.push_back("proton");
+job_partIndex.push_back(PROTON); job_charge.push_back(-1); job_file.push_back(embFile_pbar); job_label.push_back("antiproton");
 
-  struct SpeciesJob{ int partIndex; int charge; string file; const char* label; };
-  vector<SpeciesJob> jobs = {
-    {PION,   1, embFile_pip,  "pi+"},
-    {PION,  -1, embFile_pim,  "pi-"},
-    {KAON,   1, embFile_Kp,   "K+"},
-    {KAON,  -1, embFile_Km,   "K-"},
-    {PROTON, 1, embFile_pro,  "proton"},
-    {PROTON,-1, embFile_pbar, "antiproton"},
-  };
 
   //##################   LOAD EMBEDDING + FIT TPC EFFICIENCY + ENERGY LOSS   ##################
-  for(unsigned int jobIndex = 0; jobIndex < jobs.size(); jobIndex++){
-    if(jobs[jobIndex].file == ""){
-      cout << "Skipping " << jobs[jobIndex].label << " -- no embedding file given yet (see TODO above)." << endl;
+  for(unsigned int jobIndex = 0; jobIndex < job_partIndex.size(); jobIndex++){
+    if(job_file[jobIndex] == ""){
+      cout << "Skipping " << job_label[jobIndex] << " -- no embedding file given yet (see TODO above)." << endl;
       continue;
     }
-    cout << "\nLoading embedding for " << jobs[jobIndex].label << "..." << endl;
+    cout << "\nLoading embedding for " << job_label[jobIndex] << "..." << endl;
     // a_inFileNameTwo="" -- RunEmbeddingBinner.C already combines every RequestID for this
     // species/charge into one file, so there's nothing left to add a second file for here.
-    fitter->loadEmbeddingFiles(jobs[jobIndex].file, "", jobs[jobIndex].partIndex, jobs[jobIndex].charge,
+    fitter->loadEmbeddingFiles(job_file[jobIndex], "", job_partIndex[jobIndex], job_charge[jobIndex],
                                 mtm0Rebin, convert16to9CentBins);
 
-    cout << "Fitting AllCent TPC efficiency for " << jobs[jobIndex].label << "..." << endl;
+    cout << "Fitting AllCent TPC efficiency for " << job_label[jobIndex] << "..." << endl;
     // fitEfficiency(partIndex, charge, centIndex, doTPCEff, doDataDrivenBTOF, doLegendreResiduleFits)
     // doTPCEff=true, doDataDrivenBTOF=false -- this is the embedding-data path, not the
     // BTOF-only data-driven path RunEfficiencyFitter.C uses.
-    fitter->fitEfficiency(jobs[jobIndex].partIndex, jobs[jobIndex].charge, -1, true, false, false);
+    fitter->fitEfficiency(job_partIndex[jobIndex], job_charge[jobIndex], -1, true, false, false);
     // RawSpectraModifier has no "AllCent" fallback for TPC efficiency either (same issue
     // RunEfficiencyFitter.C's header comment flags for BTOF) -- copy the AllCent fit into
     // every Cent%02d slot so loadAndApplyTPCEffAndEnergyLossAndBTOFEffFile() finds what it
     // expects.
-    fitter->copyAllCentTPCFitsToSpecCent(jobs[jobIndex].partIndex, jobs[jobIndex].charge);
+    fitter->copyAllCentTPCFitsToSpecCent(job_partIndex[jobIndex], job_charge[jobIndex]);
 
-    cout << "Fitting AllCent energy loss for " << jobs[jobIndex].label << "..." << endl;
-    fitter->fitEnergyLoss(jobs[jobIndex].partIndex, jobs[jobIndex].charge, -1);
+    cout << "Fitting AllCent energy loss for " << job_label[jobIndex] << "..." << endl;
+    fitter->fitEnergyLoss(job_partIndex[jobIndex], job_charge[jobIndex], -1);
     // NOTE: fitEnergyLoss's AllCent-vs-Cent%02d naming wasn't traced as deeply as TPC
     // efficiency's here -- if RawSpectraModifier warns it can't find a Cent%02d-named
     // energy-loss object when you run RunRawSpectraModifier.C, check EfficiencyFitter.cxx's
