@@ -9722,6 +9722,7 @@ void EfficiencyFitter::fitEnergyLoss(int a_partIndex, int a_charge, int a_centIn
       else            mTm0LossProfile = m_EnergyLossProfile_ByCent[a_partIndex][a_centIndex][yIndex][pmIndex];
       mTm0LossHisto = dynamic_cast<TH1D*>(mTm0LossProfile);
       if(!mTm0LossProfile || HistogramUtilities::numBinsWithContentAboveThreshold(mTm0LossHisto,-1) < 5) continue;
+      mTm0LossGraph = HistogramUtilities::makeGraphAsymm(mTm0LossHisto);
       #ifdef _EFFICIENCY_FITTER_DEBUG_
         HistogramUtilities::printHistoInfo(mTm0LossHisto);
       #endif
