@@ -10086,7 +10086,25 @@ void EfficiencyFitter::fitEnergyLoss(int a_partIndex, int a_charge, int a_centIn
       TMatrixDSym* legendreCovMatRes = (TMatrixDSym*) matrixTemp.Clone();
 
       TF1* functOrig = mTm0GraphResidulals->GetFunction("legendreFunctMtM0LossRes");
-      fitFunctionRes = (TF1*) functOrig->Clone();
+      // FIXED 2026-09-23: functOrig->Clone() segfaulted whenever the Legendre fit just
+      // above failed (functOrig NULL) -- which it always does under ROOT 5's CINT
+      // TFormula parser, since PhysMath::getLegendreExpansion() builds a formula string
+      // that calls PhysMath::legendre(...) as a bare namespaced C++ function, the same
+      // class of "Bad numerical expression"/"has 0 parameters instead of 1" failure as
+      // the cosmetic *Parab TF1 warnings at startup -- except nothing downstream
+      // dereferenced those without a null check, and this did. Everything below that
+      // uses fitFunctionRes (the combinedFunct construction) is already wrapped in
+      // `if(fitFunctionRes){...}`, so degrading to NULL here just skips the Legendre
+      // residual correction for this bin/species instead of crashing the whole run --
+      // same defensive pattern already used above for fitFunction_PowerLawPt.
+      if(functOrig){
+        fitFunctionRes = (TF1*) functOrig->Clone();
+      }else{
+        cout << "WARNING: Legendre residual fit for " << m_partInfo->GetParticleName(a_partIndex,a_charge).Data()
+             << "  Cent: " << a_centIndex << "  yIndex:" << yIndex
+             << " did not produce a valid function (TFormula couldn't compile PhysMath::legendre() under this ROOT version) -- skipping the Legendre correction for this rapidity, keeping the power-law fit alone." << endl;
+        fitFunctionRes = NULL;
+      }
       cout << " more issues? ptr: " << fitFunctionRes << endl;
       TCanvas* fittingCanvas = new TCanvas("fittingCanvas_EnergyLoss","Fitting Canvas",1300,900);
       fittingCanvas->cd();
