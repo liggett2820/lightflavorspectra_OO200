@@ -144,4 +144,21 @@ void makeLibs_SL23c(TString opt=""){
   gSystem->CompileMacro("source/Helix.cxx","gk");
 
   gSystem->CompileMacro("macros/SetCutClass.C","gk");
+
+  // ADDED 2026-09-23: EfficiencyFitter dependencies. This build macro previously only
+  // covered the RCF-side StMuAnalysisMaker/PicoBinner build stage and never compiled
+  // EfficiencyFitter.cxx, so macros/RunEfficiencyFitter_Embedding.C had no way to pick
+  // up EfficiencyFitter.cxx changes when run interactively under `starver SL23c` --
+  // macros/makeLibs_SL24y.C was the only script that built it. Safe to add here:
+  // EfficiencyFitter.cxx/SplineFitter.cxx/GraphFitter.cxx (and their headers) have zero
+  // StPicoDst/PicoDstReader dependency -- confirmed by grepping all three .h/.cxx files
+  // -- so none of this build's -D_PICO_READER_SL23c_ / libStPicoDst_SL23c.so machinery
+  // applies to them. Their only real dependencies (PhysMath.h/HistogramUtilities.h/
+  // PhysMathHistogramUtilities.h via namespaces.cxx, ParticleInfo.h) are already
+  // compiled above. Order matches macros/makeLibs_SL24y.C: SplineFitter.cxx and
+  // GraphFitter.cxx before EfficiencyFitter.cxx, since headers/EfficiencyFitter.h
+  // includes both headers/SplineFitter.h and headers/GraphFitter.h.
+  gSystem->CompileMacro("source/SplineFitter.cxx","gk");
+  gSystem->CompileMacro("source/GraphFitter.cxx","gk");
+  gSystem->CompileMacro("source/EfficiencyFitter.cxx","gk");
 }
