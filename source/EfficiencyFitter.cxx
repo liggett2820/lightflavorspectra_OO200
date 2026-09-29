@@ -7186,14 +7186,15 @@ void EfficiencyFitter::fitEfficiency(int a_partIndex, int a_charge, int a_centIn
         fitOptions = fitOptions + " Q";
       #endif
       TFitResult*  result_ptr;
+      TFitResultPtr sysFitResultOwner; // must outlive this block: ROOT 5 deletes the TFitResult when its TFitResultPtr is destroyed
       if(doInitialFitWithHistogram){
         fitOptions += "I";
-        TFitResultPtr resultPtr = effHisto->Fit(sysFunct,fitOptions.c_str(),"",lowFitRange,highFitRange);
-        result_ptr = resultPtr.Get();
+        sysFitResultOwner = effHisto->Fit(sysFunct,fitOptions.c_str(),"",lowFitRange,highFitRange);
+        result_ptr = sysFitResultOwner.Get();
         fitFunctSys = effHisto->GetFunction("sysFunct");
       }else{
-        TFitResultPtr resultPtr = effGraph->Fit(sysFunct,fitOptions.c_str(),"",lowFitRange,highFitRange);
-        result_ptr = resultPtr.Get();
+        sysFitResultOwner = effGraph->Fit(sysFunct,fitOptions.c_str(),"",lowFitRange,highFitRange);
+        result_ptr = sysFitResultOwner.Get();
         fitFunctSys = effGraph->GetFunction("sysFunct");
       }
       if(!result_ptr){
@@ -7231,9 +7232,9 @@ void EfficiencyFitter::fitEfficiency(int a_partIndex, int a_charge, int a_centIn
         for(int iii = 0; iii < m_spline_numKnots; iii++){
           fitFunctSysTwo->FixParameter(iii,fitFunctSys->GetParameter(iii));
         }
-        TFitResultPtr resultPtrSecond = effGraph->Fit(fitFunctSysTwo,fitOptions.c_str(),"",lowFitRange,highFitRange);
+        sysFitResultOwner = effGraph->Fit(fitFunctSysTwo,fitOptions.c_str(),"",lowFitRange,highFitRange);
         fitFunctSys = effGraph->GetFunction("sysFunctTwo");
-        result_ptr  = resultPtrSecond.Get();
+        result_ptr  = sysFitResultOwner.Get();
         status      = result_ptr->Status();
         #ifdef _EFFICIENCY_FITTER_DEBUG_
           cout << "---- Second Fit Status: " << status << endl;
@@ -8409,8 +8410,8 @@ void EfficiencyFitter::fitHybridFeedDown(int a_partIndex,int a_charge, int a_cen
         cout << "WARNING: TEMPERATURE SEED IS NEGATIVE" << endl;
         fitFunct->SetParLimits(1,-50.0*temp,0.001);
       }
-      TFitResultPtr fitPtr2 = feedDownGraph->Fit(fitFunct,fitOptions.c_str(),"",lowFitRange[a_partIndex][pmIndex],maxFitRange);
-      fitResult = fitPtr2.Get();
+      fitPtr = feedDownGraph->Fit(fitFunct,fitOptions.c_str(),"",lowFitRange[a_partIndex][pmIndex],maxFitRange); // must outlive this block: ROOT 5 deletes the TFitResult when its TFitResultPtr is destroyed
+      fitResult = fitPtr.Get();
     }
 
 
@@ -8431,8 +8432,8 @@ void EfficiencyFitter::fitHybridFeedDown(int a_partIndex,int a_charge, int a_cen
         cout << "ERROR: FIT WAS REALLY BAD... Doing Refit with fit options: " << fitOptions << endl;
           HistogramUtilities::printHistoInfo(feedDownHisto);
       #endif
-      TFitResultPtr fitPtr2 = feedDownGraph->Fit(fitFunct,fitOptions.c_str(),"",lowFitRange[a_partIndex][pmIndex],highEdge);
-      fitResult = fitPtr2.Get();
+      fitPtr = feedDownGraph->Fit(fitFunct,fitOptions.c_str(),"",lowFitRange[a_partIndex][pmIndex],highEdge); // must outlive this block: ROOT 5 deletes the TFitResult when its TFitResultPtr is destroyed
+      fitResult = fitPtr.Get();
     }
     if(!fitResult){
       cout << "ERROR: Fit Failed... " << endl;
@@ -9933,16 +9934,17 @@ void EfficiencyFitter::fitEnergyLoss(int a_partIndex, int a_charge, int a_centIn
     TF1*            fitFunction_PowerLawPt = NULL;
     TMatrixDSym*    covMat           = NULL;
     TGraphErrors*   conf_graph       = NULL;
+    TFitResultPtr   energyLossFitResultOwner; // must outlive this block: ROOT 5 deletes the TFitResult when its TFitResultPtr is destroyed
     if(m_useEnergyLossTProfiles){
-      TFitResultPtr resultPtrPtr = mTm0LossHisto->Fit(powerLawPt, fitOptions.c_str(),"",0.0,highFitRange);
-      resultPtr = resultPtrPtr.Get();
+      energyLossFitResultOwner = mTm0LossHisto->Fit(powerLawPt, fitOptions.c_str(),"",0.0,highFitRange);
+      resultPtr = energyLossFitResultOwner.Get();
       if(resultPtr){
         fitFunction_PowerLawPt = mTm0LossHisto->GetFunction("powerLawPt");
       }
     }else{
       if(!m_fixed_target_mode && m_pTLossMode && doPtModification && highestMtM0InGraph > 1.2) highFitRange = 1.2;
-      TFitResultPtr resultPtrPtr = mTm0LossGraph->Fit(powerLawPt, fitOptions.c_str(),"", 0.0, highFitRange);
-      resultPtr = resultPtrPtr.Get();
+      energyLossFitResultOwner = mTm0LossGraph->Fit(powerLawPt, fitOptions.c_str(),"", 0.0, highFitRange);
+      resultPtr = energyLossFitResultOwner.Get();
       if(resultPtr){
         fitFunction_PowerLawPt = mTm0LossGraph->GetFunction("powerLawPt");
       }
