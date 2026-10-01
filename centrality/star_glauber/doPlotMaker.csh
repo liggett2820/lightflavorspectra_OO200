@@ -15,7 +15,7 @@ endif
 if ( $?GLAUBER_STARVER ) then
   starver $GLAUBER_STARVER
 else
-  starver SL16d
+  starver SL24y
 endif
 
 set name = "$1"

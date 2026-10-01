@@ -26,7 +26,7 @@ STAR's code only had 2pF Woods–Saxon, so `GlauberUtilities::WoodsSaxon3pF` was
 
 **Script changes.**
 
-- `doFastGlauberMcMaker.csh`, `doAnalysisMaker.csh` and `doPlotMaker.csh` use `$GLAUBER_STARVER` when set. Upstream mixes SL19b, SL16d and stardev.
+- `doFastGlauberMcMaker.csh`, `doAnalysisMaker.csh` and `doPlotMaker.csh` use `$GLAUBER_STARVER` when set and default to SL24y (as PicoBinner). Upstream mixes SL19b, SL16d and stardev. `submit_condor.pl` runs each condor job inside the SDCC SL7 container.
 - `submit_condor.pl` sends condor error mail to `$USER` instead of the original author.
 
 **New O+O files:**
@@ -44,13 +44,30 @@ STAR's code only had 2pF Woods–Saxon, so `GlauberUtilities::WoodsSaxon3pF` was
 
 ## Run it on RCF
 
-Copy this directory to your RCF home. The upstream README puts the outputs on PWG disk via `prepare.sh`, which writes to `../glauberOut`.
+There are two kinds of commands. Anything that runs `starver`, `cons` or `root4star` (the build, the interactive test, `addNcollVsNpart.C`) runs **inside** the SDCC SL7 container, the same one PicoBinner uses:
+
+```bash
+singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif /bin/tcsh
+```
+
+The submission scripts (`all_submit_OO200.csh`, `submit_doScan_OO200.pl`, `all_doAnalysisMaker.csh`) only call `condor_submit`, so run them **outside** the container, on the host. `submit_condor.pl` wraps every condor job in that same container image, so the jobs run inside it.
+
+The STAR version defaults to SL24y, as for PicoBinner. To use another, `setenv GLAUBER_STARVER <version>` in both shells; the variable is passed into the jobs.
+
+Inside the container:
 
 ```csh
-setenv GLAUBER_STARVER SL19b      # any one version, used for cons AND every step
-set path = ( . $path )            # submit_glauber.pl calls submit_condor.pl without ./
-./prepare.sh
+cd <repo>/centrality/star_glauber
+./prepare.sh                      # first set outDir to your PWG disk
 ./build_OO200.csh                 # syncs Makers/St* into StRoot/ and runs cons
+./doFastGlauberMcMaker.csh output/test_OO.root 1000 OO 200 default kFALSE   # quick test
+```
+
+On the host, for the submissions:
+
+```csh
+cd <repo>/centrality/star_glauber
+set path = ( . $path )            # submit_glauber.pl calls submit_condor.pl without ./
 ```
 
 ### Step 1: Glauber trees
@@ -64,7 +81,7 @@ Check one output first, `output/fastglaubermc_OO_200GeV_default_spherical_run000
 
 ```csh
 ./createList_OO200.csh
-root4star -b -q -l addNcollVsNpart.C      # -> ncoll_npart.root (default trees)
+root4star -b -q -l addNcollVsNpart.C      # inside the container -> ncoll_npart.root
 ```
 
 ### Step 2: NBD fit to raw refMult
@@ -113,7 +130,7 @@ Then check the best point's `RatioChi2Files/Ratio_*.root`. `hRatio` (MC/data) sh
    ```csh
    ./createList_OO200.csh
    ./all_doAnalysisMaker.csh OO_200GeV kFALSE kFALSE
-   ./all_doPlotMaker.csh 200        # tables in ./table, figures in ./figure
+   ./all_doPlotMaker.csh 200        # inside the container (runs root4star directly); tables in ./table, figures in ./figure
    ```
 
 The tables cover 5% classes and the wider ones in `StGlauberConstUtilities`: 0–10, 10–20, 20–40, 40–60, 60–80, 40–80 and others. The systematic error per class is the maximum deviation over the types.

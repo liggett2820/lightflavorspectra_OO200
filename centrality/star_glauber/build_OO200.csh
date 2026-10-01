@@ -4,10 +4,8 @@
 # cons compiles packages under ./StRoot, so the packages in ./Makers are synced there first.
 # Run from this directory on an RCF interactive node:  ./build_OO200.csh
 #----------------------------------------------------------------------------------------------------
-if ( ! $?GLAUBER_STARVER ) then
-  echo "Set the STAR library version first, e.g.  setenv GLAUBER_STARVER SL19b"
-  exit 1
-endif
+# Run INSIDE the SDCC SL7 container (same one PicoBinner uses). Default SL24y, as for PicoBinner.
+if ( ! $?GLAUBER_STARVER ) setenv GLAUBER_STARVER SL24y
 starver $GLAUBER_STARVER
 
 mkdir -p StRoot

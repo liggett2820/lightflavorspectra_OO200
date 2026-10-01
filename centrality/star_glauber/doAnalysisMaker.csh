@@ -20,7 +20,7 @@ set unitweight = "$6"
 if ( $?GLAUBER_STARVER ) then
   starver $GLAUBER_STARVER
 else
-  starver SL16d
+  starver SL24y
 endif
 
 root4star -b <<EOF

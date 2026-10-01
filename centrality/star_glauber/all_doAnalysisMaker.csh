@@ -9,7 +9,7 @@ if ( $#argv != 3 ) then
 endif
 
 #starnew
-stardev
+#stardev   # not needed: the condor jobs set the STAR version inside the container
 #set list=("default")
 #set list = ( "smallNpp" "largeNpp" )
 #set list = ( "lowrw" "highrw" )

@@ -188,8 +188,15 @@ if ( $submit ) {
   open (OUT, ">$xmlFile") || die "can't open $xmlFile\n";
   print OUT "Universe        = vanilla\n" ;
   print OUT "Notification    = Error\n" ;
-  print OUT "Executable      = $execCommand\n";
-  print OUT "Arguments       = @arguments\n";
+  # SDCC worker nodes need the STAR SL7 container for starver/root4star (same image and binds
+  # as xml/runPicoBinner_OO200_SDCC_template.xml). -e cleans the environment, so the one
+  # variable the job scripts read is passed in explicitly.
+  my $container = "/cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif";
+  my $binds     = "-B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02";
+  my $starver   = defined $ENV{GLAUBER_STARVER} ? $ENV{GLAUBER_STARVER} : "SL24y";
+  print OUT "Executable      = /usr/bin/env\n";
+  print OUT "transfer_executable = False\n";
+  print OUT "Arguments       = SINGULARITYENV_GLAUBER_STARVER=$starver APPTAINERENV_GLAUBER_STARVER=$starver singularity exec -e $binds $container $execCommand @arguments\n";
   print OUT "Initialdir      = $currentDir\n" ;
   print OUT "Output          = $outFile\n" ;
   print OUT "Error           = $errFile\n" ;

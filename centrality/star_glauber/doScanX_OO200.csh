@@ -6,7 +6,7 @@
 if ( $?GLAUBER_STARVER ) then
   starver $GLAUBER_STARVER
 else
-  starver SL19b
+  starver SL24y
 endif
 
 set npp     = $1
