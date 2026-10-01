@@ -1,0 +1,945 @@
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StCentralityMaker/StCentrality.cxx star_glauber/Makers/StCentralityMaker/StCentrality.cxx
+--- star_glauber.orig/Makers/StCentralityMaker/StCentrality.cxx	2026-10-01 17:00:11.278514729 +0000
++++ star_glauber/Makers/StCentralityMaker/StCentrality.cxx	2026-10-01 17:05:11.674347099 +0000
+@@ -43,6 +43,7 @@
+ 	else if( system.CompareTo("dau_200GeV", TString::kIgnoreCase) == 0 )  Init_dAu200GeV() ;
+ 	else if( system.CompareTo("cucu_200GeV", TString::kIgnoreCase) == 0 ) Init_CuCu200GeV() ;
+ 	else if( system.CompareTo("zrzr_200GeV", TString::kIgnoreCase) == 0 ) Init_ZrZr200GeV() ;
++	else if( system.CompareTo("oo_200GeV", TString::kIgnoreCase) == 0 )   Init_OO200GeV() ;
+ 	else if( system.CompareTo("uu_200GeV", TString::kIgnoreCase) == 0 )   Init_UU200GeV() ;
+ 	else if( system.CompareTo("pbpb_2760GeV", TString::kIgnoreCase) == 0 ) Init_PbPb2760GeV() ;
+ 	else{
+@@ -118,6 +119,7 @@
+ 	LOG_INFO << "AuAu_19GeV     Au + Au at 19.6 GeV" << endm;
+ 	LOG_INFO << "AuAu_7GeV      Au + Au at 7.7 GeV" << endm;
+ 	LOG_INFO << "dAu_200GeV      d + Au at 200 GeV" << endm;
++	LOG_INFO << "OO_200GeV       O + O at 200 GeV (Run 21)" << endm;
+ 	LOG_INFO << endm;
+ 	LOG_INFO << "  NOTE: input system name is case insensitive" << endm;
+ 	LOG_INFO << "#----------------------------------------------------------------------------------------------------" << endm;
+@@ -1358,6 +1360,83 @@
+ 
+ 	// Set same centrality bins 
+ 	for(UInt_t ic=0; ic<mCentralityMin[0].size(); ic++){
++		for(UInt_t im=1; im<mNMode; im++){
++			mCentralityMin[im].push_back( mCentralityMin[0][ic] );
++			mCentralityMax[im].push_back( mCentralityMax[0][ic] );
++		}
++	}
++}
++
++//____________________________________________________________________________________________________
++void StCentrality::Init_OO200GeV()
++{
++	/// Initialize O + O collisions at 200 GeV (Run 21), raw refMult (no StRefMultCorr for this system)
++	//----------------------------------------------------------------------------------------------------
++	//  HOW TO FILL THIS FUNCTION (README Step 3)
++	//    1. Run the NBD scan (submit_doScan_OO200.pl) against hRefMult from make_hRefMult_OO200.C
++	//    2. Put the best (npp, k, x, eff) below
++	//    3. Paste the 32 "mMultiplicityCut[...]" lines printed by StNbdFitMaker::CalculateCentrality
++	//       for the best point (LOG_Scan/doScanX_OO200_*.out) between the PASTE markers, unchanged
++	//    4. Set kIsPlaceholder = kFALSE, recompile (cons), regenerate the Glauber trees, run the analysis
++	//
++	//  Until then everything here is a PLACEHOLDER so that Step 1 (tree generation) can run.
++	//  Placeholder npp/k/x/eff only set the tree's multiplicity branch (multiplicity-weighted
++	//  eccentricity); Npart/Ncoll/b in the trees do not depend on them.
++	//----------------------------------------------------------------------------------------------------
++	const Bool_t kIsPlaceholder = kTRUE ;
++
++	// NOTE: type 'low' and 'high' are for npp, x is anti-correlated with npp (same convention as Au+Au 200 GeV)
++	Double_t xError = 0.0 ; // absolute error
++	if( mType.CompareTo("low", TString::kIgnoreCase) == 0 )       xError = 0.02 ; // npp is low, x is high
++	else if( mType.CompareTo("high", TString::kIgnoreCase) == 0 ) xError = -0.02 ; // npp is high, x is low
++
++	const Double_t npp = 2.40 ; // PLACEHOLDER: replace with best-fit npp
++	mNpp = npp + GetNppError(npp) ; // 5% error on npp for low/high
++	mK   = 2.00 ;                   // PLACEHOLDER: replace with best-fit k
++	mX   = 0.13 + xError ;          // PLACEHOLDER: replace with best-fit x
++	mEfficiency  = 0.00 ;           // PLACEHOLDER: replace with best-fit d (multiplicity-dependent efficiency)
++	mTriggerBias = 1.00 ;
++
++	//---------------------------------------- PASTE BEGIN ----------------------------------------
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back(  0.0 ); mCentralityMax[0].push_back(  5.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back(  5.0 ); mCentralityMax[0].push_back( 10.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 10.0 ); mCentralityMax[0].push_back( 15.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 15.0 ); mCentralityMax[0].push_back( 20.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 20.0 ); mCentralityMax[0].push_back( 25.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 25.0 ); mCentralityMax[0].push_back( 30.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 30.0 ); mCentralityMax[0].push_back( 35.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 35.0 ); mCentralityMax[0].push_back( 40.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 40.0 ); mCentralityMax[0].push_back( 45.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 45.0 ); mCentralityMax[0].push_back( 50.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 50.0 ); mCentralityMax[0].push_back( 55.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 55.0 ); mCentralityMax[0].push_back( 60.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 60.0 ); mCentralityMax[0].push_back( 65.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 65.0 ); mCentralityMax[0].push_back( 70.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 70.0 ); mCentralityMax[0].push_back( 75.0 );
++	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 75.0 ); mCentralityMax[0].push_back( 80.0 );
++	// -5%                                 +5%
++	for(UInt_t ic=0; ic<16; ic++){ mMultiplicityCut[1].push_back( 0 ); mMultiplicityCut[2].push_back( 0 ); } // PLACEHOLDER: replace this loop with the 16 pasted lines
++	//---------------------------------------- PASTE END ------------------------------------------
++
++	// StNbdFitMaker::CalculateCentrality prints the lowest multiplicity INCLUDED in each class
++	// (class = refMult >= printed cut; this is also what StRefMultCorr's "> cut" selects after its
++	// [0,1) refMult smearing). StCentrality::GetCentrality() below uses a strict "M > cut" on the
++	// integer MC multiplicity, so shift by one here (same "- 1" as the Run4 Au+Au table above).
++	// At O+O multiplicities one unit of refMult is several percent of centrality, so this matters.
++	for(UInt_t im=0; im<mNMode; im++){
++		for(UInt_t ic=0; ic<mMultiplicityCut[im].size(); ic++){
++			if( mMultiplicityCut[im][ic] > 0 ) mMultiplicityCut[im][ic] -= 1 ;
++		}
++	}
++
++	if( kIsPlaceholder ){
++		Warning("StCentrality::Init_OO200GeV",
++			"O+O 200 GeV NBD parameters and multiplicity cuts are PLACEHOLDERS. "
++			"Fine for generating Glauber trees (Step 1); fill them in before running StGlauberAnalysisMaker (Step 3).");
++	}
++
++	// Set same centrality bins 
++	for(UInt_t ic=0; ic<mCentralityMin[0].size(); ic++){
+ 		for(UInt_t im=1; im<mNMode; im++){
+ 			mCentralityMin[im].push_back( mCentralityMin[0][ic] );
+ 			mCentralityMax[im].push_back( mCentralityMax[0][ic] );
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StCentralityMaker/StCentrality.h star_glauber/Makers/StCentralityMaker/StCentrality.h
+--- star_glauber.orig/Makers/StCentralityMaker/StCentrality.h	2026-10-01 17:00:11.278775213 +0000
++++ star_glauber/Makers/StCentralityMaker/StCentrality.h	2026-10-01 17:05:11.671475543 +0000
+@@ -54,6 +54,7 @@
+ 		// Need actual implementation
+ 		void Init_CuCu200GeV() ;
+ 		void Init_ZrZr200GeV() ;
++		void Init_OO200GeV() ;  /// Initialization of O + O 200 GeV (Run 21)
+ 		void Init_UU200GeV() ;
+ 		void Init_PbPb2760GeV() ;
+ 
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StCentralityMaker/StNbdFitMaker.cxx star_glauber/Makers/StCentralityMaker/StNbdFitMaker.cxx
+--- star_glauber.orig/Makers/StCentralityMaker/StNbdFitMaker.cxx	2026-10-01 17:00:11.278734319 +0000
++++ star_glauber/Makers/StCentralityMaker/StNbdFitMaker.cxx	2026-10-01 17:05:24.539371301 +0000
+@@ -31,6 +31,7 @@
+ 
+ 	//mDoCentralityDetermination = kFALSE ;
+ 	mDoCentralityDetermination = kTRUE;
++	mIntegerGlauberSampling = kFALSE ;
+ 
+ 	mCanvas = 0 ;
+ 	mCutOff[0] = 0;
+@@ -257,6 +258,13 @@
+ }
+ 
+ //____________________________________________________________________________________________________
++void StNbdFitMaker::SetIntegerGlauberSampling(const Bool_t flag)
++{
++	mIntegerGlauberSampling = flag ;
++	LOG_INFO << "StNbdFitMaker::SetIntegerGlauberSampling  Integer (Npart, Ncoll) sampling = " << (flag ? "ON" : "OFF") << endm;
++}
++
++//____________________________________________________________________________________________________
+ void StNbdFitMaker::SetMinimumMultiplicityCut(const Double_t cut)
+ {
+ 	mMinimumMultiplicityCut = cut ;
+@@ -349,6 +357,12 @@
+ 	{
+ 		Double_t npart, ncoll;
+ 		mhNcoll_Npart->GetRandom2(npart, ncoll);
++		// hNcoll_Npart has unit-width bins [n, n+1) (addNcollVsNpart.C), so GetRandom2 returns n + U(0,1).
++		// Recover the integer Glauber values when requested (used for O+O)
++		if( mIntegerGlauberSampling ){
++			npart = TMath::Floor(npart);
++			ncoll = TMath::Floor(ncoll);
++		}
+ 		const Bool_t isNpartNcollOk = (npart>=2 && ncoll>=1) ;
+ 		if ( !isNpartNcollOk ) continue ;
+ 
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StCentralityMaker/StNbdFitMaker.h star_glauber/Makers/StCentralityMaker/StNbdFitMaker.h
+--- star_glauber.orig/Makers/StCentralityMaker/StNbdFitMaker.h	2026-10-01 17:00:11.278479301 +0000
++++ star_glauber/Makers/StCentralityMaker/StNbdFitMaker.h	2026-10-01 17:05:24.538368789 +0000
+@@ -57,6 +57,11 @@
+ 		/// Set minimum multiplicity cuts to avoid inefficiency (default is M>50)
+ 		void SetMinimumMultiplicityCut(const Double_t cut) ;
+ 
++		/// Sample integer (Npart, Ncoll) from hNcoll_Npart (default kFALSE = upstream behaviour).
++		/// TH2::GetRandom2 returns a uniform position inside the (1 x 1) bin, i.e. Npart+U(0,1);
++		/// negligible for Au+Au, a +0.5 bias on Npart (up to 25% at Npart=2) for O+O. See Fit().
++		void SetIntegerGlauberSampling(const Bool_t flag=kTRUE) ;
++
+ 	private:
+ 		// Functions
+ 		Double_t GetNormalization(const TH1& h1, const TH1& h2,
+@@ -74,6 +79,7 @@
+ 		Int_t mNData ; /// Number of data points used in fit
+ 		Double_t mMinimumMultiplicityCut ; /// Minimum multiplicity cut for fitting
+ 		Bool_t mDoCentralityDetermination ; /// Centrality determination flag (default is false)
++		Bool_t mIntegerGlauberSampling ; /// Floor sampled (Npart, Ncoll) to the bin's integer value
+ 
+ 		TCanvas* mCanvas   ; /// Canvas to draw multiplicity
+ 		TLine* mCutOff[2]  ; /// Multiplicity cut off
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.cxx star_glauber/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.cxx
+--- star_glauber.orig/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.cxx	2026-10-01 17:00:11.279495983 +0000
++++ star_glauber/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.cxx	2026-10-01 17:04:29.353440940 +0000
+@@ -49,6 +49,8 @@
+ 	: mEnergy(200), mOutputFileName("fastglaubermc.root"),
+ 	mInelasticNNCrossSection(4.2)  // fm^2 --> 42 mb
+ {
++	mW[0] = 0.0 ; mW[1] = 0.0 ; // 2pF Woods-Saxon unless a system sets 3pF
++
+ 	/// Initialize Au+Au collisions at 200 GeV
+ 	const UInt_t A = 197 ;
+ 	const Double_t R = 6.38 ;
+@@ -72,6 +74,8 @@
+ : mEnergy(energy), mOutputFileName(outputFileName),
+ 	mInelasticNNCrossSection(GetInelasticNNCrossSection(mEnergy, type))
+ {
++	mW[0] = 0.0 ; mW[1] = 0.0 ; // 2pF Woods-Saxon unless a system sets 3pF (InitOO)
++
+ 	// Set deformation. Spherical + Spherical or Deformed + Deformed collision
+ 	// Use other constructor if Spherical + Deformed collision is needed
+ 	mIsDeformed[0] = isDeformed ;
+@@ -122,6 +126,10 @@
+                 LOG_INFO << "StFastGlauberMcMaker  Initialize RuRu_Case3 collisions" << endm;
+                 InitRuRu(type,3);
+         }
++	else if ( system.CompareTo("oo", TString::kIgnoreCase) == 0 ){
++		LOG_INFO << "StFastGlauberMcMaker  Initialize OO collisions" << endm;
++		InitOO(type);
++	}
+ 	else{
+ 		Error("StFastGlauberMcMaker", "Unknown system %s. abort", system.Data());
+ 		assert(0);
+@@ -143,6 +151,7 @@
+ 	mInelasticNNCrossSection(inelasticCrossSection)
+ {
+ 	mMode = 0 ;
++	mW[0] = 0.0 ; mW[1] = 0.0 ;
+ 
+ 	// Set deformation
+ 	mIsDeformed[0] = kFALSE ;
+@@ -176,6 +185,7 @@
+ 	mInelasticNNCrossSection(inelasticCrossSection)
+ {
+ 	mMode = 0 ;
++	mW[0] = 0.0 ; mW[1] = 0.0 ;
+ 
+ 	// Set deformation
+ 	mIsDeformed[0] = kFALSE ;
+@@ -358,7 +368,17 @@
+ 			// Radius and skin depth
+ 			mfWoodsSaxon2D[in] = 0 ; // NULL pointer for deformed woods-saxon
+ 
+-			mfWoodsSaxon[in] = new TF1(Form("fWoodsSaxon_%d", in), GlauberUtilities::WoodsSaxon, 0, 20, 2);
++			if( mW[in] == 0.0 ){
++				mfWoodsSaxon[in] = new TF1(Form("fWoodsSaxon_%d", in), GlauberUtilities::WoodsSaxon, 0, 20, 2);
++			}
++			else{
++				// 3-parameter Fermi (see GlauberUtilities::WoodsSaxon3pF)
++				mfWoodsSaxon[in] = new TF1(Form("fWoodsSaxon_%d", in), GlauberUtilities::WoodsSaxon3pF, 0, 20, 3);
++				mfWoodsSaxon[in]->SetParName(2, "w (3pF)");
++				mfWoodsSaxon[in]->SetParameter(2, mW[in]);
++				// light nucleus: finer sampling of the radial profile (default 100 points over 0-20 fm)
++				mfWoodsSaxon[in]->SetNpx(2000);
++			}
+ 			mfWoodsSaxon[in]->SetParName(0, "Radius");
+ 			mfWoodsSaxon[in]->SetParName(1, "Skin depth");
+ 			if( in == 0 ){
+@@ -808,6 +828,72 @@
+ 
+ 
+ //____________________________________________________________________________________________________
++Int_t StFastGlauberMcMaker::InitOO(const TString type)
++{
++	/// Initialize O + O collisions
++	///
++	/// 16O nuclear density: 3-parameter Fermi (3pF) from electron scattering,
++	///   rho(r) ~ (1 + w r^2/R^2) / (1 + exp((r-R)/d)),  R = 2.608 fm, d = 0.513 fm, w = -0.051
++	///   H. De Vries, C.W. De Jager, C. De Vries, At. Data Nucl. Data Tables 36, 495 (1987)
++	///   (same 16O parameterization as TGlauberMC: C. Loizides, J. Kamin, D. d'Enterria, PRC 97, 054910 (2018))
++	///
++	/// 16O is treated as spherical (no beta2/beta4); no alpha clustering.
++	const UInt_t A   = 16 ;
++	const Double_t R = 2.608 ;
++	const Double_t d = 0.513 ;
++	const Double_t w = -0.051 ;
++
++	Double_t RError = 0.0 ; // Absolute error on R
++	Double_t dError = 0.0 ; // Absolute error on d
++
++	// No deformation parameters for 16O here: force spherical, otherwise Init() aborts on beta2=beta4=0
++	if( mIsDeformed[0] || mIsDeformed[1] ){
++		LOG_WARN << "StFastGlauberMcMaker::InitOO  Deformation was requested, but 16O is generated spherical (3pF). "
++			<< "Setting deformation flag to kFALSE" << endm ;
++		mIsDeformed[0] = kFALSE ;
++		mIsDeformed[1] = kFALSE ;
++	}
++	const Double_t beta2 = 0.0 ;
++	const Double_t beta4 = 0.0 ;
++
++	// Systematic variations follow the convention documented in Print("type") and submit_glauber.pl:
++	//   large: R +2%, d -10%      small: R -2%, d +10%
++	if ( type.CompareTo("large", TString::kIgnoreCase) == 0 ){
++		LOG_INFO << "StFastGlauberMcMaker::InitOO  Set large R, small d" << endm;
++		RError =  0.02 * R ;
++		dError = -0.10 * d ;
++	}
++	else if ( type.CompareTo("small", TString::kIgnoreCase) == 0 ){
++		LOG_INFO << "StFastGlauberMcMaker::InitOO  Set small R, large d" << endm;
++		RError = -0.02 * R ;
++		dError =  0.10 * d ;
++	}
++	else if ( type.CompareTo("gauss", TString::kIgnoreCase) == 0 ){
++		LOG_INFO << "StFastGlauberMcMaker::InitOO  Gaussian collision profile" << endm;
++		DoGaussianCollision() ;
++	}
++	else if ( type.CompareTo("smallNpp", TString::kIgnoreCase) == 0 ){
++		mMode = 1 ;
++		LOG_INFO << "StFastGlauberMcMaker::InitOO  Use small npp, large x for multiplicity (mMode = "
++			<< mMode << ")"
++			<< endm;
++	}
++	else if ( type.CompareTo("largeNpp", TString::kIgnoreCase) == 0 ){
++		mMode = 2 ;
++		LOG_INFO << "StFastGlauberMcMaker::InitOO  Use large npp, small x for multiplicity (mMode = "
++			<< mMode << ")"
++			<< endm;
++	}
++
++	mW[0] = w ;
++	mW[1] = w ;
++	LOG_INFO << "StFastGlauberMcMaker::InitOO  16O 3pF density: R = " << R+RError << " fm, d = " << d+dError
++		<< " fm, w = " << w << endm;
++
++	return Init(A, R+RError, d+dError, beta2, beta4, A, R+RError, d+dError, beta2, beta4, type);
++}
++
++//____________________________________________________________________________________________________
+ Bool_t StFastGlauberMcMaker::IsCollision(Nucleon* nucleon0, Nucleon* nucleon1) const
+ {
+ 	const Double_t dx     = nucleon0->GetX() - nucleon1->GetX() ;
+@@ -1299,6 +1385,7 @@
+ 		case 238: return "U";
+ 		//ZS The following should be changed to include Ru
+ 		case 96:  return "Zr";
++		case 16:  return "O";
+ 		default:
+ 				  Error("StFastGlauberMcMaker::GetName", "can't find mass number = %d. Return white space", massNumber);
+ 				  return "";
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.h star_glauber/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.h
+--- star_glauber.orig/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.h	2026-10-01 17:00:11.279611133 +0000
++++ star_glauber/Makers/StFastGlauberMcMaker/StFastGlauberMcMaker.h	2026-10-01 17:04:29.352475341 +0000
+@@ -162,6 +162,7 @@
+     Int_t InitCuCu(const TString type) ;
+     Int_t InitZrZr(const TString type, int Case) ;
+     Int_t InitRuRu(const TString type, int Case) ;
++    Int_t InitOO(const TString type) ; /// O+O, 16O with 3-parameter Fermi density
+ 
+     /// Nucleon-Nucleon collision
+     Bool_t IsCollision(Nucleon* nucleon0, Nucleon* nucleon1) const ;
+@@ -203,6 +204,7 @@
+     const Double_t mEnergy ; /// sqrt(sNN)
+     const TString mOutputFileName ; /// Output filename
+     Double_t mInelasticNNCrossSection ; /// Inelastic NN cross section
++    Double_t mW[2] ; /// 3pF w parameter for (projectile, target); 0 = standard 2pF Woods-Saxon
+ 
+     UInt_t mDebug ; /// Debug flag
+ 
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StGlauberUtilities/StGlauberUtilities.cxx star_glauber/Makers/StGlauberUtilities/StGlauberUtilities.cxx
+--- star_glauber.orig/Makers/StGlauberUtilities/StGlauberUtilities.cxx	2026-10-01 17:00:11.279096219 +0000
++++ star_glauber/Makers/StGlauberUtilities/StGlauberUtilities.cxx	2026-10-01 17:04:29.351488867 +0000
+@@ -41,6 +41,25 @@
+ 
+   //____________________________________________________________________________________________________
+   // Woods-saxon density profile (2D for deformed nuclei)
++  //____________________________________________________________________________________________________
++  // Three-parameter Fermi density (spherical), with r^2 phase-space factor as in WoodsSaxon()
++  //   rho(r) ~ (1 + w r^2/R^2) / (1 + exp((r-R)/d))
++  // The (1 + w r^2/R^2) factor is clipped at 0: for w<0 it turns negative only at
++  // r > R/sqrt(|w|) (11.5 fm for 16O), where the Fermi factor is already < 1e-7,
++  // but TF1::GetRandom() must never see a negative value.
++  Double_t WoodsSaxon3pF(Double_t* x, Double_t* par)
++  {
++    const Double_t r = x[0] ;
++    const Double_t R = par[0] ;
++    const Double_t d = par[1] ;
++    const Double_t w = par[2] ;
++
++    const Double_t shape = 1.0 + w*r*r/(R*R) ;
++    if( shape <= 0.0 ) return 0.0 ;
++
++    return r*r*shape/(1.0+TMath::Exp((r-R)/d)) ;
++  }
++
+   Double_t WoodsSaxon2D(Double_t* x, Double_t* par)
+   {
+     const Double_t r        = x[0] ;
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/Makers/StGlauberUtilities/StGlauberUtilities.h star_glauber/Makers/StGlauberUtilities/StGlauberUtilities.h
+--- star_glauber.orig/Makers/StGlauberUtilities/StGlauberUtilities.h	2026-10-01 17:00:11.279074252 +0000
++++ star_glauber/Makers/StGlauberUtilities/StGlauberUtilities.h	2026-10-01 17:04:29.350941185 +0000
+@@ -62,6 +62,11 @@
+   // Woods-saxon density profile (2D for deformed nuclei)
+   Double_t WoodsSaxon2D(Double_t* x, Double_t* par) ;
+ 
++  // Three-parameter Fermi (3pF) density profile, r^2 (1 + w r^2/R^2) / (1 + exp((r-R)/d))
++  // Used for light nuclei (e.g. 16O) whose tabulated density is 3pF rather than 2pF.
++  // par[0]=R, par[1]=d, par[2]=w. w=0 reproduces WoodsSaxon() exactly.
++  Double_t WoodsSaxon3pF(Double_t* x, Double_t* par) ;
++
+   // Step function
+   Double_t StepFunction(Double_t* x, Double_t* par) ;
+ 
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/README_OO200.md star_glauber/README_OO200.md
+--- star_glauber.orig/README_OO200.md	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/README_OO200.md	2026-10-01 17:09:57.493987665 +0000
+@@ -0,0 +1,127 @@
++# STAR Glauber + NBD centrality for O+O 200 GeV (Run 21, raw refMult)
++
++This is STAR's own centrality package (`star-sw/StRoot/PWGTools/CentralityCalibration/Glauber/star_glauber`, last upstream change 9319c7f9be, Apr 2023) with O+O added. Everything else in the chain (StFastGlauberMcMaker, StNbdFitMaker, StGlauberAnalysisMaker, the condor scripts) is the upstream code and runs exactly as the upstream README describes. `star_glauber_OO200.patch` is the full diff against upstream.
++
++## What was added or changed
++
++**O+O system.** `StFastGlauberMcMaker` gets `InitOO()` (system string `OO`). The settings are:
++
++- A = 16, spherical.
++- σ_NN = 42 mb (upstream 200 GeV value; `largeXsec`/`smallXsec` give ±1 mb).
++- Hard-core NN collisions, b sampled up to 20 fm, as upstream.
++
++**¹⁶O density.** The density is a three-parameter Fermi (3pF): ρ(r) ∝ (1 + w r²/R²)/(1 + exp((r−R)/d)), with R = 2.608 fm, d = 0.513 fm and w = −0.051. These are the De Vries, De Jager & De Vries values (At. Data Nucl. Data Tables 36, 495 (1987)), the same ¹⁶O parameterization TGlauberMC uses (Loizides, Kamin & d'Enterria, PRC 97, 054910 (2018)). Its rms radius is 2.73 fm.
++
++STAR's code only had 2pF Woods–Saxon, so `GlauberUtilities::WoodsSaxon3pF` was added. Setting w = 0 reproduces the old function, so no other system changes.
++
++**Systematic types.** `large`/`small` follow the convention already documented in `Print("type")` and `submit_glauber.pl`: R ±2% with d ∓10%. For a nucleus this light, d dominates, so `large` is the more compact one (rms 2.64 fm) and `small` the more extended one (2.82 fm).
++
++**StCentrality.** `Init_OO200GeV()` (system `OO_200GeV`) holds placeholders until Step 3. It warns while they are placeholders.
++
++**Centrality edge convention.** `StNbdFitMaker` prints, for each class, the lowest refMult *included* in it (class = refMult ≥ printed value). This is also what StRefMultCorr's `> cut` selects after its [0,1) smearing. `StCentrality::GetCentrality()` uses a strict `>` on the integer MC multiplicity, so `Init_OO200GeV()` subtracts 1 from the pasted values. This is the same "− 1" as the Run 4 Au+Au table in that file.
++
++**What this means in your analysis.** Select class i as `refMult >= cut_i`.
++
++**Npart sampling.** `StNbdFitMaker::SetIntegerGlauberSampling()` is new and off by default. `TH2::GetRandom2` on the unit-width `hNcoll_Npart` returns Npart + U(0,1). That is negligible for Au+Au but is up to +25% at Npart = 2. The O+O macro `doNbdFitMaker_OO200.C` turns it on.
++
++**Script changes.**
++
++- `doFastGlauberMcMaker.csh`, `doAnalysisMaker.csh` and `doPlotMaker.csh` use `$GLAUBER_STARVER` when set. Upstream mixes SL19b, SL16d and stardev.
++- `submit_condor.pl` sends condor error mail to `$USER` instead of the original author.
++
++**New O+O files:**
++
++- `build_OO200.csh`
++- `all_submit_OO200.csh`
++- `createList_OO200.csh`
++- `make_hRefMult_OO200.C`
++- `doNbdFitMaker_OO200.C`
++- `doScanX_OO200.csh`
++- `submit_doScan_OO200.pl`
++- `find_best_nbd_OO200.py`
++
++`find_best_nbd_OO200.py` replaces `getBestChi2_fromCat/*.sh`, which read fixed log line numbers and character columns.
++
++## Run it on RCF
++
++Copy this directory to your RCF home. The upstream README puts the outputs on PWG disk via `prepare.sh`, which writes to `../glauberOut`.
++
++```csh
++setenv GLAUBER_STARVER SL19b      # any one version, used for cons AND every step
++set path = ( . $path )            # submit_glauber.pl calls submit_condor.pl without ./
++./prepare.sh
++./build_OO200.csh                 # syncs Makers/St* into StRoot/ and runs cons
++```
++
++### Step 1: Glauber trees
++
++```csh
++./all_submit_OO200.csh 0 1 0      # dry run: prints the condor commands
++./all_submit_OO200.csh 0 10 1     # 10 jobs x 200k per type (jobs 0..9)
++```
++
++Check one output first, `output/fastglaubermc_OO_200GeV_default_spherical_run0000.root`. `hWoodsSaxon_0` (the sampled density ρ(r)) should be flat in the core and drop to half its central value near r = 2.6 fm, and the tree header should show A = 16 and σ_NN = 42 mb.
++
++```csh
++./createList_OO200.csh
++root4star -b -q -l addNcollVsNpart.C      # -> ncoll_npart.root (default trees)
++```
++
++### Step 2: NBD fit to raw refMult
++
++Make the data input from the PicoBinner output (plain ROOT; works on the laptop too):
++
++```csh
++root -l -b -q 'make_hRefMult_OO200.C("yieldHistos_OO200_pion.root")'   # -> hRefMult_OO200.root
++```
++
++The input is PicoBinner's `refMult` after the event cuts (trigger 860003, |Vz| ≤ 2 cm, Vr ≤ 1 cm). Use the histogram from your current production.
++
++Scan, then rank:
++
++```csh
++./submit_doScan_OO200.pl          # prints the 180 jobs
++./submit_doScan_OO200.pl -run     # submits them
++python3 find_best_nbd_OO200.py LOG_Scan
++```
++
++The coarse grid is:
++
++| Parameter | Range | Points |
++|---|---|---|
++| npp | 1.6–3.2 | 9 |
++| k | 1–9 | 5 |
++| x | 0.08–0.28 | 6 |
++| d | 0–0.12 | 4 |
++
++The fit uses refMult ≥ 15 (`multCut` in `doScanX_OO200.csh`). Repeat with 10 and 20 as a cross-check.
++
++`find_best_nbd_OO200.py` flags a best point on the edge of the grid. Narrow the ranges around the minimum and rescan before trusting it.
++
++d = 0 means a constant 98% efficiency. That is consistent with the flat TPC efficiency vs centrality seen in the embedding, but let the scan decide.
++
++Then check the best point's `RatioChi2Files/Ratio_*.root`. `hRatio` (MC/data) should be flat at 1 above `multCut`, and the deviation below it is the trigger/vertex inefficiency. Follow the upstream README's reweight-and-refit check if you want the flat-ratio closure plot (`fit()` in `doNbdFitMaker_OO200.C` does a single fixed-parameter fit).
++
++### Step 3: Centrality table, Npart/Ncoll and systematics
++
++1. In `Makers/StCentralityMaker/StCentrality.cxx` → `Init_OO200GeV()`:
++   - put in the best npp, k, x and d;
++   - paste the 32 `mMultiplicityCut[...]` lines that `find_best_nbd_OO200.py` printed, between the PASTE markers, replacing the placeholder lines and the placeholder loop;
++   - set `kIsPlaceholder = kFALSE`.
++2. Run `./build_OO200.csh`, then regenerate the trees (Step 1), as the upstream README requires.
++3. Run the analysis and tables:
++   ```csh
++   ./createList_OO200.csh
++   ./all_doAnalysisMaker.csh OO_200GeV kFALSE kFALSE
++   ./all_doPlotMaker.csh 200        # tables in ./table, figures in ./figure
++   ```
++
++The tables cover 5% classes and the wider ones in `StGlauberConstUtilities`: 0–10, 10–20, 20–40, 40–60, 60–80, 40–80 and others. The systematic error per class is the maximum deviation over the types.
++
++## Things to keep in mind for O+O
++
++**Multiplicity granularity.** refMult is a small integer here, so a 5% class cannot be exactly 5%. The printed edge is the integer whose cumulative fraction is closest. Quote the actual fraction each class selects, from the data histogram above the fit range and from the MC below it.
++
++**No refMult corrections.** STAR's procedure expects luminosity- and Vz-corrected refMult. With |Vz| ≤ 2 cm, the Vz dependence is small, but ⟨refMult⟩ vs ZDC coincidence rate has not been checked for this dataset.
++
++**Nuclear structure.** ¹⁶O is generated spherical with uncorrelated nucleons. α-clustering and short-range correlations are not in STAR's model.
+Binary files star_glauber.orig/__pycache__/find_best_nbd_OO200.cpython-311.pyc and star_glauber/__pycache__/find_best_nbd_OO200.cpython-311.pyc differ
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/all_submit_OO200.csh star_glauber/all_submit_OO200.csh
+--- star_glauber.orig/all_submit_OO200.csh	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/all_submit_OO200.csh	2026-10-01 17:06:53.952543829 +0000
+@@ -0,0 +1,30 @@
++#!/bin/csh -f
++#----------------------------------------------------------------------------------------------------
++# Step 1 for O+O 200 GeV: submit StFastGlauberMcMaker jobs for every systematic type
++# Same as all_submit_doFastGlauberMcMaker.csh, with the system fixed to OO at 200 GeV and
++# spherical nuclei (-def kFALSE; 16O has no deformation parameters in InitOO).
++#
++# Usage: ./all_submit_OO200.csh [Begin jobIndex] [End jobIndex] [0=test, 1=submit]
++#   e.g. ./all_submit_OO200.csh 0 10 1   -> 10 jobs x 200k = 2M accepted events per type
++#----------------------------------------------------------------------------------------------------
++if ( $#argv != 3 ) then
++  echo ""
++  echo "  Usage : $0 [Begin jobIndex] [End jobIndex] [0=test, 1=submit]"
++  echo ""
++  exit
++endif
++
++set nevents = 200000
++set begin   = "$1"
++set end     = "$2"
++set flag    = "$3"
++set types   = ( "default" "large" "small" "largeXsec" "smallXsec" "gauss" "smallNpp" "largeNpp" )
++
++set run = ""
++if ( $flag == 1 ) then
++  set run = "-run"
++endif
++
++foreach type ($types)
++  ./submit_glauber.pl -sleep 0 -v $run -n $nevents -sys OO -e 200 -t $type -def kFALSE $begin $end
++end
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/build_OO200.csh star_glauber/build_OO200.csh
+--- star_glauber.orig/build_OO200.csh	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/build_OO200.csh	2026-10-01 17:06:53.951336393 +0000
+@@ -0,0 +1,17 @@
++#!/bin/csh -f
++#----------------------------------------------------------------------------------------------------
++# Build the STAR Glauber/centrality libraries (with O+O) with cons.
++# cons compiles packages under ./StRoot, so the packages in ./Makers are synced there first.
++# Run from this directory on an RCF interactive node:  ./build_OO200.csh
++#----------------------------------------------------------------------------------------------------
++if ( ! $?GLAUBER_STARVER ) then
++  echo "Set the STAR library version first, e.g.  setenv GLAUBER_STARVER SL19b"
++  exit 1
++endif
++starver $GLAUBER_STARVER
++
++mkdir -p StRoot
++foreach pkg ( StCentralityMaker StFastGlauberMcMaker StGlauberAnalysisMaker StGlauberTree StGlauberUtilities )
++  rsync -a --delete Makers/$pkg/ StRoot/$pkg/
++end
++cons
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/createList_OO200.csh star_glauber/createList_OO200.csh
+--- star_glauber.orig/createList_OO200.csh	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/createList_OO200.csh	2026-10-01 17:06:53.954962514 +0000
+@@ -0,0 +1,18 @@
++#!/bin/csh -f
++# Make LIST/tree.<type>.list from the O+O Glauber trees (spherical), as createList.csh does for Ru+Ru
++set types = ( "default" "small" "large" "smallXsec" "largeXsec" "gauss" "smallNpp" "largeNpp" )
++
++foreach type ($types)
++  set treelist = "./LIST/tree.$type.list"
++  echo "Make $treelist..."
++  ls -1 ./output/fastglaubermc_OO_200GeV_${type}_spherical_*.root > $treelist
++end
++
++# smallTotal/largeTotal/lowrw/highrw re-use the default trees (as in createList.csh)
++cd LIST
++ln -vsf tree.default.list tree.smallTotal.list
++ln -vsf tree.default.list tree.largeTotal.list
++ln -vsf tree.default.list tree.lowrw.list
++ln -vsf tree.default.list tree.highrw.list
++ls -lrta
++cd -
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/doAnalysisMaker.csh star_glauber/doAnalysisMaker.csh
+--- star_glauber.orig/doAnalysisMaker.csh	2026-10-01 17:00:11.279767921 +0000
++++ star_glauber/doAnalysisMaker.csh	2026-10-01 17:06:20.979613203 +0000
+@@ -16,7 +16,12 @@
+ set reweighting = "$5"
+ set unitweight = "$6"
+ 
+-starver SL16d
++# Use one STAR library version for cons and every step: setenv GLAUBER_STARVER <version> before running
++if ( $?GLAUBER_STARVER ) then
++  starver $GLAUBER_STARVER
++else
++  starver SL16d
++endif
+ 
+ root4star -b <<EOF
+   .L doAnalysisMaker.C
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/doFastGlauberMcMaker.csh star_glauber/doFastGlauberMcMaker.csh
+--- star_glauber.orig/doFastGlauberMcMaker.csh	2026-10-01 17:00:11.278380790 +0000
++++ star_glauber/doFastGlauberMcMaker.csh	2026-10-01 17:06:20.978904911 +0000
+@@ -14,7 +14,12 @@
+ set type = "$5"
+ set deformation = "$6"
+ 
+-starver SL19b
++# Use one STAR library version for cons and every step: setenv GLAUBER_STARVER <version> before running
++if ( $?GLAUBER_STARVER ) then
++  starver $GLAUBER_STARVER
++else
++  starver SL19b
++endif
+ 
+ root4star -b <<EOF
+   .L doFastGlauberMcMaker.C
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/doNbdFitMaker_OO200.C star_glauber/doNbdFitMaker_OO200.C
+--- star_glauber.orig/doNbdFitMaker_OO200.C	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/doNbdFitMaker_OO200.C	2026-10-01 17:06:53.956725831 +0000
+@@ -0,0 +1,68 @@
++//____________________________________________________________________________________________________
++// NBD x Glauber fit for O+O 200 GeV (StNbdFitMaker), raw refMult.
++// Same calls as doNbdFitMaker.C, plus SetIntegerGlauberSampling(kTRUE): (Npart, Ncoll) are drawn as
++// the integer Glauber values instead of n + U(0,1) from the unit-width bins of hNcoll_Npart.
++//   data histogram : "hRefMult" (made by make_hRefMult_OO200.C; unit bins [n, n+1) from 0)
++//   isConstEfficiency = kFALSE : multiplicity-dependent efficiency eff = 0.98 (1 - d M/540), d = "efficiency"
++//____________________________________________________________________________________________________
++void scan(
++    const Int_t    nevents         = 1000000,
++    const Char_t*  realData        = "hRefMult_OO200.root",
++    const Char_t*  glauber         = "ncoll_npart.root",
++    const Double_t multiplicityCut = 15,
++    const Int_t    nppbin = 1, const Double_t nppmin = 2.4,  const Double_t nppmax = 2.4,
++    const Int_t    kbin   = 1, const Double_t kmin   = 2.0,  const Double_t kmax   = 2.0,
++    const Int_t    xbin   = 1, const Double_t xmin   = 0.13, const Double_t xmax   = 0.13,
++    const Double_t efficiency        = 0.00,
++    const Double_t triggerbias       = 1.00,
++    const Bool_t   isConstEfficiency = kFALSE
++)
++{
++  gSystem->Load("St_base");
++  gSystem->Load("StUtilities");
++  gSystem->Load("StGlauberUtilities");
++  gSystem->Load("StCentralityMaker");
++
++  StNbdFitMaker* maker = new StNbdFitMaker();
++  maker->SetMinimumMultiplicityCut(multiplicityCut);
++  maker->SetIntegerGlauberSampling(kTRUE);
++  maker->SetParameters(nppmin, kmin, xmin, efficiency, triggerbias, isConstEfficiency);
++  maker->ReadData(realData, glauber, "hRefMult");
++
++  maker->Scan(
++      nevents,
++      nppbin, nppmin, nppmax,
++      kbin, kmin, kmax,
++      xbin, xmin, xmax,
++      efficiency, triggerbias, isConstEfficiency
++      );
++}
++
++//____________________________________________________________________________________________________
++// Single fit at fixed parameters (README "fix the parameters" step), writes MC/data ratio + histograms
++void fit(
++    const Char_t*  outputFileName  = "NbdFit_OO200_best.root",
++    const Int_t    nevents         = 1000000,
++    const Char_t*  realData        = "hRefMult_OO200.root",
++    const Char_t*  glauber         = "ncoll_npart.root",
++    const Double_t multiplicityCut = 15,
++    const Double_t npp             = 2.4,
++    const Double_t k               = 2.0,
++    const Double_t x               = 0.13,
++    const Double_t efficiency      = 0.00,
++    const Double_t triggerbias     = 1.00,
++    const Bool_t   isConstEfficiency = kFALSE
++)
++{
++  gSystem->Load("St_base");
++  gSystem->Load("StUtilities");
++  gSystem->Load("StGlauberUtilities");
++  gSystem->Load("StCentralityMaker");
++
++  StNbdFitMaker* maker = new StNbdFitMaker();
++  maker->SetMinimumMultiplicityCut(multiplicityCut);
++  maker->SetIntegerGlauberSampling(kTRUE);
++  maker->SetParameters(npp, k, x, efficiency, triggerbias, isConstEfficiency);
++  maker->ReadData(realData, glauber, "hRefMult");
++  maker->Fit(nevents, outputFileName);
++}
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/doPlotMaker.csh star_glauber/doPlotMaker.csh
+--- star_glauber.orig/doPlotMaker.csh	2026-10-01 17:00:11.280104321 +0000
++++ star_glauber/doPlotMaker.csh	2026-10-01 17:06:20.980219891 +0000
+@@ -11,7 +11,12 @@
+   exit
+ endif
+ 
+-starver SL16d
++# Use one STAR library version for cons and every step: setenv GLAUBER_STARVER <version> before running
++if ( $?GLAUBER_STARVER ) then
++  starver $GLAUBER_STARVER
++else
++  starver SL16d
++endif
+ 
+ set name = "$1"
+ set energy = "$2"
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/doScanX_OO200.csh star_glauber/doScanX_OO200.csh
+--- star_glauber.orig/doScanX_OO200.csh	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/doScanX_OO200.csh	2026-10-01 17:06:53.958278521 +0000
+@@ -0,0 +1,28 @@
++#!/bin/csh
++#----------------------------------------------------------------------------------------------------
++# One NBD scan job for O+O 200 GeV (called by submit_doScan_OO200.pl through condor)
++# Arguments: npp k eff xbin xmin xmax   (x is scanned inside the job)
++#----------------------------------------------------------------------------------------------------
++if ( $?GLAUBER_STARVER ) then
++  starver $GLAUBER_STARVER
++else
++  starver SL19b
++endif
++
++set npp     = $1
++set k       = $2
++set eff     = $3
++set xbin    = $4
++set xmin    = $5
++set xmax    = $6
++
++set nevents = "1000000" # 1M per (npp, k, x, eff) point
++set real    = "hRefMult_OO200.root"   # raw refMult after event cuts, from make_hRefMult_OO200.C
++set mc      = "ncoll_npart.root"      # from addNcollVsNpart.C on the default O+O trees
++set multCut = "15"                    # fit refMult >= 15 only (trigger/vertex inefficiency at low refMult); vary 10/20 as a check
++
++root4star -b <<EOF2
++  .L doNbdFitMaker_OO200.C
++  scan($nevents, "$real", "$mc", $multCut, 1, $npp, $npp, 1, $k, $k, $xbin, $xmin, $xmax, $eff, 1.00, kFALSE);
++  .q
++EOF2
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/find_best_nbd_OO200.py star_glauber/find_best_nbd_OO200.py
+--- star_glauber.orig/find_best_nbd_OO200.py	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/find_best_nbd_OO200.py	2026-10-01 17:07:20.248612651 +0000
+@@ -0,0 +1,73 @@
++#!/usr/bin/env python3
++"""
++Step 2b for O+O 200 GeV: rank all NBD scan points and print the centrality table of the best one.
++
++Replaces getBestChi2_fromCat/*.sh for this system. Those scripts read fixed line numbers
++("head -206") and fixed character columns ("cut -c 67-71") of the logs, which shift as soon as
++one log line or number width changes. This reads the summary line that StNbdFitMaker::Scan
++prints for every point,
++  StNbdFitMaker::Scan  Fitting for (npp, k, x, d, chi2/ndf) = (2.400, 2.000, 0.130, 0.000, 123.4/ 80=1.543) ...
++and attaches the 32 "mMultiplicityCut[...]" lines CalculateCentrality printed for that same point
++(they come right before its summary line in the same log).
++
++Usage (from the star_glauber directory, after the scan jobs finished):
++  python3 find_best_nbd_OO200.py [LOG_Scan] [N best to list, default 15]
++"""
++import glob, os, re, sys
++
++logdir = sys.argv[1] if len(sys.argv) > 1 else "LOG_Scan"
++ntop   = int(sys.argv[2]) if len(sys.argv) > 2 else 15
++
++summary = re.compile(r"StNbdFitMaker::Scan\s+Fitting for \(npp, k, x, d, chi2/ndf\) = \(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+),\s*([\d.]+),\s*([\d.eE+-]+)/\s*(\d+)=\s*([\d.eE+-]+|nan|inf)\)")
++cutline = re.compile(r"(mMultiplicityCut\[[012]\]\.push_back\(.*)$")
++
++points = []
++files = sorted(glob.glob(os.path.join(logdir, "doScanX_OO200*.out")))
++if not files:
++    sys.exit(f"No doScanX_OO200*.out in {logdir}")
++
++for fn in files:
++    block = []
++    with open(fn, errors="replace") as f:
++        for line in f:
++            m = cutline.search(line)
++            if m:
++                block.append(m.group(1).strip())
++                continue
++            s = summary.search(line)
++            if s:
++                npp, k, x, d, chi2, ndf, red = s.groups()
++                try:
++                    red = float(red)
++                except ValueError:
++                    red = float("inf")
++                points.append(dict(npp=float(npp), k=float(k), x=float(x), d=float(d),
++                                   chi2=float(chi2), ndf=int(ndf), chi2ndf=red, log=fn, cuts=block))
++                block = []
++
++if not points:
++    sys.exit("Found logs but no scan summary lines: check that the jobs finished.")
++
++points.sort(key=lambda p: p["chi2ndf"])
++print(f"{len(points)} scan points from {len(files)} logs\n")
++print(f"{'rank':>4} {'npp':>6} {'k':>6} {'x':>6} {'d':>6} {'chi2':>10} {'ndf':>4} {'chi2/ndf':>9}")
++for i, p in enumerate(points[:ntop]):
++    print(f"{i+1:>4} {p['npp']:6.3f} {p['k']:6.3f} {p['x']:6.3f} {p['d']:6.3f} {p['chi2']:10.1f} {p['ndf']:>4} {p['chi2ndf']:9.3f}")
++
++# Warn if the best point sits on the edge of the scanned grid (scan range too small)
++best = points[0]
++for key in ("npp", "k", "x", "d"):
++    vals = sorted({p[key] for p in points})
++    if len(vals) > 1 and best[key] in (vals[0], vals[-1]):
++        print(f"\nWARNING: best {key} = {best[key]:.3f} is at the edge of the scanned range "
++              f"[{vals[0]:.3f}, {vals[-1]:.3f}]; extend the range and rescan.")
++
++print(f"\nBest point log: {best['log']}")
++print(f"Ratio file   : RatioChi2Files/Ratio_npp{best['npp']:.3f}_k{best['k']:.3f}_x{best['x']:.3f}_eff{best['d']:.3f}.root")
++print("\n// ---- paste between the PASTE markers in StCentrality::Init_OO200GeV() ----")
++print(f"// npp = {best['npp']:.3f}, k = {best['k']:.3f}, x = {best['x']:.3f}, d = {best['d']:.3f}, "
++      f"chi2/ndf = {best['chi2']:.1f}/{best['ndf']} = {best['chi2ndf']:.3f}")
++if len(best["cuts"]) != 32:
++    print(f"// WARNING: expected 32 centrality lines for this point, found {len(best['cuts'])}")
++for c in best["cuts"]:
++    print("\t" + c)
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/make_hRefMult_OO200.C star_glauber/make_hRefMult_OO200.C
+--- star_glauber.orig/make_hRefMult_OO200.C	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/make_hRefMult_OO200.C	2026-10-01 17:07:34.528546241 +0000
+@@ -0,0 +1,53 @@
++//____________________________________________________________________________________________________
++// make_hRefMult_OO200.C -- data input for the STAR NBD x Glauber fit (StNbdFitMaker), O+O 200 GeV
++//
++// Reads the raw refMult histogram that PicoBinner books after the event cuts (trigger 860003,
++// |Vz| <= 2 cm, Vr <= 1 cm, ...) -- TH1I "refMult", 1000 unit bins from 0 -- and writes it as
++// TH1D "hRefMult", the name and type StNbdFitMaker::ReadData() expects.
++//
++// Binning requirement (StNbdFitMaker::CalculateCentrality): bin i+1 must hold refMult = i,
++// i.e. unit-width bins starting at 0. Checked below.
++//
++// Plain ROOT, no STAR libraries:
++//   root -l -b -q 'make_hRefMult_OO200.C("yieldHistos_OO200_pion.root")'
++//____________________________________________________________________________________________________
++void make_hRefMult_OO200(
++    const char* inputFile  = "yieldHistos_OO200_pion.root",
++    const char* inputName  = "refMult",
++    const char* outputFile = "hRefMult_OO200.root"
++)
++{
++  TFile* fin = TFile::Open(inputFile, "READ");
++  if(!fin || fin->IsZombie()){ Error("make_hRefMult_OO200", "cannot open %s", inputFile); return; }
++
++  TH1* hin = dynamic_cast<TH1*>(fin->Get(inputName));
++  if(!hin){ Error("make_hRefMult_OO200", "no histogram '%s' in %s", inputName, inputFile); return; }
++
++  const Int_t    nbins = hin->GetNbinsX();
++  const Double_t xmin  = hin->GetXaxis()->GetXmin();
++  const Double_t xmax  = hin->GetXaxis()->GetXmax();
++  if( xmin != 0.0 || TMath::Abs((xmax - xmin)/nbins - 1.0) > 1e-9 ){
++    Error("make_hRefMult_OO200", "'%s' must have unit bins starting at 0 (has %d bins in [%g, %g])",
++          inputName, nbins, xmin, xmax);
++    return;
++  }
++
++  TH1D* h = new TH1D("hRefMult", "O+O 200 GeV, raw refMult after event cuts;refMult;Events", nbins, xmin, xmax);
++  for(Int_t i=1; i<=nbins; i++){
++    h->SetBinContent(i, hin->GetBinContent(i));
++    h->SetBinError(i, TMath::Sqrt(hin->GetBinContent(i))); // raw event counts
++  }
++  h->SetEntries(hin->GetEntries());
++
++  Int_t lastFilled = 0;
++  for(Int_t i=nbins; i>=1; i--) if(h->GetBinContent(i) > 0){ lastFilled = i; break; }
++  cout << "hRefMult: " << (Long64_t)h->GetEntries() << " events, mean refMult = " << h->GetMean()
++       << ", underflow = " << hin->GetBinContent(0) << ", overflow = " << hin->GetBinContent(nbins+1)
++       << ", highest filled refMult = " << lastFilled-1 << endl;
++
++  TFile* fout = TFile::Open(outputFile, "RECREATE");
++  h->Write();
++  fout->Close();
++  fin->Close();
++  cout << "Wrote " << outputFile << endl;
++}
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/submit_condor.pl star_glauber/submit_condor.pl
+--- star_glauber.orig/submit_condor.pl	2026-10-01 17:00:11.278209893 +0000
++++ star_glauber/submit_condor.pl	2026-10-01 17:06:20.980641511 +0000
+@@ -159,7 +159,7 @@
+ # Set submission command
+ #----------------------------------------------------------------------------------------------------
+ $requirements = '(CPU_Type != "crs") && (CPU_Experiment == "star") && CPU_Experiment != "lsst" && CPU_Experiment != "atlas"';
+-$usermail = "chenlz\@rcf.rhic.bnl.gov";
++$usermail = "$ENV{USER}\@rcf.rhic.bnl.gov"; # was hard-coded to the original author
+ 
+ #print "-------------------------- condor_submit input list --------------------------\n" ;
+ #print "\n" ;
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/submit_doScan_OO200.pl star_glauber/submit_doScan_OO200.pl
+--- star_glauber.orig/submit_doScan_OO200.pl	1970-01-01 00:00:00.000000000 +0000
++++ star_glauber/submit_doScan_OO200.pl	2026-10-01 17:06:53.959927159 +0000
+@@ -0,0 +1,34 @@
++#! /usr/bin/perl
++#----------------------------------------------------------------------------------------------------
++# Step 2 for O+O 200 GeV: submit the NBD (npp, k, x, d) scan.
++# One condor job per (npp, k, d); x is scanned inside each job (xbin points).
++# Coarse pass below; after it, narrow the ranges around the minimum and run again.
++# Usage: ./submit_doScan_OO200.pl        (prints the commands)
++#        ./submit_doScan_OO200.pl -run   (submits)
++#----------------------------------------------------------------------------------------------------
++my $run = (defined $ARGV[0] && $ARGV[0] eq "-run") ? 1 : 0 ;
++
++my $nppbin = 9;  my $nppmin = 1.6;  my $nppmax = 3.2;   # step 0.2
++my $kbin   = 5;  my $kmin   = 1.0;  my $kmax   = 9.0;   # step 2.0
++my $xbin   = 6;  my $xmin   = 0.08; my $xmax   = 0.28;  # step 0.04 (inside each job)
++my $effbin = 4;  my $effmin = 0.00; my $effmax = 0.12;  # step 0.04; d=0 is a constant 98% efficiency
++
++my $npp_step = ($nppbin==1) ? 0 : ($nppmax-$nppmin)/($nppbin-1);
++my $k_step   = ($kbin==1)   ? 0 : ($kmax-$kmin)/($kbin-1);
++my $eff_step = ($effbin==1) ? 0 : ($effmax-$effmin)/($effbin-1);
++
++my $nJobs = $nppbin * $kbin * $effbin;
++print "number of jobs: $nJobs  (each scans $xbin x values)\n";
++
++for (my $i=0; $i<$nppbin; $i++) {
++  for (my $j=0; $j<$kbin; $j++) {
++    for (my $l=0; $l<$effbin; $l++) {
++      my $npp = sprintf("%.3f", $nppmin + $npp_step*$i);
++      my $k   = sprintf("%.3f", $kmin   + $k_step*$j);
++      my $eff = sprintf("%.3f", $effmin + $eff_step*$l);
++      my $submit = "./submit_condor.pl -s doScanX_OO200.csh $npp $k $eff $xbin $xmin $xmax";
++      print "$submit\n";
++      system("$submit") if $run;
++    }
++  }
++}
+diff -ruN -x star_glauber_OO200.patch star_glauber.orig/submit_glauber.pl star_glauber/submit_glauber.pl
+--- star_glauber.orig/submit_glauber.pl	2026-10-01 17:00:11.279928367 +0000
++++ star_glauber/submit_glauber.pl	2026-10-01 17:06:20.981083567 +0000
+@@ -57,6 +57,7 @@
+     Current available systems are:
+         AuAu
+         SmSm
++        OO       (16O, 3-parameter Fermi density, spherical: use -def kFALSE)
+ 
+     -sleep [second]                   Wait [second] sec (default is 0 sec, i.e. no wait)
+ 
