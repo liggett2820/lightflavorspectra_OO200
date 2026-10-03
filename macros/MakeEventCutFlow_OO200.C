@@ -18,7 +18,7 @@
 // macros/PlotEventCutFlow_OO200.C.
 //
 // Usage (repo root, RCF, inside the SL7 container, SL24y):
-//   root -l -b -q macros/LoadEventDisplayLibs.C 'macros/MakeEventCutFlow_OO200.C+("files.list","cutflow_part0.root")'
+//   root -l -b -q macros/LoadCutFlowLibs.C 'macros/MakeEventCutFlow_OO200.C+("files.list","cutflow_part0.root")'
 // Set doTracks = false to skip the track loop (much faster; drops the <nHitsFit> vs Vz profile).
 
 #include <fstream>
