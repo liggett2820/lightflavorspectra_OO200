@@ -201,7 +201,9 @@ if ( $submit ) {
   print OUT "Output          = $outFile\n" ;
   print OUT "Error           = $errFile\n" ;
   print OUT "Log             = $logFile\n" ;
-  print OUT "Requirements    = $requirements\n" ;
+  # The old RCF farm attributes (CPU_Type, CPU_Experiment) no longer exist on SDCC condor and
+  # matched 0 slots, so no extra Requirements are added; condor still requires a matching FileSystemDomain.
+  #print OUT "Requirements    = $requirements\n" ;
   print OUT "GetEnv          = True\n" ;
   print OUT "Notify_user     = $usermail\n" ;
   print OUT "Priority        = +10\n" ;
