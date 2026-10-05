@@ -3879,8 +3879,32 @@ complex< double > PhysMath::ComplexGamma( complex<double> z){
 
 
 #ifdef _CPP11_
+// FIXED 2026-09-02: replaced the C++11 lambda comparator here with a plain named
+// functor. g++ (with -std=c++11) compiled the lambda fine, but ACLiC's dictionary
+// generation goes through CINT/rootcint, a completely separate, much older
+// hand-written parser that has NEVER supported C++11 lambda syntax, at any flag
+// setting -- unlike the "-std=c++11 supplies no -std= flag" issue this file's
+// build macros/Makefile fix elsewhere, this isn't a flag problem, it's a hard
+// CINT limitation (see http://root.cern.ch/viewvc/branches/v5-34-00-patches/cint/doc/limitati.txt).
+// Real symptom at RCF/SL23c: "Error in <ACLiC>: Dictionary generation failed with
+// a core dump!" while compiling source/namespaces.cxx (which pulls this file in as
+// part of its single combined translation unit -- see that file's own comment),
+// which also then left the same long-running root.exe process's CINT state
+// corrupted for every ACLiC CompileMacro call after it in that session (observed:
+// MattMcEvent.cxx/MattMcTrack.cxx's own dictionaries came out missing
+// Class()/ShowMembers()/Streamer() despite compiling with no printed error).
+// This functor is behaviorally identical to the removed lambda -- same signature,
+// same capture-by-reference of a_values -- just spelled in a form CINT can parse.
+namespace {
+  struct SimultaneousSortDoubleIntComparator {
+    const vector<double>& values;
+    SimultaneousSortDoubleIntComparator(const vector<double>& a_values) : values(a_values) {}
+    bool operator()(size_t i, size_t j) const { return values[i] > values[j]; }
+  };
+}
+
 void PhysMath::SimultaneousSortDoubleInt( vector< double > a_values, vector< double > a_other){
-  std::sort(a_other.begin(), a_other.end(),[&a_values](size_t i, size_t j){return a_values[i] > a_values[j];});
+  std::sort(a_other.begin(), a_other.end(), SimultaneousSortDoubleIntComparator(a_values));
   std::sort(a_values.begin(), a_values.end(),std::greater<double>());
 }
 #endif
