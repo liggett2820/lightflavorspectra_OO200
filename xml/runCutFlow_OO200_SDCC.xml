@@ -10,7 +10,9 @@
   Before submitting (on RCF, from the repo root): bin/libStPicoDst.so must exist (README,
   One-time build setup, step 1) and the output directory must exist:
     mkdir -p /star/data03/pwg/liggett/CutFlow_OO200 /star/data03/scratch/liggett/schedFiles/cutFlow_OO200 /star/data03/scratch/liggett/cutFlow_OO200/stdout_stderr
-  Submit with:  star-submit xml/runCutFlow_OO200_SDCC.xml
+  Submit with:  rm -f CutFlow_OO200.zip; star-submit xml/runCutFlow_OO200_SDCC.xml
+  (SUMS reuses an existing CutFlow_OO200.zip sandbox without repacking it, so after any
+  change to macros/ or scripts/ the old zip must be deleted or the jobs run the old code.)
 -->
 
 <job name="cutFlow_OO200" maxFilesPerProcess="50" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="true">
