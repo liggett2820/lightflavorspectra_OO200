@@ -41,11 +41,11 @@ void PlotEventCutFlow_OO200(const char* inName = "cutflow_OO200_all.root"){
     unsigned int id; double nev; tt->SetBranchAddress("trigId",&id); tt->SetBranchAddress("nEvents",&nev);
     std::vector<std::pair<double,unsigned int> > v;
     std::map<unsigned int,double> sum;
-    for(Long64_t i=0;i<tt->GetEntries();i++){ tt->GetEntry(i); sum[id]+=nev; }   // hadd keeps one row per part
-    for(std::map<unsigned int,double>::iterator it=sum.begin(); it!=sum.end(); ++it) v.push_back(std::make_pair(it->second,it->first));
+    for(Long64_t ie=0;ie<tt->GetEntries();ie++){ tt->GetEntry(ie); sum[id]+=nev; }   // hadd keeps one row per part
+    for(std::map<unsigned int,double>::iterator its=sum.begin(); its!=sum.end(); ++its) v.push_back(std::make_pair(its->second,its->first));
     std::sort(v.rbegin(), v.rend());
     txt << "\ntrigger_id\tevents_with_this_id\n";
-    for(size_t i=0;i<v.size();i++) txt << v[i].second << "\t" << (long long)v[i].first << "\n";
+    for(size_t iv=0;iv<v.size();iv++) txt << v[iv].second << "\t" << (long long)v[iv].first << "\n";
   }
   txt.close();
 
@@ -71,7 +71,7 @@ void PlotEventCutFlow_OO200(const char* inName = "cutflow_OO200_all.root"){
     p->SetMarkerStyle(20); p->SetMarkerColor(kAzure+3); p->SetLineColor(kAzure+3); p->GetXaxis()->SetRangeUser(-150,150);
     p->Draw();
     double lo = p->GetMinimum(), hi = p->GetMaximum();
-    TBox* b = new TBox(-2, lo, 2, hi); b->SetFillColorAlpha(kOrange+7,0.35); b->Draw();
+    TBox* b = new TBox(-2, lo, 2, hi); b->SetFillColor(kOrange-9); b->Draw();  // opaque; profile redrawn on top (SetFillColorAlpha is ROOT 6 only)
     p->Draw("same");
   }
   c2->SaveAs("OO200_TPC_vs_Vz.png");
@@ -88,18 +88,18 @@ void PlotEventCutFlow_OO200(const char* inName = "cutflow_OO200_all.root"){
     if(hasAll){ tr->SetBranchAddress("nAll",&nAll); tr->SetBranchAddress("nTrig",&nTrig); }
     std::map<int,std::pair<double,double> > m;        // hadd keeps one row per job: sum by run
     std::map<int,std::pair<double,double> > mAT;      // run -> (all, 860003)
-    for(Long64_t i=0;i<tr->GetEntries();i++){
-      tr->GetEntry(i); m[run].first+=nEv; m[run].second+=zs;
+    for(Long64_t ir=0;ir<tr->GetEntries();ir++){
+      tr->GetEntry(ir); m[run].first+=nEv; m[run].second+=zs;
       if(hasAll){ mAT[run].first+=nAll; mAT[run].second+=nTrig; }
     }
-    TGraph* g = new TGraph(); int k=0, nRunTrig=0; double sumAll=0, sumTrig=0, sumAllTrigRuns=0;
+    TGraph* g = new TGraph(); int kg=0, nRunTrig=0; double sumAll=0, sumTrig=0, sumAllTrigRuns=0;
     std::ofstream rt("OO200_RunList.txt"); rt << "run\tall_events\ttrigger_860003\tevents_after_cuts\tmean_ZDCx_kHz\n";
-    for(std::map<int,std::pair<double,double> >::iterator it=m.begin(); it!=m.end(); ++it){
-      double mean = it->second.first>0 ? it->second.second/it->second.first : 0;
-      double a = hasAll ? mAT[it->first].first : -1, t = hasAll ? mAT[it->first].second : -1;
-      rt << it->first << "\t" << (long long)a << "\t" << (long long)t << "\t" << (long long)it->second.first << "\t" << mean << "\n";
+    for(std::map<int,std::pair<double,double> >::iterator itr=m.begin(); itr!=m.end(); ++itr){
+      double mean = itr->second.first>0 ? itr->second.second/itr->second.first : 0;
+      double a = hasAll ? mAT[itr->first].first : -1, t = hasAll ? mAT[itr->first].second : -1;
+      rt << itr->first << "\t" << (long long)a << "\t" << (long long)t << "\t" << (long long)itr->second.first << "\t" << mean << "\n";
       if(hasAll){ sumAll += a; sumTrig += t; if(t > 0){ nRunTrig++; sumAllTrigRuns += a; } }
-      if(it->second.first > 0){ g->SetPoint(k, k, mean); k++; }
+      if(itr->second.first > 0){ g->SetPoint(kg, kg, mean); kg++; }
     }
     rt.close();
     if(hasAll){
@@ -110,7 +110,7 @@ void PlotEventCutFlow_OO200(const char* inName = "cutflow_OO200_all.root"){
           << "\nall_events_in_runs_with_860003\t" << (long long)sumAllTrigRuns << "\n";
       txt.close();
     }
-    g->SetTitle(Form("%d runs;run index;#LTZDC coincidence rate#GT (kHz)", k));
+    g->SetTitle(Form("%d runs;run index;#LTZDC coincidence rate#GT (kHz)", kg));
     g->SetMarkerStyle(20); g->SetMarkerSize(0.6); g->SetMarkerColor(kAzure+3); g->Draw("AP");
   }
   c3->cd(3); TProfile* pz = (TProfile*)f->Get("pRefMult_vs_ZDCx"); pz->SetMarkerStyle(20); pz->SetMarkerColor(kAzure+3); pz->Draw();
