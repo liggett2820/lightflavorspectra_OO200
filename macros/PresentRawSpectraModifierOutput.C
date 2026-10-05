@@ -234,6 +234,55 @@
 // per curve, not a physical quantity). Everything else (signed-y color mapping from
 // REVISION 5, the compact corner annotation, plain-black-vs-colored choice from
 // REVISION 3/4) is unchanged.
+//
+// REVISION 10 (2026-07-29): Andrew asked for two kinds of output: the existing one
+// PNG per (species, charge, centrality) [unchanged -- that's what this macro already
+// produced], PLUS a new one PNG per (species, charge) combining every populated
+// centrality bin so they can be compared side-by-side. Asked Andrew (via
+// AskUserQuestion) how a 6-centrality combination should actually be drawn, since each
+// existing per-centrality panel already overlays many rapidity-bin curves (offset by
+// decade) on its own -- overlaying 6 centralities' worth of that directly onto one set
+// of axes would be unreadable. Andrew chose "all rapidity bins, faceted": a 3x2 grid of
+// small sub-panels on one canvas, one per populated centrality (this analysis uses
+// CutClass's 6-bin centrality scheme: 0-5%,5-10%,10-20%,20-40%,40-80%,80-100%, same
+// range this file already loops centIndex 0..15 over -- only 0..5 are ever populated),
+// each sub-panel showing the exact same rapidity-bin-overlay content as the standalone
+// per-centrality PNG for that bin, just smaller.
+//
+// Implemented by splitting drawOneCorrectedSpectraPanel()'s old monolithic body into
+// three pieces so the faceted grid can reuse the data-gathering and drawing code
+// exactly, rather than re-deriving it (and risking the grid silently disagreeing with
+// the individual panels about which points survived the significance/chi^2 cuts):
+//   - gatherAndCutRapidityBins(): the per-(species,charge,centrality) fetch-from-file +
+//     significance-cut + chi^2-cut loop, now returns its `bins` vector instead of being
+//     inlined.
+//   - drawSpectraIntoPad(): the actual axis/point/annotation drawing, now takes
+//     whatever TVirtualPad is already current instead of always creating its own
+//     TCanvas, plus an a_compact flag. a_compact=false (used for the standalone
+//     per-centrality PNGs, byte-for-byte the same drawing this macro always did) draws
+//     the full corner annotation, color-scale bar, and TPC/BTOF legend. a_compact=true
+//     (new, used only inside the faceted grid's sub-pads) shrinks the corner text down
+//     to just the centrality label and skips the color bar/legend entirely -- six tiny
+//     copies of the same bar/legend would be illegible and redundant, and the full
+//     versions are always available on the individual per-centrality PNGs generated
+//     alongside the grid.
+//   - drawOneCorrectedSpectraPanel() itself is now a thin wrapper: gather bins, run the
+//     existing numeric N_evt/BTOF checks (unchanged), create its own TCanvas as before,
+//     call drawSpectraIntoPad(canv, bins, ..., a_compact=false), save the PNG. Output
+//     filenames/content for this path are unchanged from REVISION 9.
+//   - drawAllCentralitiesFacetedCanvas() is the new function: builds one TCanvas,
+//     Divide(3,2)'s it, and for each populated centrality re-runs
+//     gatherAndCutRapidityBins() (same cuts, same chi^2 files) and
+//     drawSpectraIntoPad(pad, bins, ..., a_compact=true) into that grid cell. Written to
+//     "<a_outDir>/AllCentralities_<Species><Plus/Minus>.png". Called once per charge
+//     sign from PresentRawSpectraModifierOutput(), right after that charge's centrality
+//     loop finishes.
+// Untested (no ROOT available to Claude in this environment, same constraint as every
+// prior revision here) -- please render both a full per-centrality PNG and the new
+// AllCentralities_*.png for one species/charge and confirm: the individual panels look
+// identical to before this revision, the grid's 6 cells are legible (axis labels not
+// overlapping, centrality label readable in each cell), and empty/unpopulated cells (if
+// any) show a plain "no data" placeholder rather than a blank pad that looks broken.
 
 #include "TFile.h"
 #include "TDirectory.h"
@@ -638,54 +687,34 @@ void printBTOFCorrectionCheck(TDirectory* a_dir, string a_speciesName, string a_
 }
 
 //_______________________________________________________________________________
-// One (species, charge, centrality) panel: gather every populated rapidity bin's
-// corrected TPC/BTOF/ETOF TGraphErrors from a_dir, then draw them all overlaid, offset
-// (optional) purely for visual separation between curves, colored by signed y on the
-// fixed [-a_kRapColorMax,+a_kRapColorMax] scale using ROOT's active default palette
-// (REVISION 5, 2026-07-22 -- see header comment). The offset multiplier is the
-// ORIGINAL rank-index-based mult = 10^b, where b is the curve's position in the bins
-// vector (REVISION 7, 2026-07-22 -- reverted from REVISION 3-6's bounded, y-value-based
-// formula per Andrew's explicit preference for less error-bar overlap; see header
-// comment for the full history, including the fact this can reach ~10^40 for the
-// widest-rapidity panels now that the rapidity cut has been widened -- intentional,
-// not a bug).
-void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, string a_chargeLabel,
-                                   int a_centIndex, double a_maxMtM0, bool a_offsetByDecade,
-                                   string a_outDir, string a_systemLabel, int a_nColors,
-                                   double a_kRapColorMax,
-                                   TH1D* a_centEventsHist, double a_speciesMassGeV,
-                                   double a_minSignificance,
-                                   TH2* a_tpcChiSqrHist, TH2* a_btofChiSqrHist, TH2* a_etofChiSqrHist,
-                                   double a_maxChiSqrNdf, double a_maxChiSqrNdfTPCMinus){
+// One populated rapidity bin's TPC/BTOF/ETOF TGraphErrors, plus the rapidity value and
+// yIndex they were fetched under. REVISION 10 (2026-07-29): hoisted out of
+// drawOneCorrectedSpectraPanel() to file scope so gatherAndCutRapidityBins() and
+// drawSpectraIntoPad() (both new in this revision -- see the header comment) can share
+// it without duplicating the struct definition.
+struct RapBin { double y; int yIndex; TGraphErrors* tpc; TGraphErrors* btof; TGraphErrors* etof; };
 
-  // Offset formula history: REVISION 3 (2026-07-21) replaced the original rank-index
-  // formula (mult=10^b) with a bounded, y-value-based one (mult=base^(scaleFactor*y))
-  // to fix a latent unboundedness bug (b could reach ~40 after the rapidity cut was
-  // widened, so mult could reach 10^40). REVISION 6 (2026-07-22) raised that formula's
-  // scaleFactor from 2 to 10 to widen the curve separation, matching the reference
-  // plot's own "x3^{+-10y}" convention. REVISION 7 (2026-07-22, same day): after
-  // seeing the REVISION 6 render, Andrew said he preferred the ORIGINAL rank-index
-  // formula (mult=10^b) over the bounded y-value-based one -- less error-bar overlap
-  // between curves. Reverted to that original formula below (see the mult=... lines
-  // in the pass-1/pass-2 loops over `bins`). This intentionally reintroduces the
-  // unbounded-multiplier property REVISION 3 had fixed (mult can reach ~10^40 for the
-  // widest-rapidity panels) -- accepted as the tradeoff for the wider separation
-  // Andrew is asking for; ROOT's log-y axis handles the resulting large dynamic range
-  // fine, since it's a per-curve display multiplier, not a physical quantity.
-
-  struct RapBin { double y; int yIndex; TGraphErrors* tpc; TGraphErrors* btof; TGraphErrors* etof; };
+//_______________________________________________________________________________
+// REVISION 10 (2026-07-29): extracted from drawOneCorrectedSpectraPanel()'s old yIndex
+// loop (unchanged in behavior -- see that function's original REVISION 7-9 history in
+// this file's header comment) so drawAllCentralitiesFacetedCanvas() can gather the exact
+// same already-significance-and-chi^2-cut points for its grid cells, rather than
+// re-deriving a separate (and possibly inconsistent) cut. Fetches every populated
+// yIndex's corrected_dEdxSpectra_.../corrected_InvBetaBTOFSpectra_.../
+// corrected_InvBetaETOFSpectra_... TGraphErrors for this exact (species, charge,
+// centrality) from a_dir, applies the significance cut then the chi^2/ndf cut to each
+// (mutating the graphs in place, same as before), and returns the bins that had ANY of
+// the three detectors present. a_nSignificanceSuppressed/a_nChiSqrSuppressed are
+// out-parameters so the caller can still print the same per-panel suppression tallies
+// this macro has always printed.
+vector<RapBin> gatherAndCutRapidityBins(TDirectory* a_dir, string a_speciesName, string a_chargeLabel, int a_centIndex,
+                                         double a_minSignificance,
+                                         TH2* a_tpcChiSqrHist, TH2* a_btofChiSqrHist, TH2* a_etofChiSqrHist,
+                                         double a_maxChiSqrNdf, double a_maxChiSqrNdfTPCMinus,
+                                         int& a_nSignificanceSuppressed, int& a_nChiSqrSuppressed){
   vector<RapBin> bins;
-
-  // STATISTICAL SIGNIFICANCE CUT (REVISION 8, 2026-07-23) -- see suppressInsignificantPoints()
-  // and this file's header comment for the rationale. Tallied per-panel and reported once
-  // below, same convention as PresentZFitterSpectra.C's per-panel suppression summary.
-  int nSignificanceSuppressed = 0;
-
-  // FIT-QUALITY (chi^2/ndf) CUT (REVISION 9, 2026-07-23) -- see suppressBadFitQualityPoints()
-  // and this file's header comment for the rationale, including why TPC gets its own
-  // threshold when a_chargeLabel=="Minus" (antiprotons): that category's chi^2/ndf
-  // distribution runs roughly 4x higher than every other detector/charge combination.
-  int nChiSqrSuppressed = 0;
+  a_nSignificanceSuppressed = 0;
+  a_nChiSqrSuppressed = 0;
   double tpcMaxChiSqrNdf = (a_chargeLabel == "Minus") ? a_maxChiSqrNdfTPCMinus : a_maxChiSqrNdf;
 
   for(int yIndex = 0; yIndex < 120; yIndex++){
@@ -698,12 +727,13 @@ void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, strin
     if(!tpc && !btof && !etof) continue;
 
     // Applied right after fetch, before this bin's rapidity is parsed or it's stored in
-    // `bins` -- so every downstream consumer (the N_evt/BTOF numeric checks below and the
-    // Pass 1/Pass 2 drawing loops further down) sees the same already-cut points, rather
-    // than risking the checks and the plot disagreeing about which points survived.
-    if(tpc)  nSignificanceSuppressed += suppressInsignificantPoints(tpc,  a_minSignificance);
-    if(btof) nSignificanceSuppressed += suppressInsignificantPoints(btof, a_minSignificance);
-    if(etof) nSignificanceSuppressed += suppressInsignificantPoints(etof, a_minSignificance);
+    // `bins` -- so every downstream consumer (the N_evt/BTOF numeric checks and BOTH
+    // drawing paths -- the standalone per-centrality panel and the faceted grid cell --
+    // as of REVISION 10) sees the same already-cut points, rather than risking them
+    // disagreeing about which points survived.
+    if(tpc)  a_nSignificanceSuppressed += suppressInsignificantPoints(tpc,  a_minSignificance);
+    if(btof) a_nSignificanceSuppressed += suppressInsignificantPoints(btof, a_minSignificance);
+    if(etof) a_nSignificanceSuppressed += suppressInsignificantPoints(etof, a_minSignificance);
 
     double y = -999;
     if(tpc)       y = parseRapidityCenterFromTitle(tpc);
@@ -718,14 +748,186 @@ void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, strin
     // Applied after the significance cut and after y is known (needed to look up the
     // right row of a_*ChiSqrHist) but still before this bin is stored -- same
     // already-cut-before-anyone-reads-it guarantee as the significance cut above.
-    if(tpc)  nChiSqrSuppressed += suppressBadFitQualityPoints(tpc,  y, a_tpcChiSqrHist,  tpcMaxChiSqrNdf);
-    if(btof) nChiSqrSuppressed += suppressBadFitQualityPoints(btof, y, a_btofChiSqrHist, a_maxChiSqrNdf);
-    if(etof) nChiSqrSuppressed += suppressBadFitQualityPoints(etof, y, a_etofChiSqrHist, a_maxChiSqrNdf);
+    if(tpc)  a_nChiSqrSuppressed += suppressBadFitQualityPoints(tpc,  y, a_tpcChiSqrHist,  tpcMaxChiSqrNdf);
+    if(btof) a_nChiSqrSuppressed += suppressBadFitQualityPoints(btof, y, a_btofChiSqrHist, a_maxChiSqrNdf);
+    if(etof) a_nChiSqrSuppressed += suppressBadFitQualityPoints(etof, y, a_etofChiSqrHist, a_maxChiSqrNdf);
 
     RapBin b;
     b.y = y; b.yIndex = yIndex; b.tpc = tpc; b.btof = btof; b.etof = etof;
     bins.push_back(b);
   }
+  return bins;
+}
+
+//_______________________________________________________________________________
+// REVISION 10 (2026-07-29): extracted from drawOneCorrectedSpectraPanel()'s old Pass
+// 1/frame/annotation/Pass 2/color-bar/legend block -- see this file's header comment
+// for the full rationale. Draws into whatever pad is CURRENT when called (the caller
+// must gPad->cd() into it -- or just have already created it via canv->cd()/Divide() --
+// and set its margins BEFORE calling this, same as drawOneCorrectedSpectraPanel()
+// already did for its own TCanvas) rather than creating its own TCanvas, so the exact
+// same axis/point-drawing code can produce either a full standalone panel
+// (a_compact=false, used by drawOneCorrectedSpectraPanel(), pixel-for-pixel identical
+// to every prior revision's output) or one small cell of the new faceted grid
+// (a_compact=true, used only by drawAllCentralitiesFacetedCanvas()). a_compact drops
+// the color-scale bar and TPC/BTOF legend (illegible at 1/6 canvas size, and six
+// repeated copies would be redundant) and shrinks the corner annotation down to just
+// the centrality label -- the full legend/color-bar/annotation stay available on the
+// individual per-centrality PNGs generated alongside every faceted canvas, so nothing
+// is lost, just not repeated six times over.
+void drawSpectraIntoPad(TVirtualPad* a_pad, vector<RapBin>& a_bins, string a_speciesName, string a_chargeLabel,
+                         int a_centIndex, double a_maxMtM0, bool a_offsetByDecade, string a_systemLabel,
+                         int a_nColors, double a_kRapColorMax, bool a_compact){
+  a_pad->cd();
+
+  // Pass 1: figure out the y-axis range from the actual (post-offset) point values.
+  double globalMinPositiveY = 1e300;
+  double globalMaxY = 0;
+  for(size_t b = 0; b < a_bins.size(); b++){
+    double mult = a_offsetByDecade ? TMath::Power(10.0,(double)b) : 1.0;
+    TGraphErrors* graphs[3] = {a_bins[b].tpc, a_bins[b].btof, a_bins[b].etof};
+    for(int gi = 0; gi < 3; gi++){
+      TGraphErrors* g = graphs[gi];
+      if(!g) continue;
+      for(int p = 0; p < g->GetN(); p++){
+        double val = g->GetY()[p]*mult;
+        if(val <= 0) continue;
+        if(val < globalMinPositiveY) globalMinPositiveY = val;
+        if(val > globalMaxY) globalMaxY = val;
+      }
+    }
+  }
+
+  if(globalMaxY <= 0){
+    cout << "WARNING: every point for " << a_speciesName << a_chargeLabel << " Cent" << a_centIndex
+         << " is zero/negative -- skipping this panel." << endl;
+    return;
+  }
+
+  double yFloor = TMath::Power(10.0, TMath::Floor(TMath::Log10(globalMinPositiveY)));
+
+  a_pad->SetLogy();
+
+  // 2026-07-21: gStyle->SetOptTitle(0) (set in PresentRawSpectraModifierOutput() below)
+  // suppresses ANY title string passed to DrawFrame -- pass an empty title here and
+  // draw the real labels explicitly via TLatex further below instead, so they're
+  // guaranteed to actually render.
+  TH1F* frame = a_pad->DrawFrame(0, yFloor, a_maxMtM0, globalMaxY*3, "");
+  frame->GetXaxis()->SetTitle("m_{T}-m_{0} [GeV/c^{2}]");
+  // Full-size panels keep the complete invariant-yield label (see
+  // printNormalizationCheck()'s header comment for the derivation); a_compact panels
+  // (six per canvas, much less horizontal room) use a shortened axis title instead --
+  // the complete label is always visible on the standalone per-centrality PNG for the
+  // same (species,charge,centrality) generated alongside the grid.
+  frame->GetYaxis()->SetTitle(a_compact ? "Yield [(GeV/c^{2})^{-2}]"
+                               : "1/(2#pi m_{T} N_{evt}) d^{2}N/dy d(m_{T}-m_{0}) [(GeV/c^{2})^{-2}]");
+  frame->GetYaxis()->CenterTitle(true);
+  frame->GetYaxis()->SetTitleOffset(a_compact ? 1.7 : 1.4);
+  if(a_compact){
+    frame->GetXaxis()->SetTitleSize(0.05); frame->GetXaxis()->SetLabelSize(0.045);
+    frame->GetYaxis()->SetTitleSize(0.05); frame->GetYaxis()->SetLabelSize(0.04);
+  }
+
+  // Corner annotation. Full panels: the same 3-part title (species+charge, system,
+  // centrality) every prior revision has drawn, at the same position/size. Compact grid
+  // cells: just the centrality label, smaller, since the species/charge/system are
+  // already identified once for the whole canvas by drawAllCentralitiesFacetedCanvas()'s
+  // header, and there isn't room here for more without crowding the axes.
+  double annX = a_compact ? 0.16 : 0.13;
+  TLatex* titleLine = new TLatex(annX, a_compact ? 0.95 : 0.965,
+    a_compact ? centralityLabel(a_centIndex).c_str()
+              : Form("%s Spectra, %s, %s",
+                     particleSymbolWithCharge(a_speciesName,a_chargeLabel).c_str(),
+                     a_systemLabel.c_str(),
+                     centralityLabel(a_centIndex).c_str()));
+  titleLine->SetNDC();
+  titleLine->SetTextFont(43);
+  titleLine->SetTextSize(a_compact ? 16 : 20);
+  titleLine->SetTextAlign(13); // left, top
+  titleLine->Draw();
+
+  // Pass 2: draw every rapidity bin's TPC/BTOF/ETOF points, offset by the rank-index
+  // decade formula (mult=10^b, b=curve rank -- see REVISION 7 in this file's header
+  // comment for why this, rather than the bounded y-value-based formula REVISION 3-6
+  // tried, is the one still in use), colored by SIGNED y (REVISION 5) using ROOT's
+  // active default/configured palette. Cloned before scaling so the offset multiplier
+  // never mutates the actual objects loaded live out of the file -- important now that
+  // REVISION 10 can call this twice for the same underlying graphs (once for the
+  // standalone panel, once for the faceted grid cell).
+  for(size_t b = 0; b < a_bins.size(); b++){
+    double mult = a_offsetByDecade ? TMath::Power(10.0,(double)b) : 1.0;
+    double colorFrac = TMath::Max(0.0, TMath::Min(1.0, (a_bins[b].y + a_kRapColorMax) / (2.0*a_kRapColorMax)));
+    int colorIndex = TColor::GetColorPalette((int)(colorFrac*(a_nColors-1)));
+
+    if(a_bins[b].tpc){
+      TGraphErrors* g = (TGraphErrors*) a_bins[b].tpc->Clone();
+      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
+      g->SetMarkerStyle(20); // filled circle = TPC, same convention as PresentZFitterSpectra.C
+      g->SetMarkerColor(colorIndex);
+      g->SetLineColor(colorIndex);
+      g->SetMarkerSize(a_compact ? 0.5 : 0.7);
+      g->Draw("PE SAME");
+    }
+    if(a_bins[b].btof){
+      TGraphErrors* g = (TGraphErrors*) a_bins[b].btof->Clone();
+      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
+      g->SetMarkerStyle(24); // open circle = BTOF
+      g->SetMarkerColor(colorIndex);
+      g->SetLineColor(colorIndex);
+      g->SetMarkerSize(a_compact ? 0.5 : 0.7);
+      g->Draw("PE SAME");
+    }
+    if(a_bins[b].etof){
+      TGraphErrors* g = (TGraphErrors*) a_bins[b].etof->Clone();
+      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
+      g->SetMarkerStyle(25); // open square = ETOF
+      g->SetMarkerColor(colorIndex);
+      g->SetLineColor(colorIndex);
+      g->SetMarkerSize(a_compact ? 0.5 : 0.7);
+      g->Draw("PE SAME");
+    }
+  }
+
+  if(a_compact) return; // no color bar / legend at grid-cell scale -- see header comment above
+
+  drawColorScaleBar((TPad*)a_pad, a_kRapColorMax, a_nColors,
+                     Form("bar_%s%s_Cent%02d",a_speciesName.c_str(),a_chargeLabel.c_str(),a_centIndex));
+
+  TLegend* leg = new TLegend(0.55,0.74,0.72,0.855);
+  leg->SetBorderSize(0);
+  leg->SetFillStyle(0);
+  leg->SetTextSize(0.03);
+  TGraphErrors* dummyTPC  = new TGraphErrors(); dummyTPC->SetMarkerStyle(20);  dummyTPC->SetMarkerColor(kBlack);
+  TGraphErrors* dummyBTOF = new TGraphErrors(); dummyBTOF->SetMarkerStyle(24); dummyBTOF->SetMarkerColor(kBlack);
+  leg->AddEntry(dummyTPC,Form("#times10^{b} offset (b = curve rank)"),"p");
+  leg->AddEntry(dummyTPC,"TPC","p");
+  leg->AddEntry(dummyBTOF,"BTOF","p");
+  leg->Draw();
+}
+
+//_______________________________________________________________________________
+// One (species, charge, centrality) panel, saved as its own PNG -- unchanged output
+// from every prior revision. REVISION 10 (2026-07-29) rewrote this function's BODY to
+// call the newly-extracted gatherAndCutRapidityBins()/drawSpectraIntoPad() instead of
+// inlining that logic, but the numeric checks, print statements, canvas size/margins,
+// and PNG filename below are all identical to before -- this is a pure refactor of this
+// function, not a behavior change.
+void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, string a_chargeLabel,
+                                   int a_centIndex, double a_maxMtM0, bool a_offsetByDecade,
+                                   string a_outDir, string a_systemLabel, int a_nColors,
+                                   double a_kRapColorMax,
+                                   TH1D* a_centEventsHist, double a_speciesMassGeV,
+                                   double a_minSignificance,
+                                   TH2* a_tpcChiSqrHist, TH2* a_btofChiSqrHist, TH2* a_etofChiSqrHist,
+                                   double a_maxChiSqrNdf, double a_maxChiSqrNdfTPCMinus){
+
+  double tpcMaxChiSqrNdf = (a_chargeLabel == "Minus") ? a_maxChiSqrNdfTPCMinus : a_maxChiSqrNdf;
+
+  int nSignificanceSuppressed = 0, nChiSqrSuppressed = 0;
+  vector<RapBin> bins = gatherAndCutRapidityBins(a_dir, a_speciesName, a_chargeLabel, a_centIndex,
+                            a_minSignificance, a_tpcChiSqrHist, a_btofChiSqrHist, a_etofChiSqrHist,
+                            a_maxChiSqrNdf, a_maxChiSqrNdfTPCMinus,
+                            nSignificanceSuppressed, nChiSqrSuppressed);
 
   if(bins.empty()){
     cout << "No corrected spectra found for " << a_speciesName << a_chargeLabel << " Cent" << a_centIndex
@@ -747,17 +949,10 @@ void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, strin
   }
 
   // Explicit numeric N_evt/normalization check (Andrew, 2026-07-21) -- run once per
-  // panel. IMPORTANT (revised same day): originally this picked the FIRST bin (in
-  // yIndex order, i.e. lowest yIndex) with a non-empty point. That turned out to bias
-  // toward an EDGE rapidity bin (RawSpectraModifier's own output covers a wider
-  // rapidity range than the BTOF efficiency was actually fit across -- the
-  // EfficiencyFitter diagnostic-image survey earlier this session only sampled
-  // mid-rapidity y~0 and edge |y|~0.9, not necessarily this file's full range), which
-  // is exactly the kind of bin least likely to have real efficiency-correction data
-  // available for it. Now picks the bin with the SMALLEST |y| among those with a
-  // non-empty point instead -- a mid-rapidity bin is far more likely to sit inside
-  // whatever rapidity range the efficiency measurement actually covered, so this is a
-  // fairer, more representative test than "whichever bin happened to be first."
+  // panel. Picks the bin with the SMALLEST |y| among those with a non-empty point --
+  // a mid-rapidity bin is far more likely to sit inside whatever rapidity range the
+  // efficiency measurement actually covered, so this is a fairer, more representative
+  // test than "whichever bin happened to be first."
   int bestTpcBin = -1; double bestTpcAbsY = 1e300;
   for(size_t b = 0; b < bins.size(); b++){
     if(bins[b].tpc && bins[b].tpc->GetN() > 0 && TMath::Abs(bins[b].y) < bestTpcAbsY){
@@ -774,9 +969,7 @@ void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, strin
   }
 
   // Same idea, but on a BTOF point (see printBTOFCorrectionCheck()'s header comment
-  // for why this is the STRONGER confirmatory test -- a real, non-trivial correction
-  // is expected here, unlike the TPC point above which trivially shows scale=1 in a
-  // run with no TPC efficiency/energy-loss file). Same mid-rapidity-preferred
+  // for why this is the STRONGER confirmatory test). Same mid-rapidity-preferred
   // selection as the TPC check above, for the same reason.
   int bestBtofBin = -1; double bestBtofAbsY = 1e300;
   for(size_t b = 0; b < bins.size(); b++){
@@ -794,178 +987,111 @@ void drawOneCorrectedSpectraPanel(TDirectory* a_dir, string a_speciesName, strin
          << "momentum handoff, or if BTOF spectra weren't written for this species/charge/centrality)." << endl;
   }
 
-  // Pass 1: figure out the y-axis range from the actual (post-offset) point values.
-  double globalMinPositiveY = 1e300;
-  double globalMaxY = 0;
-  for(size_t b = 0; b < bins.size(); b++){
-    double mult = a_offsetByDecade ? TMath::Power(10.0,(double)b) : 1.0;
-    TGraphErrors* graphs[3] = {bins[b].tpc, bins[b].btof, bins[b].etof};
-    for(int gi = 0; gi < 3; gi++){
-      TGraphErrors* g = graphs[gi];
-      if(!g) continue;
-      for(int p = 0; p < g->GetN(); p++){
-        double val = g->GetY()[p]*mult;
-        if(val <= 0) continue;
-        if(val < globalMinPositiveY) globalMinPositiveY = val;
-        if(val > globalMaxY) globalMaxY = val;
-      }
-    }
-  }
-
-  if(globalMaxY <= 0){
-    cout << "WARNING: every point for " << a_speciesName << a_chargeLabel << " Cent" << a_centIndex
-         << " is zero/negative -- skipping plot." << endl;
-    return;
-  }
-
-  double yFloor = TMath::Power(10.0, TMath::Floor(TMath::Log10(globalMinPositiveY)));
-
   TCanvas* canv = new TCanvas(Form("canv_%s%s_Cent%02d",a_speciesName.c_str(),a_chargeLabel.c_str(),a_centIndex),"",900,700);
   canv->SetLogy();
-  // REVISION 4 (2026-07-21): color-scale bar is back (see header comment), so restore
-  // the right margin that makes room for it -- same convention as PresentZFitterSpectra.C.
   canv->SetRightMargin(0.16);
-  // Extra headroom for the compact corner annotation block drawn below (replacing the
-  // DrawFrame title string, which gStyle->SetOptTitle(0) silently suppresses -- see the
-  // comment on the DrawFrame call itself). Must be set BEFORE DrawFrame() so the frame
-  // is actually sized to leave this space, not just drawn under it.
   canv->SetTopMargin(0.14);
 
-  // 2026-07-21: gStyle->SetOptTitle(0) (set in PresentRawSpectraModifierOutput() below)
-  // suppresses ANY title string passed to DrawFrame -- it was silently never actually
-  // rendered on any plot, including the "rapidity bins offset by decades for
-  // readability" note that used to live inside it. Andrew asked for exactly that kind
-  // of scaling information (anything not already captured by the y-axis label) to be
-  // made visible. Pass an empty title here and draw the real labels explicitly via
-  // TLatex further below instead, so they're guaranteed to actually render.
-  TH1F* frame = canv->DrawFrame(0, yFloor, a_maxMtM0, globalMaxY*3, "");
-  frame->GetXaxis()->SetTitle("m_{T}-m_{0} [GeV/c^{2}]");
-  // 2026-07-21: fixed from a placeholder "Corrected Yield [arb. norm.]" after Andrew
-  // asked about the normalization -- confirmed via direct read of
-  // RawSpectraModifier::convertSpectraToInvariant() that every point here already has
-  // 1/(2*pi*mT*N_evt*dy*d(mT-m0)) baked in (see printNormalizationCheck()'s header
-  // comment for the full derivation + a runtime numeric check), PLUS the real BTOF
-  // efficiency correction for BTOF points specifically. This is a proper superset of
-  // PresentZFitterSpectra.C's own "1/(2pi N_evt) dN/dy d(mT-m0)" label -- that plot's
-  // simpler label was always a stand-in for its earlier, pre-efficiency pipeline
-  // stage (see that macro's own NORMALIZATION header comment) -- so the two axis
-  // labels are intentionally NOT the same string; this one is the more complete,
-  // standard invariant-yield form.
-  frame->GetYaxis()->SetTitle("1/(2#pi m_{T} N_{evt}) d^{2}N/dy d(m_{T}-m_{0}) [(GeV/c^{2})^{-2}]");
-  frame->GetYaxis()->CenterTitle(true);
-  frame->GetYaxis()->SetTitleOffset(1.4);
-
-  // Compact corner annotation block (kept from REVISION 3, per Andrew: "there's too
-  // many words" -- title line, a system/energy line, and one short bullet line for
-  // the offset formula + N_evt). REVISION 4 (2026-07-21): moved from top-right to
-  // top-left, since the color-scale bar is back and occupies the top-right corner
-  // (the right-margin strip) again.
-  double annX = 0.13;
-  TLatex* titleLine = new TLatex(annX,0.965,
-    Form("%s Spectra, %s, %s",
-         particleSymbolWithCharge(a_speciesName,a_chargeLabel).c_str(),
-         a_systemLabel.c_str(),
-         centralityLabel(a_centIndex).c_str()));
-  titleLine->SetNDC();
-  titleLine->SetTextFont(43);
-  titleLine->SetTextSize(20);
-  titleLine->SetTextAlign(13); // left, top
-  titleLine->Draw();
-
-  //double nEvtForLabel = (a_centEventsHist) ? a_centEventsHist->GetBinContent(a_centIndex+1) : -1;
-  //if(a_offsetByDecade){
-  //  string bulletLabel = "#bullet #times10^{b} offset (b = curve rank)";
-  //  if(nEvtForLabel > 0) bulletLabel += Form(", N_{evt}=%.0f", nEvtForLabel);
-  //  TLatex* bulletLine = new TLatex(annX,0.925,bulletLabel.c_str());
-  //  bulletLine->SetNDC();
-  //  bulletLine->SetTextFont(43);
-  //  bulletLine->SetTextSize(15);
-  //  bulletLine->SetTextAlign(13); // left, top
-  //  bulletLine->Draw();
-  //}else if(nEvtForLabel > 0){
-  //  TLatex* nEvtLine = new TLatex(annX,0.925,Form("N_{evt} = %.0f",nEvtForLabel));
-  //  nEvtLine->SetNDC();
-  //  nEvtLine->SetTextFont(43);
-  //  nEvtLine->SetTextSize(15);
-  //  nEvtLine->SetTextAlign(13); // left, top
-  //  nEvtLine->Draw();
-  //}*/
-
-  // Pass 2: draw every rapidity bin's TPC/BTOF/ETOF points, offset per the y-value-based
-  // formula above, colored by SIGNED y (REVISION 5, 2026-07-22 -- see below) using
-  // ROOT's active default palette. Cloned before scaling so the offset multiplier never
-  // mutates the actual objects loaded live out of the file.
-  //
-  // REVISION 5 (2026-07-22): Andrew asked to "undo the symmetric rapidity coloring" --
-  // REVISION 4's colorFrac used |y|, so a +0.5 and a -0.5 bin mapped to the exact same
-  // color (symmetric about y=0), which is exactly the "symmetric coloring" complaint.
-  // Fixed by mapping colorFrac from SIGNED y over the full [-a_kRapColorMax,
-  // +a_kRapColorMax] range instead of |y| over [0,a_kRapColorMax] -- so the full active
-  // palette (e.g. kBird's blue->green->yellow) is now spread across the whole rapidity
-  // range, with -y and +y bins landing on visibly different colors. drawColorScaleBar()
-  // above was updated to match (ticks/labels/title now reflect the signed range).
-  for(size_t b = 0; b < bins.size(); b++){
-    double mult = a_offsetByDecade ? TMath::Power(10.0,(double)b) : 1.0;
-    double colorFrac = TMath::Max(0.0, TMath::Min(1.0, (bins[b].y + a_kRapColorMax) / (2.0*a_kRapColorMax)));
-    int colorIndex = TColor::GetColorPalette((int)(colorFrac*(a_nColors-1)));
-
-    if(bins[b].tpc){
-      TGraphErrors* g = (TGraphErrors*) bins[b].tpc->Clone();
-      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
-      g->SetMarkerStyle(20); // filled circle = TPC, same convention as PresentZFitterSpectra.C
-      g->SetMarkerColor(colorIndex);
-      g->SetLineColor(colorIndex);
-      g->SetMarkerSize(0.7);
-      g->Draw("PE SAME");
-    }
-    if(bins[b].btof){
-      TGraphErrors* g = (TGraphErrors*) bins[b].btof->Clone();
-      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
-      g->SetMarkerStyle(24); // open circle = BTOF
-      g->SetMarkerColor(colorIndex);
-      g->SetLineColor(colorIndex);
-      g->SetMarkerSize(0.7);
-      g->Draw("PE SAME");
-    }
-    if(bins[b].etof){
-      TGraphErrors* g = (TGraphErrors*) bins[b].etof->Clone();
-      for(int p = 0; p < g->GetN(); p++) g->SetPoint(p, g->GetX()[p], g->GetY()[p]*mult);
-      g->SetMarkerStyle(25); // open square = ETOF
-      g->SetMarkerColor(colorIndex);
-      g->SetLineColor(colorIndex);
-      g->SetMarkerSize(0.7);
-      g->Draw("PE SAME");
-    }
-  }
-
-  // REVISION 4 (2026-07-21): drawColorScaleBar() call restored, same right-side
-  // placement as PresentZFitterSpectra.C.
-  //
-  // REVISION 9 (2026-07-22, same day as REVISION 8): per Andrew's explicit request,
-  // moved the TPC/BTOF marker-style legend from the top-left (below the corner
-  // annotation) to the upper-right portion of the plot instead. The color-scale bar
-  // itself only occupies x in [0.86,0.99] (see drawColorScaleBar()'s barX1/barX2), so
-  // there's genuinely open space between the corner annotation (x in [0.13,0.5], y in
-  // [0.89,0.975]) and the bar -- the legend now sits at x in [0.55,0.85], y in
-  // [0.78,0.885], just left of the bar and below the annotation's row, so it collides
-  // with neither.
-  drawColorScaleBar((TPad*)gPad, a_kRapColorMax, a_nColors,
-                     Form("bar_%s%s_Cent%02d",a_speciesName.c_str(),a_chargeLabel.c_str(),a_centIndex));
-
-  TLegend* leg = new TLegend(0.55,0.74,0.72,0.855);
-  leg->SetBorderSize(0);
-  leg->SetFillStyle(0);
-  leg->SetTextSize(0.03);
-  TGraphErrors* dummyTPC  = new TGraphErrors(); dummyTPC->SetMarkerStyle(20);  dummyTPC->SetMarkerColor(kBlack);
-  TGraphErrors* dummyBTOF = new TGraphErrors(); dummyBTOF->SetMarkerStyle(24); dummyBTOF->SetMarkerColor(kBlack);
-  leg->AddEntry(dummyTPC,Form("#times10^{b} offset (b = curve rank)"),"p");
-  leg->AddEntry(dummyTPC,"TPC","p");
-  leg->AddEntry(dummyBTOF,"BTOF","p");
-  leg->Draw();
+  drawSpectraIntoPad(canv, bins, a_speciesName, a_chargeLabel, a_centIndex, a_maxMtM0, a_offsetByDecade,
+                      a_systemLabel, a_nColors, a_kRapColorMax, false);
 
   string outName = Form("%s/CorrectedSpectra_%s%s_Cent%02d.png",
                          a_outDir.c_str(), a_speciesName.c_str(), a_chargeLabel.c_str(), a_centIndex);
   canv->SaveAs(outName.c_str());
+  delete canv;
+}
+
+//_______________________________________________________________________________
+// NEW in REVISION 10 (2026-07-29) -- see this file's header comment for the full
+// rationale and the AskUserQuestion exchange that settled on this "faceted grid"
+// design over the two alternatives (midrapidity-only overlay colored by centrality,
+// or a collapsed dN/dy-vs-centrality point plot). Builds ONE canvas per (species,
+// charge) with a 3x2 grid of sub-pads, one per populated centrality bin (this
+// analysis's CutClass scheme has 6: 0-5%,5-10%,10-20%,20-40%,40-80%,80-100%), each
+// showing the same rapidity-bin-overlaid spectrum as the corresponding standalone
+// CorrectedSpectra_<Species><Charge>_Cent<CC>.png (same gatherAndCutRapidityBins() cuts,
+// same drawSpectraIntoPad() drawing code, just a_compact=true and drawn into a grid
+// cell instead of a full-size canvas). A centrality with no populated data (shouldn't
+// happen within a_nCentBinsPopulated for a normal run, but PicoBinner/ZFitter could in
+// principle leave one empty) gets a plain "no data" placeholder in its cell rather than
+// a confusing blank pad.
+void drawAllCentralitiesFacetedCanvas(TDirectory* a_dir, string a_speciesName, string a_chargeLabel,
+                                       double a_maxMtM0, bool a_offsetByDecade, string a_outDir,
+                                       string a_systemLabel, int a_nColors, double a_kRapColorMax,
+                                       double a_minSignificance,
+                                       TFile* a_tpcZFitterFile, TFile* a_btofZFitterFile,
+                                       double a_maxChiSqrNdf, double a_maxChiSqrNdfTPCMinus,
+                                       int a_nCentBinsPopulated){
+
+  TCanvas* canv = new TCanvas(Form("canvAll_%s%s",a_speciesName.c_str(),a_chargeLabel.c_str()),"",1500,1000);
+
+  // Thin header strip (canvas-level title identifying species/charge/system, since the
+  // individual grid cells only label themselves by centrality -- see drawSpectraIntoPad()'s
+  // a_compact branch) above a 3x2 grid of the actual spectra.
+  TPad* headerPad = new TPad(Form("header_%s%s",a_speciesName.c_str(),a_chargeLabel.c_str()),"",0,0.945,1,1);
+  headerPad->SetFillStyle(0);
+  headerPad->Draw();
+  headerPad->cd();
+  TLatex* header = new TLatex(0.5,0.5,
+    Form("%s Spectra, %s -- All Centralities",
+         particleSymbolWithCharge(a_speciesName,a_chargeLabel).c_str(), a_systemLabel.c_str()));
+  header->SetNDC();
+  header->SetTextFont(43);
+  header->SetTextSize(22);
+  header->SetTextAlign(22);
+  header->Draw();
+
+  canv->cd();
+  TPad* gridPad = new TPad(Form("grid_%s%s",a_speciesName.c_str(),a_chargeLabel.c_str()),"",0,0,1,0.945);
+  gridPad->SetFillStyle(0);
+  gridPad->Draw();
+  gridPad->Divide(3,2,0.012,0.03);
+
+  bool anyDrawn = false;
+  for(int centIndex = 0; centIndex < a_nCentBinsPopulated; centIndex++){
+    TH2* tpcChiSqrHist  = a_tpcZFitterFile  ? (TH2*) a_tpcZFitterFile->Get(Form("DeDx_FitData/%s/ZTPC_ChiSqr_%s%s_Cent%02d",
+                              a_speciesName.c_str(),a_speciesName.c_str(),a_chargeLabel.c_str(),centIndex)) : NULL;
+    TH2* btofChiSqrHist = a_btofZFitterFile ? (TH2*) a_btofZFitterFile->Get(Form("BTOF_FitData/%s/ZbTOF_ChiSqr_%s%s_Cent%02d",
+                              a_speciesName.c_str(),a_speciesName.c_str(),a_chargeLabel.c_str(),centIndex)) : NULL;
+    TH2* etofChiSqrHist = a_btofZFitterFile ? (TH2*) a_btofZFitterFile->Get(Form("ETOF_FitData/%s/ZbTOF_ChiSqr_%s%s_Cent%02d",
+                              a_speciesName.c_str(),a_speciesName.c_str(),a_chargeLabel.c_str(),centIndex)) : NULL;
+
+    int nSignificanceSuppressed = 0, nChiSqrSuppressed = 0;
+    vector<RapBin> bins = gatherAndCutRapidityBins(a_dir, a_speciesName, a_chargeLabel, centIndex,
+                              a_minSignificance, tpcChiSqrHist, btofChiSqrHist, etofChiSqrHist,
+                              a_maxChiSqrNdf, a_maxChiSqrNdfTPCMinus,
+                              nSignificanceSuppressed, nChiSqrSuppressed);
+
+    TVirtualPad* pad = gridPad->cd(centIndex+1);
+    if(bins.empty()){
+      TLatex* empty = new TLatex(0.5,0.5,Form("%s: No Data",centralityLabel(centIndex).c_str()));
+      empty->SetNDC();
+      empty->SetTextAlign(22);
+      empty->SetTextFont(43);
+      empty->SetTextSize(18);
+      empty->Draw();
+      continue;
+    }
+    anyDrawn = true;
+    pad->SetTopMargin(0.12);
+    pad->SetRightMargin(0.04);
+    pad->SetLeftMargin(0.16);
+    pad->SetBottomMargin(0.14);
+
+    drawSpectraIntoPad(pad, bins, a_speciesName, a_chargeLabel, centIndex, a_maxMtM0, a_offsetByDecade,
+                        a_systemLabel, a_nColors, a_kRapColorMax, true);
+  }
+
+  if(!anyDrawn){
+    cout << "No corrected spectra found for " << a_speciesName << a_chargeLabel
+         << " in ANY centrality -- skipping the combined-centrality canvas." << endl;
+    delete canv;
+    return;
+  }
+
+  string outName = Form("%s/AllCentralities_%s%s.png", a_outDir.c_str(), a_speciesName.c_str(), a_chargeLabel.c_str());
+  canv->SaveAs(outName.c_str());
+  cout << "Wrote combined-centrality canvas: " << outName << endl;
   delete canv;
 }
 
@@ -1046,36 +1172,29 @@ void PresentRawSpectraModifierOutput(string a_correctedSpectraFile,
          << "inside RunRawSpectraModifier.C regardless of whether this histogram survived into this file)." << endl;
   }
 
-  // REVISION 4 (2026-07-21): color-by-|y| restored, per Andrew's request to use
-  // "the default coloring scheme" -- clarified as ROOT's own built-in default palette
-  // (kBird), not the single-hue blue gradient table REVISION 1-2 had copied from
-  // PresentZFitterSpectra.C. Originally deliberately did NOT call gStyle->SetPalette(...)
-  // or TColor::CreateGradientColorTable(...) at all -- TColor::GetColorPalette(idx)
-  // below simply samples whatever ROOT's already-active default palette is.
-  //
   // REVISION 8 (2026-07-22, same day as REVISION 7): Andrew asked for the color scale
   // to reach red. Asked via AskUserQuestion which approach he wanted -- a dedicated
-  // diverging blue-gray-red ramp (drafted earlier this session via the dataviz skill,
-  // matched to signed-y/polarity data, but never implemented) vs. ROOT's built-in
-  // kRainBow palette (reaches red, but is the same non-perceptually-monotonic rainbow
-  // palette already replaced once this session in PresentZFitterSpectra.C, since nearby
-  // values there could look similar). Andrew explicitly chose kRainBow. Implemented by
-  // adding a single `gStyle->SetPalette(kRainBow);` call right here, so
-  // TColor::GetColorPalette(idx) below now samples kRainBow (blue->cyan->green->yellow
-  // ->red) instead of the previously-active kBird (blue->green->yellow, no red) --
-  // every other REVISION 4/5 choice (signed-y colorFrac mapping, no custom gradient
-  // table beyond this one explicit SetPalette call, drawColorScaleBar()'s tick/label/
-  // axis-title logic) is unchanged. This is a deliberate step back from the dataviz
-  // skill's "never a rainbow" guidance, made knowingly per Andrew's explicit choice --
-  // not an oversight.
+  // diverging blue-gray-red ramp vs. ROOT's built-in kRainBow palette. Andrew explicitly
+  // chose kRainBow. TColor::GetColorPalette(idx) below samples kRainBow (blue->cyan->
+  // green->yellow->red) -- every other REVISION 4/5 choice (signed-y colorFrac mapping,
+  // drawColorScaleBar()'s tick/label/axis-title logic) is unchanged.
   gStyle->SetPalette(kRainBow);
   int nColors = TColor::GetNumberOfColors();
   const double kRapColorMax = 1.3; // same fixed scale as PresentZFitterSpectra.C
 
   // Compact system/energy label for the corner annotation drawn in
-  // drawOneCorrectedSpectraPanel() -- hardcoded to this analysis's actual collision
-  // system, matching the reference image's own "AuAu"/"sqrt(s_NN)=3.2 GeV" convention.
+  // drawSpectraIntoPad() -- hardcoded to this analysis's actual collision system,
+  // matching the reference image's own "AuAu"/"sqrt(s_NN)=3.2 GeV" convention.
   string systemLabel = "O+O, #sqrt{s_{NN}} = 200 GeV";
+
+  // Matches CutClass's 6-bin centrality scheme used throughout this analysis
+  // (0-5,5-10,10-20,20-40,40-80,80-100 -- see centralityLabel() above and
+  // RunRawSpectraModifier.C's own nCentBins=6). The per-centrality loop below still
+  // runs centIndex 0..15 (unchanged from every prior revision, since a run could in
+  // principle populate more), but the NEW combined-centrality canvas
+  // (drawAllCentralitiesFacetedCanvas(), REVISION 10) only has 6 grid cells, so it's
+  // explicitly bounded to this analysis's known scheme.
+  const int kNCentBinsPopulated = 6;
 
   for(int pmIndex = 0; pmIndex < 2; pmIndex++){
     string chargeLabel = (pmIndex == 0) ? "Plus" : "Minus";
@@ -1108,6 +1227,14 @@ void PresentRawSpectraModifierOutput(string a_correctedSpectraFile,
                                     tpcChiSqrHist, btofChiSqrHist, etofChiSqrHist,
                                     a_maxChiSqrNdf, a_maxChiSqrNdfTPCMinus);
     }
+
+    // NEW in REVISION 10 (2026-07-29): one combined-centrality PNG per charge sign,
+    // right after that charge's per-centrality loop finishes -- see
+    // drawAllCentralitiesFacetedCanvas()'s own header comment for what it draws.
+    drawAllCentralitiesFacetedCanvas(dir, speciesName, chargeLabel, maxMtM0, a_offsetByDecade,
+                                      a_outDir, systemLabel, nColors, kRapColorMax,
+                                      a_minSignificance, tpcZFitterFile, btofZFitterFile,
+                                      a_maxChiSqrNdf, a_maxChiSqrNdfTPCMinus, kNCentBinsPopulated);
   }
 
   cout << "Done. Plots written to " << a_outDir << endl;
