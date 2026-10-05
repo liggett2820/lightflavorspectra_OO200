@@ -8,6 +8,8 @@
 //      triggered events passing every cut except Vz (why the Vz window is tight)
 //   4. Luminosity: ZDC coincidence rate (ZDCx) per event and per run, and <refMult> vs ZDCx
 //   5. Every trigger ID present in the files, with event counts
+//   6. Per run: all events, trigger-860003 events, events after all cuts (tree "runs"),
+//      so the runs that actually contain 860003 come out of the data itself
 //
 // Cut values mirror macros/SetCutClass.C + source/CutClass.cxx + source/PicoBinner.cxx at
 // commit 8296655 (trigger 860003, setZRange(-2,2), setRadialCut(1.0) about (0,0),
@@ -77,6 +79,7 @@ void MakeEventCutFlow_OO200(const char* fileList, const char* outName = "cutflow
   TH1D* hZdc        = new TH1D("hZDCx_final", "After all event cuts;ZDC coincidence rate (kHz);Events", 400, 0, 400);
   TProfile* pRefZdc = new TProfile("pRefMult_vs_ZDCx", "After all event cuts;ZDC coincidence rate (kHz);#LTrefMult#GT", 80, 0, 400);
   std::map<int, double> runEvents, runZdcSum;      // per run, after all cuts
+  std::map<int, double> runAll, runTrig;           // per run, all events and trigger 860003 events
   std::map<unsigned int, double> trigCounts;       // every trigger ID, all events
 
   for(size_t f = 0; f < files.size(); f++){
@@ -93,10 +96,12 @@ void MakeEventCutFlow_OO200(const char* fileList, const char* outName = "cutflow
       if(!ev) continue;
 
       hFlow->Fill(0.5);
+      runAll[ev->runId()] += 1;
       std::vector<unsigned int> ids = ev->triggerIds();
       for(size_t t = 0; t < ids.size(); t++) trigCounts[ids[t]] += 1;
       if(!ev->isTrigger(kTrigger)) continue;
       hFlow->Fill(1.5);
+      runTrig[ev->runId()] += 1;
 
       TVector3 pv = ev->primaryVertex();
       const double vz = pv.Z();
@@ -147,11 +152,14 @@ void MakeEventCutFlow_OO200(const char* fileList, const char* outName = "cutflow
 
   // per-run tree (additive under hadd)
   out->cd();
-  TTree* tRun = new TTree("runs", "Per-run counts after all event cuts");
-  int run; double nEv, zdcSum;
+  // One row per run seen in this job (every run, including runs without trigger 860003).
+  // nAll: all events; nTrig: events with 860003; nEvents: after all event cuts.
+  TTree* tRun = new TTree("runs", "Per-run event counts: all, trigger 860003, after all event cuts");
+  int run; double nEv, zdcSum, nAll, nTrig;
   tRun->Branch("run", &run, "run/I"); tRun->Branch("nEvents", &nEv, "nEvents/D"); tRun->Branch("zdcSum_kHz", &zdcSum, "zdcSum_kHz/D");
-  for(std::map<int,double>::iterator it = runEvents.begin(); it != runEvents.end(); ++it){
-    run = it->first; nEv = it->second; zdcSum = runZdcSum[run]; tRun->Fill();
+  tRun->Branch("nAll", &nAll, "nAll/D"); tRun->Branch("nTrig", &nTrig, "nTrig/D");
+  for(std::map<int,double>::iterator it = runAll.begin(); it != runAll.end(); ++it){
+    run = it->first; nAll = it->second; nTrig = runTrig[run]; nEv = runEvents[run]; zdcSum = runZdcSum[run]; tRun->Fill();
   }
   TTree* tTrig = new TTree("triggers", "Every trigger ID in the files, event counts");
   unsigned int tid; double tN;

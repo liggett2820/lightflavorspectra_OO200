@@ -82,16 +82,35 @@ void PlotEventCutFlow_OO200(const char* inName = "cutflow_OO200_all.root"){
   c3->cd(2);
   TTree* tr = (TTree*)f->Get("runs");
   if(tr){
-    int run; double nEv, zs; tr->SetBranchAddress("run",&run); tr->SetBranchAddress("nEvents",&nEv); tr->SetBranchAddress("zdcSum_kHz",&zs);
-    std::map<int,std::pair<double,double> > m;
-    for(Long64_t i=0;i<tr->GetEntries();i++){ tr->GetEntry(i); m[run].first+=nEv; m[run].second+=zs; }
-    TGraph* g = new TGraph(); int k=0;
-    std::ofstream rt("OO200_RunList.txt"); rt << "run\tevents_after_cuts\tmean_ZDCx_kHz\n";
-    for(std::map<int,std::pair<double,double> >::iterator it=m.begin(); it!=m.end(); ++it, ++k){
-      double mean = it->second.first>0 ? it->second.second/it->second.first : 0;
-      g->SetPoint(k, k, mean); rt << it->first << "\t" << (long long)it->second.first << "\t" << mean << "\n";
+    int run; double nEv, zs, nAll = 0, nTrig = 0;
+    tr->SetBranchAddress("run",&run); tr->SetBranchAddress("nEvents",&nEv); tr->SetBranchAddress("zdcSum_kHz",&zs);
+    const bool hasAll = tr->GetBranch("nAll") != 0;   // older outputs only have post-cut rows
+    if(hasAll){ tr->SetBranchAddress("nAll",&nAll); tr->SetBranchAddress("nTrig",&nTrig); }
+    std::map<int,std::pair<double,double> > m;        // hadd keeps one row per job: sum by run
+    std::map<int,std::pair<double,double> > mAT;      // run -> (all, 860003)
+    for(Long64_t i=0;i<tr->GetEntries();i++){
+      tr->GetEntry(i); m[run].first+=nEv; m[run].second+=zs;
+      if(hasAll){ mAT[run].first+=nAll; mAT[run].second+=nTrig; }
     }
-    g->SetTitle(Form("%d runs;run index;#LTZDC coincidence rate#GT (kHz)", (int)m.size()));
+    TGraph* g = new TGraph(); int k=0, nRunTrig=0; double sumAll=0, sumTrig=0, sumAllTrigRuns=0;
+    std::ofstream rt("OO200_RunList.txt"); rt << "run\tall_events\ttrigger_860003\tevents_after_cuts\tmean_ZDCx_kHz\n";
+    for(std::map<int,std::pair<double,double> >::iterator it=m.begin(); it!=m.end(); ++it){
+      double mean = it->second.first>0 ? it->second.second/it->second.first : 0;
+      double a = hasAll ? mAT[it->first].first : -1, t = hasAll ? mAT[it->first].second : -1;
+      rt << it->first << "\t" << (long long)a << "\t" << (long long)t << "\t" << (long long)it->second.first << "\t" << mean << "\n";
+      if(hasAll){ sumAll += a; sumTrig += t; if(t > 0){ nRunTrig++; sumAllTrigRuns += a; } }
+      if(it->second.first > 0){ g->SetPoint(k, k, mean); k++; }
+    }
+    rt.close();
+    if(hasAll){
+      std::cout << Form("Runs read: %d; runs with trigger 860003: %d", (int)m.size(), nRunTrig) << std::endl;
+      std::cout << Form("All events: %.0f; in runs with 860003: %.0f; with 860003: %.0f", sumAll, sumAllTrigRuns, sumTrig) << std::endl;
+      txt.open("OO200_CutFlow.txt", std::ios::app);
+      txt << "\nruns_read\t" << m.size() << "\nruns_with_860003\t" << nRunTrig
+          << "\nall_events_in_runs_with_860003\t" << (long long)sumAllTrigRuns << "\n";
+      txt.close();
+    }
+    g->SetTitle(Form("%d runs;run index;#LTZDC coincidence rate#GT (kHz)", k));
     g->SetMarkerStyle(20); g->SetMarkerSize(0.6); g->SetMarkerColor(kAzure+3); g->Draw("AP");
   }
   c3->cd(3); TProfile* pz = (TProfile*)f->Get("pRefMult_vs_ZDCx"); pz->SetMarkerStyle(20); pz->SetMarkerColor(kAzure+3); pz->Draw();
