@@ -1,0 +1,90 @@
+{
+  "config": {
+    "model": "WoodsSaxon (3-param Fermi, O-16)",
+    "A_nucleons": 16,
+    "sigma_NN_mb": 42,
+    "N_thrown": 2000000,
+    "N_success": 1112124,
+    "WS_w": -0.051,
+    "WS_c_fm": 2.608,
+    "WS_a_fm": 0.513,
+    "R_nuclearRadius_fm_bmax_only": 3.1498,
+    "b_max_fm": 8.18949,
+    "r_eff_fm": 1.15624,
+    "sigma_reaction_mb": 1171.62
+  },
+  "centrality_bins": [
+    {
+      "cent": "0-5%",
+      "n_events": 55606,
+      "mean_b_fm": 0.913253,
+      "mean_Npart": 23.7803,
+      "mean_Nspec": 8.21965,
+      "mean_Ncoll": 28.124,
+      "Npart_rms": 3.36177,
+      "Nspec_rms": 3.36177,
+      "frac_Npart_of_total": 0.743136,
+      "frac_Nspec_of_total": 0.256864
+    },
+    {
+      "cent": "5-10%",
+      "n_events": 55606,
+      "mean_b_fm": 1.66669,
+      "mean_Npart": 21.1502,
+      "mean_Nspec": 10.8498,
+      "mean_Ncoll": 23.97,
+      "Npart_rms": 3.82619,
+      "Nspec_rms": 3.82619,
+      "frac_Npart_of_total": 0.660944,
+      "frac_Nspec_of_total": 0.339056
+    },
+    {
+      "cent": "10-20%",
+      "n_events": 111213,
+      "mean_b_fm": 2.35566,
+      "mean_Npart": 17.6762,
+      "mean_Nspec": 14.3238,
+      "mean_Ncoll": 18.9014,
+      "Npart_rms": 4.37616,
+      "Nspec_rms": 4.37616,
+      "frac_Npart_of_total": 0.552382,
+      "frac_Nspec_of_total": 0.447618
+    },
+    {
+      "cent": "20-40%",
+      "n_events": 222425,
+      "mean_b_fm": 3.33249,
+      "mean_Npart": 12.2343,
+      "mean_Nspec": 19.7657,
+      "mean_Ncoll": 11.7435,
+      "Npart_rms": 4.59595,
+      "Nspec_rms": 4.59595,
+      "frac_Npart_of_total": 0.382322,
+      "frac_Nspec_of_total": 0.617678
+    },
+    {
+      "cent": "40-80%",
+      "n_events": 444849,
+      "mean_b_fm": 4.80259,
+      "mean_Npart": 6.0306,
+      "mean_Nspec": 25.9694,
+      "mean_Ncoll": 4.80491,
+      "Npart_rms": 3.44175,
+      "Nspec_rms": 3.44175,
+      "frac_Npart_of_total": 0.188456,
+      "frac_Nspec_of_total": 0.811544
+    },
+    {
+      "cent": "80-100%",
+      "n_events": 222425,
+      "mean_b_fm": 6.58804,
+      "mean_Npart": 3.02183,
+      "mean_Nspec": 28.9782,
+      "mean_Ncoll": 1.9259,
+      "Npart_rms": 1.4705,
+      "Nspec_rms": 1.4705,
+      "frac_Npart_of_total": 0.0944323,
+      "frac_Nspec_of_total": 0.905568
+    }
+  ]
+}

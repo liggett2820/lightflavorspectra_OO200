@@ -1,0 +1,74 @@
+{
+  "config": {
+    "model": "NBD-Glauber fit to real refMult (two-component ancestor model)",
+    "cell_csv": "GlauberNpartNcollWeights_OO200.csv",
+    "yield_file": "/Users/aliggett/data/OO/yieldHistos_OO200_pion.root",
+    "refMult_fit_range": [15, 98],
+    "npp": 2.55658, "npp_err": 0.0383183,
+    "k": 38.5568, "k_err": 1.25417,
+    "x": 0.244708, "x_err": 0.0144802,
+    "chi2": 1443.39, "ndof": 79, "chi2_per_ndof": 18.2707
+  },
+  "centrality_bins": [
+    {
+      "cent": "0-5%",
+      "mean_Npart": 25.4166,
+      "mean_Nspec": 6.58339,
+      "mean_Ncoll": 32.9177,
+      "frac_Npart_of_total": 0.794269,
+      "frac_Nspec_of_total": 0.205731,
+      "refMult_edge_hi": 43,
+      "n_mc_events": 55726
+    },
+    {
+      "cent": "5-10%",
+      "mean_Npart": 22.1778,
+      "mean_Nspec": 9.82223,
+      "mean_Ncoll": 25.2709,
+      "frac_Npart_of_total": 0.693055,
+      "frac_Nspec_of_total": 0.306945,
+      "refMult_edge_hi": 36,
+      "n_mc_events": 55584
+    },
+    {
+      "cent": "10-20%",
+      "mean_Npart": 18.5068,
+      "mean_Nspec": 13.4932,
+      "mean_Ncoll": 19.4456,
+      "frac_Npart_of_total": 0.578338,
+      "frac_Nspec_of_total": 0.421662,
+      "refMult_edge_hi": 27,
+      "n_mc_events": 111353
+    },
+    {
+      "cent": "20-40%",
+      "mean_Npart": 12.6669,
+      "mean_Nspec": 19.3331,
+      "mean_Ncoll": 11.7421,
+      "frac_Npart_of_total": 0.395839,
+      "frac_Nspec_of_total": 0.604161,
+      "refMult_edge_hi": 15,
+      "n_mc_events": 226718
+    },
+    {
+      "cent": "40-80%",
+      "mean_Npart": 5.47016,
+      "mean_Nspec": 26.5298,
+      "mean_Ncoll": 4.06192,
+      "frac_Npart_of_total": 0.170943,
+      "frac_Nspec_of_total": 0.829057,
+      "refMult_edge_hi": 5,
+      "n_mc_events": 468855
+    },
+    {
+      "cent": "80-100%",
+      "mean_Npart": 2,
+      "mean_Nspec": 30,
+      "mean_Ncoll": 1,
+      "frac_Npart_of_total": 0.0625,
+      "frac_Nspec_of_total": 0.9375,
+      "refMult_edge_hi": 0,
+      "n_mc_events": 193605
+    }
+  ]
+}
