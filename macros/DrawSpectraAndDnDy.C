@@ -175,7 +175,7 @@ void DrawSpectraAndDnDy(string a_fitOutputFile,
           title->SetBorderSize(0);
           title->SetFillStyle(0);
           title->SetTextAlign(12);
-          title->AddText(Form("%s spectra -- Cent bin %02d", particleSymbol.Data(), centIndex));
+          title->AddText(Form("%s Spectra -- Cent Bin %02d", particleSymbol.Data(), centIndex));
           title->Draw("SAME");
 
           TString outName = Form("%s/spectra_%s_Cent%02d.png", a_outputDir.c_str(), particleName.Data(), centIndex);
@@ -234,7 +234,7 @@ void DrawSpectraAndDnDy(string a_fitOutputFile,
           if(maxY <= 0) maxY = 1.0;
 
           TH1F* frame = c->DrawFrame(minX, 0.0, maxX, maxY*1.3);
-          frame->GetXaxis()->SetTitle("rapidity y");
+          frame->GetXaxis()->SetTitle("Rapidity y");
           frame->GetYaxis()->SetTitle("dN/dy");
           frame->GetXaxis()->SetTitleSize(0.035);
           frame->GetYaxis()->SetTitleSize(0.035);
@@ -262,7 +262,7 @@ void DrawSpectraAndDnDy(string a_fitOutputFile,
           title->SetBorderSize(0);
           title->SetFillStyle(0);
           title->SetTextAlign(12);
-          title->AddText(Form("%s dN/dy -- %s fit", particleSymbol.Data(), variants[v]));
+          title->AddText(Form("%s dN/dy -- %s Fit", particleSymbol.Data(), variants[v]));
           title->Draw("SAME");
 
           TString outName = Form("%s/dNdy_%s_%s.png", a_outputDir.c_str(), particleName.Data(), variants[v]);

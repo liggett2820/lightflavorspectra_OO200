@@ -92,7 +92,7 @@ void PresentHitLossEta(string a_inputFile, string a_outDir = "."){
 
   gStyle->SetOptStat(0);
 
-  TCanvas* c = new TCanvas("PresentHitLossEta","Absolute hit loss vs #eta",900,700);
+  TCanvas* c = new TCanvas("PresentHitLossEta","Absolute Hit Loss vs #eta",900,700);
   hitLoss->SetTitle("Absolute TPC Hit Loss vs #eta");
   hitLoss->SetMarkerStyle(20);
   hitLoss->SetMarkerColor(kBlue+1);

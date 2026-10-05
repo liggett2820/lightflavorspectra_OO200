@@ -136,7 +136,7 @@ void DiffMTM0ZTPCDumps(string a_etofCsv, string a_oo200Csv, string a_outDir = ".
 
     TGraphErrors* g = new TGraphErrors((int) xVals.size(), xVals.data(), yVals.data(), nullptr, yErrs.data());
     g->SetName(Form("g_rawTPC_RapBin%02d", rapIndex));
-    g->SetTitle(Form("Raw TPC input (pre-fit): etof / OO200, ProtonPlus, RapBin %02d;Centrality bin;etof / OO200", rapIndex));
+    g->SetTitle(Form("Raw TPC Input (Pre-Fit): etof / OO200, ProtonPlus, RapBin %02d;Centrality Bin;etof / OO200", rapIndex));
     g->SetLineColor(kRed);
     g->SetMarkerColor(kRed);
     g->SetMarkerStyle(20);

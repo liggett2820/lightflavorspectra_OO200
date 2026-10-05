@@ -201,7 +201,7 @@ void runStage(TFile* a_fEtof, TFile* a_fOO200, string a_stageLabel, string a_his
 
     TGraphErrors* g = new TGraphErrors((int) xVals.size(), xVals.data(), yVals.data(), nullptr, yErrs.data());
     g->SetName(Form("g_%s_RapBin%02d", a_stageLabel.c_str(), ixRap));
-    g->SetTitle(Form("%s: etof / OO200, %s%s, RapBin %02d (y #in [%.2f, %.2f]);Centrality bin;etof / OO200",
+    g->SetTitle(Form("%s: etof / OO200, %s%s, RapBin %02d (y #in [%.2f, %.2f]);Centrality Bin;etof / OO200",
                       a_stageLabel.c_str(), a_particleName.c_str(), a_charge.c_str(), ixRap, yLo, yHi));
     g->SetLineColor(kRed);
     g->SetMarkerColor(kRed);

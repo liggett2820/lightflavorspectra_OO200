@@ -61,7 +61,7 @@ void PresentPhysicsOutput(string a_inputFile, string a_species = "Proton", int a
   gStyle->SetOptStat(0);
   gStyle->SetPalette(1);
 
-  TCanvas* c = new TCanvas("PresentPhysicsOutput","Raw yield overview",1400,600);
+  TCanvas* c = new TCanvas("PresentPhysicsOutput","Raw Yield Overview",1400,600);
   c->Divide(2,1);
 
   // Extra right margin on both COLZ pads -- otherwise the z-axis (palette) power-of-10
@@ -72,7 +72,7 @@ void PresentPhysicsOutput(string a_inputFile, string a_species = "Proton", int a
   c->cd(1); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(zTPCPlus){
     TH2* projPlus = (TH2*) zTPCPlus->Project3D("xy");
-    projPlus->SetTitle(Form("Raw TPC yield: %s+, Cent %d (y vs m_{T}-m_{0}, summed over Z_{TPC})",a_species.c_str(),a_centIndex));
+    projPlus->SetTitle(Form("Raw TPC Yield: %s+, Cent %d (y vs m_{T}-m_{0}, Summed Over Z_{TPC})",a_species.c_str(),a_centIndex));
     projPlus->GetXaxis()->SetRangeUser(projPlus->GetXaxis()->GetXmin(), 0);
     projPlus->Draw("COLZ");
   }
@@ -80,7 +80,7 @@ void PresentPhysicsOutput(string a_inputFile, string a_species = "Proton", int a
   c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(zTPCMinus){
     TH2* projMinus = (TH2*) zTPCMinus->Project3D("xy");
-    projMinus->SetTitle(Form("Raw TPC yield: %s-, Cent %d (y vs m_{T}-m_{0}, summed over Z_{TPC})",a_species.c_str(),a_centIndex));
+    projMinus->SetTitle(Form("Raw TPC Yield: %s-, Cent %d (y vs m_{T}-m_{0}, Summed Over Z_{TPC})",a_species.c_str(),a_centIndex));
     projMinus->GetXaxis()->SetRangeUser(projMinus->GetXaxis()->GetXmin(), 0);
     projMinus->Draw("COLZ");
   }

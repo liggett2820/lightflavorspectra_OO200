@@ -69,7 +69,7 @@ void PresentNHitsFitBySector(string a_inputFile, string a_outDir = "."){
   gStyle->SetPalette(1);
 
   TCanvas* c = new TCanvas("PresentNHitsFitBySector",
-                            "N_{hits}^{fit} vs #eta, by TPC sector (30#circ each)",2400,1800);
+                            "N_{hits}^{fit} vs #eta, by TPC Sector (30#circ Each)",2400,1800);
   c->Divide(4,3); // 12 pads, one per sector, in reading order (sector 0 top-left)
 
   for(int sectorIndex = 0; sectorIndex < 12; sectorIndex++){

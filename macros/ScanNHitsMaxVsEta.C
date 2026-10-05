@@ -113,20 +113,20 @@ void ScanNHitsMaxVsEta(string a_inputFile,
   gSystem->mkdir(a_outDir.c_str(), true);
 
   TGraph* peakGraph = new TGraph((int)etaVals.size(), &etaVals[0], &peakVals[0]);
-  peakGraph->SetTitle(";#eta;peak (mode) N_{hits}^{max}");
+  peakGraph->SetTitle(";#eta;Peak (Mode) N_{hits}^{max}");
   peakGraph->SetMarkerStyle(20);
   peakGraph->SetMarkerSize(0.5);
   peakGraph->SetMarkerColor(kBlue+2);
   peakGraph->SetLineColor(kBlue+2);
 
   TGraph* spikeGraph = new TGraph((int)etaVals.size(), &etaVals[0], &spikinessVals[0]);
-  spikeGraph->SetTitle(";#eta;fraction within #pm1 hit of peak (\"spikiness\")");
+  spikeGraph->SetTitle(";#eta;Fraction Within #pm1 Hit of Peak (\"Spikiness\")");
   spikeGraph->SetMarkerStyle(20);
   spikeGraph->SetMarkerSize(0.5);
   spikeGraph->SetMarkerColor(kRed+1);
   spikeGraph->SetLineColor(kRed+1);
 
-  TCanvas* c = new TCanvas("ScanNHitsMaxVsEta","NHitsMax ceiling + spikiness vs eta",900,900);
+  TCanvas* c = new TCanvas("ScanNHitsMaxVsEta","NHitsMax Ceiling + Spikiness vs Eta",900,900);
   c->Divide(1,2);
 
   c->cd(1);

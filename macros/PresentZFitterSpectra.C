@@ -1037,7 +1037,7 @@ void drawOneChargeSign(TH2* a_tpcHist, TH2* a_btofHist, TH2* a_etofHist,
   // histogram/frame titles render the same LaTeX-like markup as axis titles and the
   // legend header, so this is consistent with where the symbol was first introduced.
   TH1F* frame = gPad->DrawFrame(0,yFloor,frameMaxMtM0,globalMaxY*3,
-                                 Form("%s, %s, 1/(2#pi N_{evt}) dN/dy d(m_{T}-m_{0}) vs m_{T}-m_{0}, +y/-y rapidity bins combined",
+                                 Form("%s, %s, 1/(2#pi N_{evt}) dN/dy d(m_{T}-m_{0}) vs m_{T}-m_{0}, +y/-y Rapidity Bins Combined",
                                       particleSymbolWithCharge(a_speciesName,a_chargeLabel).c_str(),centralityLabel(a_centIndex).c_str()));
   frame->GetXaxis()->SetTitle("m_{T}-m_{0} [GeV/c^{2}]");
   frame->GetYaxis()->SetTitle("1/(2#pi N_{evt}) dN/dy d(m_{T}-m_{0}) [(GeV/c^{2})^{-1}]");
@@ -1290,7 +1290,7 @@ void PresentZFitterSpectra(string a_tpcZFitterFile, string a_btofZFitterFile = "
   gStyle->SetOptStat(0);
 
   TCanvas* c = new TCanvas(Form("PresentZFitterSpectra_%s_Cent%02d",speciesName.c_str(),a_centIndex), // internal object name, kept as CentNN (not user-visible)
-                            Form("%s ZFitter spectra, %s",speciesName.c_str(),centralityLabel(a_centIndex).c_str()),2000,900); // window title, shown in ROOT's GUI title bar if run interactively
+                            Form("%s ZFitter Spectra, %s",speciesName.c_str(),centralityLabel(a_centIndex).c_str()),2000,900); // window title, shown in ROOT's GUI title bar if run interactively
   c->Divide(2,1);
 
   c->cd(1);

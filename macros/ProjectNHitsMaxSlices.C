@@ -70,7 +70,7 @@ void ProjectNHitsMaxSlices(string a_inputFile,
   int nCols = (nSlices <= 3) ? nSlices : (int)TMath::Ceil(nSlices/2.0);
   int nRows = (nSlices <= 3) ? 1 : 2;
 
-  TCanvas* c = new TCanvas("ProjectNHitsMaxSlices","NHitsMax 1D slices vs eta",
+  TCanvas* c = new TCanvas("ProjectNHitsMaxSlices","NHitsMax 1D Slices vs Eta",
                             450*nCols, 450*nRows);
   c->Divide(nCols, nRows);
 
@@ -85,7 +85,7 @@ void ProjectNHitsMaxSlices(string a_inputFile,
     int binHigh = etaNHitsMax->GetXaxis()->FindBin(etaHigh);
 
     TH1D* proj = etaNHitsMax->ProjectionY(Form("proj_eta_%.3f", etaCenter), binLow, binHigh);
-    proj->SetTitle(Form("#eta #in [%.3f, %.3f];N_{hits}^{max};entries", etaLow, etaHigh));
+    proj->SetTitle(Form("#eta #in [%.3f, %.3f];N_{hits}^{max};Entries", etaLow, etaHigh));
     proj->SetDirectory(0);
 
     double totalEntries = proj->Integral();

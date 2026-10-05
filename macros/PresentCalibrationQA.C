@@ -66,7 +66,7 @@ void PresentCalibrationQA(string a_inputFile, string a_species = "Proton", strin
   gStyle->SetOptStat(0);
   gStyle->SetPalette(1);
 
-  TCanvas* c = new TCanvas("PresentCalibrationQA","Calibration QA overview",1400,600);
+  TCanvas* c = new TCanvas("PresentCalibrationQA","Calibration QA Overview",1400,600);
   c->Divide(2,1);
 
   // Extra right margin on both COLZ pads -- otherwise the z-axis (palette) power-of-10
@@ -77,7 +77,7 @@ void PresentCalibrationQA(string a_inputFile, string a_species = "Proton", strin
     // the actual calibration check: a flat band centered at 0 means the Bichsel
     // prediction matches the data at this V_Z slice.
     TH2* calibProj = (TH2*) calib3D->Project3D("zy");
-    calibProj->SetTitle(Form("%s calibration (Vz bin 0): ln(dE/dx / prediction) vs #beta#gamma",a_species.c_str()));
+    calibProj->SetTitle(Form("%s Calibration (Vz Bin 0): ln(dE/dx / Prediction) vs #beta#gamma",a_species.c_str()));
     if(calibProj->GetEntries() == 0){
       // A found-but-empty histogram looks identical to a blank pad once drawn with
       // COLZ -- flag it explicitly rather than silently rendering nothing. Common
@@ -112,7 +112,7 @@ void PresentCalibrationQA(string a_inputFile, string a_species = "Proton", strin
   // centered on 0 and goes negative, so a log scale isn't valid there.
   c->cd(2); gPad->SetLogx(); gPad->SetLogy(); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(isolated){
-    isolated->SetTitle(Form("Isolated (BTOF-tagged) dE/dx for %s+",a_species.c_str()));
+    isolated->SetTitle(Form("Isolated (BTOF-Tagged) dE/dx for %s+",a_species.c_str()));
     isolated->Draw("COLZ");
   }
 

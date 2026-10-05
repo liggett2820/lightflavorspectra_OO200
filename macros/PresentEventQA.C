@@ -55,7 +55,7 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   gStyle->SetOptStat(1);
   gStyle->SetPalette(1);
 
-  TCanvas* c = new TCanvas("PresentEventQA","Event QA overview",1400,1000);
+  TCanvas* c = new TCanvas("PresentEventQA","Event QA Overview",1400,1000);
   c->Divide(2,2);
 
   // dca is track-level (booked 0-3.5, unitless in PicoBinner.cxx, but the DCA cut
@@ -75,7 +75,7 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   // clipped/overlap the next pad in this Divide(2,2) grid.
   c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(xyHisto){
-    xyHisto->SetTitle("Event vertex X vs Y");
+    xyHisto->SetTitle("Event Vertex X vs Y");
     xyHisto->Draw("COLZ");
     // The default stats box (gStyle->SetOptStat(1) above) sits top-right, right on top
     // of the COLZ palette -- move it to the top-left corner instead, out of the way.
@@ -125,7 +125,7 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
 
   c->cd(4);
   if(centEvents){
-    centEvents->SetTitle("Events per centrality bin");
+    centEvents->SetTitle("Events per Centrality Bin");
     // Force the y-axis to start at 0 -- ROOT's default autoscale starts near the
     // lowest bin content, which zero-suppresses the axis and exaggerates bin-to-bin
     // differences that are actually small relative to the total.

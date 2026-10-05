@@ -14,7 +14,7 @@ void TestErrorBarDraw4(){
   TH1D* hA = new TH1D("hA","hA",5,0,5);
   hA->SetBinContent(3,0.00408945);
   hA->SetBinError(3,0.000382926);
-  TCanvas* cA = new TCanvas("cA","cA -- small value, fresh histogram",600,600);
+  TCanvas* cA = new TCanvas("cA","cA -- Small Value, Fresh Histogram",600,600);
   gPad->SetLogy();
   TH1F* frA = gPad->DrawFrame(0,1e-5,5,1);
   frA->Draw();
@@ -29,7 +29,7 @@ void TestErrorBarDraw4(){
   TH1D* projJ_B = new TH1D("projJ_B","projJ_B",5,0,5);
   TH1D* hB = (TH1D*) gROOT->ProcessLine(Form("combineMirroredProjections((TH1D*)%p,(TH1D*)%p,\"hB\")",(void*)projI_B,(void*)projJ_B));
   cout << "hB bin 3: content=" << hB->GetBinContent(3) << " error=" << hB->GetBinError(3) << endl;
-  TCanvas* cB = new TCanvas("cB","cB -- large value, through combineMirroredProjections",600,600);
+  TCanvas* cB = new TCanvas("cB","cB -- Large Value, Through combineMirroredProjections",600,600);
   gPad->SetLogy();
   TH1F* frB = gPad->DrawFrame(0,0.1,5,100);
   frB->Draw();
@@ -45,7 +45,7 @@ void TestErrorBarDraw4(){
   TH1D* projJ_C = new TH1D("projJ_C","projJ_C",5,0,5);
   TH1D* hC = (TH1D*) gROOT->ProcessLine(Form("combineMirroredProjections((TH1D*)%p,(TH1D*)%p,\"hC\")",(void*)projI_C,(void*)projJ_C));
   cout << "hC bin 3: content=" << hC->GetBinContent(3) << " error=" << hC->GetBinError(3) << endl;
-  TCanvas* cC = new TCanvas("cC","cC -- small value, through combineMirroredProjections",600,600);
+  TCanvas* cC = new TCanvas("cC","cC -- Small Value, Through combineMirroredProjections",600,600);
   gPad->SetLogy();
   TH1F* frC = gPad->DrawFrame(0,1e-5,5,1);
   frC->Draw();
@@ -57,7 +57,7 @@ void TestErrorBarDraw4(){
   TH1D* hD = new TH1D("hD","hD",5,0,5);
   hD->SetBinContent(3,10);
   hD->SetBinError(3,2);
-  TCanvas* cD = new TCanvas("cD","cD -- large value, fresh histogram",600,600);
+  TCanvas* cD = new TCanvas("cD","cD -- Large Value, Fresh Histogram",600,600);
   gPad->SetLogy();
   TH1F* frD = gPad->DrawFrame(0,0.1,5,100);
   frD->Draw();

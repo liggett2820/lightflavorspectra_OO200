@@ -41,7 +41,7 @@ void PresentAcceptance(string a_inputFile, string a_outDir = "."){
   gStyle->SetOptStat(0);
   gStyle->SetPalette(1);
 
-  TCanvas* c = new TCanvas("PresentAcceptance","Acceptance overview",1000,500);
+  TCanvas* c = new TCanvas("PresentAcceptance","Acceptance Overview",1000,500);
   c->Divide(2,1);
 
   // y/eta are dimensionless (no unit); pT is in GeV/c (filled from PicoBinner's pT
@@ -51,7 +51,7 @@ void PresentAcceptance(string a_inputFile, string a_outDir = "."){
   // Both (pseudo)rapidity axes are display-clipped to [-2,2] -- just clips the plotted
   // range, doesn't rebin or re-cut the underlying data.
   c->cd(1); gPad->SetLogz(); gPad->SetRightMargin(0.15);
-  if(pionYPt){ pionYPt->SetTitle("Acceptance: y (pion mass assumed) vs pT, TPC-only cuts"); pionYPt->GetYaxis()->SetTitle("p_{T} (GeV/c)"); pionYPt->GetXaxis()->SetRangeUser(-2, 2); pionYPt->Draw("COLZ"); }
+  if(pionYPt){ pionYPt->SetTitle("Acceptance: y (Pion Mass Assumed) vs pT, TPC-Only Cuts"); pionYPt->GetYaxis()->SetTitle("p_{T} (GeV/c)"); pionYPt->GetXaxis()->SetRangeUser(-2, 2); pionYPt->Draw("COLZ"); }
 
   c->cd(2); gPad->SetLogz(); gPad->SetRightMargin(0.15);
   if(etaPt){ etaPt->SetTitle("Acceptance: #eta vs pT"); etaPt->GetYaxis()->SetTitle("p_{T} (GeV/c)"); etaPt->GetXaxis()->SetRangeUser(-2, 2); etaPt->Draw("COLZ"); }

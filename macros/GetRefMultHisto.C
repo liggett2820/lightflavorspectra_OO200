@@ -190,7 +190,7 @@ void GetRefMultHisto(string a_filelist,
   gStyle->SetOptStat(1);
   TCanvas* c = new TCanvas("GetRefMultHisto","refMult",900,700);
   c->SetLogy();
-  refMult->SetTitle(a_triggerId >= 0 ? Form("refMult, fastoffline, trigger %d",a_triggerId) : "refMult, fastoffline, no trigger cut");
+  refMult->SetTitle(a_triggerId >= 0 ? Form("refMult, Fastoffline, Trigger %d",a_triggerId) : "refMult, Fastoffline, No Trigger Cut");
   refMult->GetXaxis()->SetRangeUser(0, a_xMaxDisplay);
   refMult->Draw();
 

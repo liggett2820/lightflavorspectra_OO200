@@ -74,7 +74,7 @@ void PresentNHitsEta(string a_inputFile, string a_outDir = "."){
   gStyle->SetOptStat(0);
   gStyle->SetPalette(1);
 
-  TCanvas* c = new TCanvas("PresentNHitsEta","N_{hits}^{fit}, N_{hits}^{max} & their ratio vs #eta",2400,700);
+  TCanvas* c = new TCanvas("PresentNHitsEta","N_{hits}^{fit}, N_{hits}^{max} & Their Ratio vs #eta",2400,700);
   c->Divide(3,1);
 
   // Extra right margin on all pads -- otherwise the z-axis (palette) power-of-10
