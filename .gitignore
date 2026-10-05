@@ -44,3 +44,19 @@ spectrafit_images/
 # deletion.
 _to_delete_*
 _to_delete/
+
+# Added 2026-10-05 (repo cleanup)
+# Review-then-delete area: files moved here are candidates for deletion, never tracked.
+_to_delete/
+# ACLiC/ROOT builds compiled next to their macros, and CMake build trees
+*_C.so
+*_cxx.so
+dose/**/build/
+# Run logs
+*.log
+# Generated plot directories and compiled executables (re-derive by re-running the macros)
+macros/EfficiencyFitterImages*/
+macros/corrected_*_plots*/
+dose/mars_gcr_penetration/MarsGCRPenetrationDepth
+# Large calibration plot dumps
+etof_calib/*.pdf
