@@ -1,7 +1,9 @@
 #!/bin/bash
 # run_cutflow_sdcc.bash -- lightflavorspectra_OO200
 # Called from xml/runCutFlow_OO200_SDCC.xml on a worker node, from the unpacked SandBox root.
-# Args: $1 file list (one picoDst per line), $2 output ROOT file
+# Args: $1 file list (one picoDst per line), $2 output ROOT file,
+#       $3 (optional) macro in macros/ taking (fileList, outFile); default MakeEventCutFlow_OO200.C
+#       (xml/runZdcNeutrons_OO200_SDCC.xml passes MakeZdcSpectatorNeutrons_OO200.C)
 set -u
 if [ $# -lt 2 ]; then echo "Usage: $0 <fileList> <outFile>"; exit 1; fi
 # The SandBox packs submodule/PicoDstReader_SL24y at the top level; LoadCutFlowLibs.C
@@ -21,7 +23,8 @@ while read -r f _; do
   esac
 done < "$1"
 echo "run_cutflow_sdcc.bash: $(wc -l < "$existing") of $(wc -l < "$1") files exist"
-root -l -b -q macros/LoadCutFlowLibs.C "macros/MakeEventCutFlow_OO200.C+(\"$existing\",\"$2\")"
+macro="${3:-MakeEventCutFlow_OO200.C}"
+root -l -b -q macros/LoadCutFlowLibs.C "macros/${macro}+(\"$existing\",\"$2\")"
 status=$?
 echo "run_cutflow_sdcc.bash: root exited $status"
 exit $status

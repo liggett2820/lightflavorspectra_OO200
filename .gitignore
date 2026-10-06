@@ -60,3 +60,11 @@ macros/corrected_*_plots*/
 dose/mars_gcr_penetration/MarsGCRPenetrationDepth
 # Large calibration plot dumps
 etof_calib/*.pdf
+
+# star-submit sandbox byproducts and local cut-flow test files (RCF)
+*.package/
+*.zip
+one.list
+cf_test.root
+OO200_CutFlow.txt
+OO200_RunList.txt
