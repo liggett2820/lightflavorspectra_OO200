@@ -5,13 +5,23 @@
 # Coarse pass below; after it, narrow the ranges around the minimum and run again.
 # Usage: ./submit_doScan_OO200.pl        (prints the commands)
 #        ./submit_doScan_OO200.pl -run   (submits)
+#        add -fine for the finer grid around the coarse minimum (move LOG_Scan aside first)
 #----------------------------------------------------------------------------------------------------
-my $run = (defined $ARGV[0] && $ARGV[0] eq "-run") ? 1 : 0 ;
+my $run  = (grep { $_ eq "-run" }  @ARGV) ? 1 : 0 ;
+my $fine = (grep { $_ eq "-fine" } @ARGV) ? 1 : 0 ;   # finer grid around the coarse-scan minimum
 
 my $nppbin = 9;  my $nppmin = 1.6;  my $nppmax = 3.2;   # step 0.2
 my $kbin   = 5;  my $kmin   = 1.0;  my $kmax   = 9.0;   # step 2.0
 my $xbin   = 6;  my $xmin   = 0.08; my $xmax   = 0.28;  # step 0.04 (inside each job)
 my $effbin = 4;  my $effmin = 0.00; my $effmax = 0.12;  # step 0.04; d=0 is a constant 98% efficiency
+
+# -fine: around the coarse-scan best point (npp, k, x, d) = (2.8, 3, 0.16, 0.08), chi2/ndf 2.76 (Oct 6 2026)
+if ($fine) {
+  ($nppbin, $nppmin, $nppmax) = (9, 2.60, 3.00);   # step 0.05
+  ($kbin,   $kmin,   $kmax)   = (5, 2.0,  4.0);    # step 0.5
+  ($xbin,   $xmin,   $xmax)   = (9, 0.12, 0.20);   # step 0.01 (inside each job)
+  ($effbin, $effmin, $effmax) = (5, 0.04, 0.12);   # step 0.02
+}
 
 my $npp_step = ($nppbin==1) ? 0 : ($nppmax-$nppmin)/($nppbin-1);
 my $k_step   = ($kbin==1)   ? 0 : ($kmax-$kmin)/($kbin-1);
