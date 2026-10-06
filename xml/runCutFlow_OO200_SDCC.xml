@@ -13,9 +13,12 @@
   Submit with:  rm -f CutFlow_OO200.zip; star-submit xml/runCutFlow_OO200_SDCC.xml
   (SUMS reuses an existing CutFlow_OO200.zip sandbox without repacking it, so after any
   change to macros/ or scripts/ the old zip must be deleted or the jobs run the old code.)
+  copyInputLocally is off: the macro reads the xrootd/NFS paths from FILELIST directly, so a
+  local copy is never used. With 50 files per job and copying on, every job of the
+  2026-10-05 submission ran ~15 h and was killed with exit code 1 without writing output.
 -->
 
-<job name="cutFlow_OO200" maxFilesPerProcess="50" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="true">
+<job name="cutFlow_OO200" maxFilesPerProcess="12" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="false">
 
   <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
 
