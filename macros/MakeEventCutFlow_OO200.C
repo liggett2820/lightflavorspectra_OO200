@@ -21,7 +21,11 @@
 //
 // Usage (repo root, RCF, inside the SL7 container, SL24y):
 //   root -l -b -q macros/LoadCutFlowLibs.C 'macros/MakeEventCutFlow_OO200.C+("files.list","cutflow_part0.root")'
-// Set doTracks = false to skip the track loop (much faster; drops the <nHitsFit> vs Vz profile).
+// doTracks defaults to false (Oct 6 2026): on the batch nodes, reading the Track branch over xrootd
+// made 12-file jobs take hours (job 124: 286k events in ~2.5 h, with xrootd read errors). With
+// doTracks = false only the Event branch is read; the cut flow, Vz, Vr, refMult-vs-Vz and ZDCx
+// histograms are unchanged, and only pNHitsFit_vs_Vz / pNGoodTracks_vs_Vz stay empty. Run with
+// doTracks = true on a small file list interactively to get those two profiles.
 
 #include <fstream>
 #include <string>
@@ -52,7 +56,7 @@ namespace {
 }
 
 void MakeEventCutFlow_OO200(const char* fileList, const char* outName = "cutflow_OO200.root",
-                            bool doTracks = true, int maxFiles = -1){
+                            bool doTracks = false, int maxFiles = -1){
   std::vector<std::string> files; std::ifstream in(fileList); std::string line;
   while(std::getline(in,line)){
     std::string f = line.substr(0, line.find_first_of(" \t"));
