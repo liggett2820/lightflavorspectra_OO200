@@ -1,7 +1,7 @@
 #!/bin/csh
 #----------------------------------------------------------------------------------------------------
 # One NBD scan job for O+O 200 GeV (called by submit_doScan_OO200.pl through condor)
-# Arguments: npp k eff xbin xmin xmax   (x is scanned inside the job)
+# Arguments: npp k eff xbin xmin xmax [multCut]   (x is scanned inside the job; multCut defaults to 15)
 #----------------------------------------------------------------------------------------------------
 if ( $?GLAUBER_STARVER ) then
   starver $GLAUBER_STARVER
@@ -20,6 +20,7 @@ set nevents = "1000000" # 1M per (npp, k, x, eff) point
 set real    = "hRefMult_OO200.root"   # raw refMult after event cuts, from make_hRefMult_OO200.C
 set mc      = "ncoll_npart.root"      # from addNcollVsNpart.C on the default O+O trees
 set multCut = "15"                    # fit refMult >= 15 only (trigger/vertex inefficiency at low refMult); vary 10/20 as a check
+if ( $#argv >= 7 ) set multCut = "$7"      # optional 7th argument overrides it (submit_doScan_OO200.pl -multcut N)
 
 root4star -b <<EOF2
   .L doNbdFitMaker_OO200.C
