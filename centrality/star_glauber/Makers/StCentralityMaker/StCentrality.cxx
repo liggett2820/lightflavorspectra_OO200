@@ -1383,39 +1383,57 @@ void StCentrality::Init_OO200GeV()
 	//  Placeholder npp/k/x/eff only set the tree's multiplicity branch (multiplicity-weighted
 	//  eccentricity); Npart/Ncoll/b in the trees do not depend on them.
 	//----------------------------------------------------------------------------------------------------
-	const Bool_t kIsPlaceholder = kTRUE ;
+	const Bool_t kIsPlaceholder = kFALSE ;
 
 	// NOTE: type 'low' and 'high' are for npp, x is anti-correlated with npp (same convention as Au+Au 200 GeV)
 	Double_t xError = 0.0 ; // absolute error
 	if( mType.CompareTo("low", TString::kIgnoreCase) == 0 )       xError = 0.02 ; // npp is low, x is high
 	else if( mType.CompareTo("high", TString::kIgnoreCase) == 0 ) xError = -0.02 ; // npp is high, x is low
 
-	const Double_t npp = 2.40 ; // PLACEHOLDER: replace with best-fit npp
+	const Double_t npp = 2.75 ; // best-fit npp
 	mNpp = npp + GetNppError(npp) ; // 5% error on npp for low/high
-	mK   = 2.00 ;                   // PLACEHOLDER: replace with best-fit k
-	mX   = 0.13 + xError ;          // PLACEHOLDER: replace with best-fit x
-	mEfficiency  = 0.00 ;           // PLACEHOLDER: replace with best-fit d (multiplicity-dependent efficiency)
+	mK   = 2.50 ;                   // best-fit k
+	mX   = 0.17 + xError ;          // best-fit x
+	mEfficiency  = 0.06 ;           // best-fit d (multiplicity-dependent efficiency)
 	mTriggerBias = 1.00 ;
 
 	//---------------------------------------- PASTE BEGIN ----------------------------------------
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back(  0.0 ); mCentralityMax[0].push_back(  5.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back(  5.0 ); mCentralityMax[0].push_back( 10.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 10.0 ); mCentralityMax[0].push_back( 15.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 15.0 ); mCentralityMax[0].push_back( 20.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 20.0 ); mCentralityMax[0].push_back( 25.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 25.0 ); mCentralityMax[0].push_back( 30.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 30.0 ); mCentralityMax[0].push_back( 35.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 35.0 ); mCentralityMax[0].push_back( 40.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 40.0 ); mCentralityMax[0].push_back( 45.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 45.0 ); mCentralityMax[0].push_back( 50.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 50.0 ); mCentralityMax[0].push_back( 55.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 55.0 ); mCentralityMax[0].push_back( 60.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 60.0 ); mCentralityMax[0].push_back( 65.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 65.0 ); mCentralityMax[0].push_back( 70.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 70.0 ); mCentralityMax[0].push_back( 75.0 );
-	mMultiplicityCut[0].push_back( 0 ); mCentralityMin[0].push_back( 75.0 ); mCentralityMax[0].push_back( 80.0 );
+	// From find_best_nbd_OO200.py, fine scan (fit refMult >= 15): npp = 2.750, k = 2.500, x = 0.170, d = 0.060, chi2/ndf = 72.2/81 = 0.89 (Oct 6 2026).
+	// Fit-range checks give the same [0] edges: refMult >= 10 (best 2.70/2.5/0.19/0.08, chi2/ndf 5.18) and >= 20 (best 2.75/2.5/0.17/0.06, chi2/ndf 0.77).
+	mMultiplicityCut[0].push_back(  43 ); mCentralityMin[0].push_back(  0.0 ); mCentralityMax[0].push_back(  5.0 );
+	mMultiplicityCut[0].push_back(  36 ); mCentralityMin[0].push_back(  5.0 ); mCentralityMax[0].push_back( 10.0 );
+	mMultiplicityCut[0].push_back(  30 ); mCentralityMin[0].push_back( 10.0 ); mCentralityMax[0].push_back( 15.0 );
+	mMultiplicityCut[0].push_back(  26 ); mCentralityMin[0].push_back( 15.0 ); mCentralityMax[0].push_back( 20.0 );
+	mMultiplicityCut[0].push_back(  23 ); mCentralityMin[0].push_back( 20.0 ); mCentralityMax[0].push_back( 25.0 );
+	mMultiplicityCut[0].push_back(  20 ); mCentralityMin[0].push_back( 25.0 ); mCentralityMax[0].push_back( 30.0 );
+	mMultiplicityCut[0].push_back(  17 ); mCentralityMin[0].push_back( 30.0 ); mCentralityMax[0].push_back( 35.0 );
+	mMultiplicityCut[0].push_back(  15 ); mCentralityMin[0].push_back( 35.0 ); mCentralityMax[0].push_back( 40.0 );
+	mMultiplicityCut[0].push_back(  13 ); mCentralityMin[0].push_back( 40.0 ); mCentralityMax[0].push_back( 45.0 );
+	mMultiplicityCut[0].push_back(  11 ); mCentralityMin[0].push_back( 45.0 ); mCentralityMax[0].push_back( 50.0 );
+	mMultiplicityCut[0].push_back(   9 ); mCentralityMin[0].push_back( 50.0 ); mCentralityMax[0].push_back( 55.0 );
+	mMultiplicityCut[0].push_back(   7 ); mCentralityMin[0].push_back( 55.0 ); mCentralityMax[0].push_back( 60.0 );
+	mMultiplicityCut[0].push_back(   5 ); mCentralityMin[0].push_back( 60.0 ); mCentralityMax[0].push_back( 65.0 );
+	mMultiplicityCut[0].push_back(   3 ); mCentralityMin[0].push_back( 65.0 ); mCentralityMax[0].push_back( 70.0 );
+	mMultiplicityCut[0].push_back(   1 ); mCentralityMin[0].push_back( 70.0 ); mCentralityMax[0].push_back( 75.0 );
+	mMultiplicityCut[0].push_back(   0 ); mCentralityMin[0].push_back( 75.0 ); mCentralityMax[0].push_back( 80.0 );
 	// -5%                                 +5%
-	for(UInt_t ic=0; ic<16; ic++){ mMultiplicityCut[1].push_back( 0 ); mMultiplicityCut[2].push_back( 0 ); } // PLACEHOLDER: replace this loop with the 16 pasted lines
+	// The last two [2] values printed by StNbdFitMaker were uninitialized (1955247001 / -643124327 and 5304 / 5296 across scans); set to 0.
+	mMultiplicityCut[1].push_back(  43 );  mMultiplicityCut[2].push_back(  42 );
+	mMultiplicityCut[1].push_back(  36 );  mMultiplicityCut[2].push_back(  35 );
+	mMultiplicityCut[1].push_back(  31 );  mMultiplicityCut[2].push_back(  30 );
+	mMultiplicityCut[1].push_back(  27 );  mMultiplicityCut[2].push_back(  26 );
+	mMultiplicityCut[1].push_back(  24 );  mMultiplicityCut[2].push_back(  22 );
+	mMultiplicityCut[1].push_back(  21 );  mMultiplicityCut[2].push_back(  19 );
+	mMultiplicityCut[1].push_back(  18 );  mMultiplicityCut[2].push_back(  16 );
+	mMultiplicityCut[1].push_back(  16 );  mMultiplicityCut[2].push_back(  14 );
+	mMultiplicityCut[1].push_back(  14 );  mMultiplicityCut[2].push_back(  12 );
+	mMultiplicityCut[1].push_back(  12 );  mMultiplicityCut[2].push_back(  10 );
+	mMultiplicityCut[1].push_back(  10 );  mMultiplicityCut[2].push_back(   8 );
+	mMultiplicityCut[1].push_back(   8 );  mMultiplicityCut[2].push_back(   6 );
+	mMultiplicityCut[1].push_back(   6 );  mMultiplicityCut[2].push_back(   4 );
+	mMultiplicityCut[1].push_back(   4 );  mMultiplicityCut[2].push_back(   2 );
+	mMultiplicityCut[1].push_back(   2 );  mMultiplicityCut[2].push_back(   0 );
+	mMultiplicityCut[1].push_back(   0 );  mMultiplicityCut[2].push_back(   0 );
 	//---------------------------------------- PASTE END ------------------------------------------
 
 	// StNbdFitMaker::CalculateCentrality prints the lowest multiplicity INCLUDED in each class
