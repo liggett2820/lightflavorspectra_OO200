@@ -32,7 +32,7 @@
 //     (Separately: an actual O+O 200 GeV StRefMultCorr calibration DOES exist upstream --
 //     STAR's public star-sw, Param.h mParamStr_ref6[0]/mParamStr_ref7[0], "Run 21 O+O 200
 //     GeV", run range [22130029,22144006], which contains this repo's own picoBinner XML
-//     run whitelist (the 60 trigger-860003 runs since Oct 2026). That's recorded in compile.bash's own header for whoever
+//     run whitelist (the 56 good trigger-860003 runs since Oct 2026). That's recorded in compile.bash's own header for whoever
 //     needs it later -- it's just not what this build uses, per the two points above.)
 //
 //   _PICO_READER_SL23c_ -- matches compile.bash's actual `cp -r

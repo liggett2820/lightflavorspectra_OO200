@@ -3,7 +3,7 @@
 
   star-submit job for macros/MakeEventCutFlow_OO200.C over the SAME picoDst set as the
   PicoBinner production (xml/runPicoBinner_OO200_SDCC_template.xml): identical catalog
-  query and 60-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014 which has no P24iy picoDsts; also in runlists/OO200_860003_runs.txt). One output ROOT file per job; hadd them afterwards:
+  query and 56-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014, which has no P24iy picoDsts, and minus 22133032, 22133037, 22133038 and 22135039, which are on the official O+O bad-run list in StRefMultCorr/BadRun.h; also in runlists/OO200_860003_runs.txt). One output ROOT file per job; hadd them afterwards:
     hadd -f cutflow_OO200_all.root /star/data03/pwg/liggett/CutFlow_OO200/*_cutflow.root
   then plot on the laptop with macros/PlotEventCutFlow_OO200.C.
 
@@ -25,7 +25,7 @@
   <stdout URL="file:/star/data03/scratch/liggett/cutFlow_OO200/stdout_stderr/$JOBID.out" />
   <stderr URL="file:/star/data03/scratch/liggett/cutFlow_OO200/stdout_stderr/$JOBID.err" />
 
-  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135039||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133032||22133037||22133038||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="all" />
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="all" />
 
   <Generator><Location>
     /star/data03/scratch/liggett/schedFiles/cutFlow_OO200

@@ -3,7 +3,7 @@
 
   star-submit job for macros/MakeZdcSpectatorNeutrons_OO200.C: ZDC (unattenuated) ADC per side
   for trigger-860003 events after the analysis event cuts, by centrality, refMult and run.
-  Same catalog query, 60-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014 which has no P24iy picoDsts; also in runlists/OO200_860003_runs.txt), and job layout as xml/runCutFlow_OO200_SDCC.xml
+  Same catalog query, 56-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014, which has no P24iy picoDsts, and minus 22133032, 22133037, 22133038 and 22135039, which are on the official O+O bad-run list in StRefMultCorr/BadRun.h; also in runlists/OO200_860003_runs.txt), and job layout as xml/runCutFlow_OO200_SDCC.xml
   (copyInputLocally off, 12 files per job). Reads only the Event branch, so jobs are short.
   Merge, then fit/plot on the laptop or in the container:
     hadd -f zdc_OO200_all.root /star/data03/pwg/liggett/ZdcNeutrons_OO200/*_zdc.root
@@ -22,7 +22,7 @@
   <stdout URL="file:/star/data03/scratch/liggett/zdcNeutrons_OO200/stdout_stderr/$JOBID.out" />
   <stderr URL="file:/star/data03/scratch/liggett/zdcNeutrons_OO200/stdout_stderr/$JOBID.err" />
 
-  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135039||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133032||22133037||22133038||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="all" />
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="all" />
 
   <Generator><Location>
     /star/data03/scratch/liggett/schedFiles/zdcNeutrons_OO200
