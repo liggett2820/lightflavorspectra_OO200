@@ -18,8 +18,9 @@
 #     exists there for O+O 200 GeV -- Param.h's mParamStr_ref6[0]/mParamStr_ref7[0]
 #     ("Run 21 O+O 200 GeV, Trigger ID = 860001/860002/860011/860012"), selected via
 #     StRefMultCorr("refmult6") or StRefMultCorr("totnMIP") for run numbers in
-#     [22130029, 22144006]. All 120 runs in this repo's picoBinner XML whitelist fall
-#     inside that window (min run 22130029 equals the table's lower bound exactly), so
+#     [22130029, 22144006]. All runs in this repo's picoBinner XML whitelist fall inside
+#     that window (since Oct 2026 the whitelist is the 60 trigger-860003 runs,
+#     22133032-22136010; runlists/OO200_860003_runs.txt), so
 #     it IS the right calibration IF this build were to use StRefMultCorr at all --
 #     confirm your trigger IDs match 860001/860002/860011/860012 too if you ever do.
 #     BUT: checked against two independent sources whether this embedding Maker SHOULD

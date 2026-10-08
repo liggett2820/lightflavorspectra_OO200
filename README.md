@@ -368,7 +368,10 @@ template, every `/liggett` path needs updating to their own account first.
    or without the runnumber whitelist carried over from the SL23c/P23ic job -- has not
    been independently re-verified against the current StarCatalog, so confirm it still
    resolves to files before relying on it (an unverified pairing may just return zero
-   files).
+   files). Since Oct 2026 the runnumber whitelist in all three XML jobs (PicoBinner,
+   cut flow, ZDC) is the 60 runs that contain trigger 860003 (22133032-22136010, minus
+   22134014, which has no P24iy picoDsts); the list is also in
+   `runlists/OO200_860003_runs.txt`.
 5. Make one copy of the template per species (PION/KAON/PROTON), editing the `PARTNAME`
    argument in the `run_picobinner_sdcc.bash` call, the job `name`, and the output paths
    in each copy so the three jobs don't collide.
