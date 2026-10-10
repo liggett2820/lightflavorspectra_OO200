@@ -68,3 +68,25 @@ one.list
 cf_test.root
 OO200_CutFlow.txt
 OO200_RunList.txt
+
+# Added 2026-10-10: RCF build and batch-submission byproducts (seen in git status on starsub05)
+*.o
+AutoDict_*.cxx
+*.dataset
+*.session.xml
+.sl73_x8664_gcc485/
+.al98_x8664_gcc11/
+temp_gccflags.c
+# STAR Glauber package: generated run directories and logs
+centrality/star_glauber/LOG*
+centrality/star_glauber/LIST
+centrality/star_glauber/output
+centrality/star_glauber/figure
+centrality/star_glauber/table
+centrality/star_glauber/RatioChi2Files
+centrality/star_glauber/glauber_OO200
+# Locally built SL23c reader (embedding) and generated dictionary headers
+submodule/PicoDstReader_SL23c/libStPicoDst.so
+submodule/PicoDstReader_SL23c/StPicoDst_Dict.C
+submodule/PicoDstReader_SL23c/StPicoDst_Dict.h
+submodule/PicoDstReader_SL24y/StPicoDst_Dict.h
