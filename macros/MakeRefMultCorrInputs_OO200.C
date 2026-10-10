@@ -15,6 +15,9 @@
 //   hRefMult_vs_nBTOFMatch  refMult vs nBTOFMatch, |Vz| <= 30 cm      -> pile-up band
 //   hRefMult_Vz_ZDCx        refMult x Vz x ZDCx, nBTOFMatch <= refMult + 100 (current cut)
 //                           -> corrected refMult distribution for the NBD refit
+//   hRefMult_Vz_ZDCx_band   the same, after the pass-1 pile-up band (refMult vs nBTOFMatch, from
+//                           FitRefMultCorr_OO200.C on the Oct 10 2026 pass-1 output); used for the
+//                           corrected refMult distribution in pass 2
 //   pRefMult_vs_run, pNBTOFMatch_vs_run, pZDCx_vs_run               -> run-by-run stability
 //   hVz, hZDCx, hEvents
 //
@@ -45,6 +48,18 @@ namespace {
   const double kVzLumi  = 10.0;   // cm, Vz window for the luminosity dependence
   const int    kTofLine = 100;    // current pile-up cut: nBTOFMatch <= refMult + 100
   // run index: (day - 130) * 100 + run number within the day (as in the ZDC macros)
+  // pass-1 pile-up band (OO200_RefMultCorr_params.txt, Oct 10 2026): keep kBandLo(t) <= refMult <= kBandUp(t),
+  // t = nBTOFMatch; pol4 up to the last fitted slice (t = 85), straight-line continuation beyond it
+  const double kBandUp[5] = {5.91052, 2.22934, -0.0221511, 0.000203259, -7.82252e-07};
+  const double kBandLo[5] = {-4.67124, -0.259727, 0.0274938, -0.00035788, 1.67535e-06};
+  const double kBandXm    = 85.;
+  double bandEdge(const double* p, double t){
+    const double tt = (t <= kBandXm) ? t : kBandXm;
+    double v = p[0] + p[1]*tt + p[2]*tt*tt + p[3]*tt*tt*tt + p[4]*tt*tt*tt*tt;
+    if(t > kBandXm) v += (p[1] + 2*p[2]*kBandXm + 3*p[3]*kBandXm*kBandXm + 4*p[4]*kBandXm*kBandXm*kBandXm) * (t - kBandXm);
+    return v;
+  }
+  bool inBand(int tof, int rm){ return rm >= bandEdge(kBandLo, tof) && rm <= bandEdge(kBandUp, tof); }
   int runIndex(int runId){ int day = (runId % 1000000) / 1000; return (day - 130) * 100 + (runId % 1000); }
 }
 
@@ -58,11 +73,12 @@ void MakeRefMultCorrInputs_OO200(const char* fileList, const char* outName = "rm
   if(maxFiles > 0 && (int)files.size() > maxFiles) files.resize(maxFiles);
 
   TFile* out = TFile::Open(outName, "RECREATE");
-  TH1D* hEvents = new TH1D("hEvents", "Events;;Events", 4, 0, 4);
+  TH1D* hEvents = new TH1D("hEvents", "Events;;Events", 5, 0, 5);
   hEvents->GetXaxis()->SetBinLabel(1, "860003");
   hEvents->GetXaxis()->SetBinLabel(2, "|Vz| <= 30 cm");
   hEvents->GetXaxis()->SetBinLabel(3, "Vr <= 1 cm");
   hEvents->GetXaxis()->SetBinLabel(4, "nBTOFMatch <= refMult+100");
+  hEvents->GetXaxis()->SetBinLabel(5, "pile-up band (pass 1)");
 
   TH1D* hVz   = new TH1D("hVz", "860003, Vr <= 1 cm;V_{z} (cm);Events", 600, -30, 30);
   TH1D* hZDCx = new TH1D("hZDCx", "860003, |V_{z}| <= 30 cm, Vr <= 1 cm;ZDCx (kHz);Events", 300, 0, 3);
@@ -71,6 +87,8 @@ void MakeRefMultCorrInputs_OO200(const char* fileList, const char* outName = "rm
   TH2F* hRefZdc = new TH2F("hRefMult_vs_ZDCx", "860003, |V_{z}| <= 10 cm, Vr <= 1 cm;ZDCx (kHz);refMult", 60, 0, 3, 300, 0, 300);
   TH2F* hRefTof = new TH2F("hRefMult_vs_nBTOFMatch", "860003, |V_{z}| <= 30 cm, Vr <= 1 cm;nBTOFMatch;refMult", 300, 0, 300, 300, 0, 300);
   TH3F* h3      = new TH3F("hRefMult_Vz_ZDCx", "860003, |V_{z}| <= 30 cm, Vr <= 1 cm, nBTOFMatch <= refMult+100;refMult;V_{z} (cm);ZDCx (kHz)",
+                           300, 0, 300, 60, -30, 30, 30, 0, 3);
+  TH3F* h3b     = new TH3F("hRefMult_Vz_ZDCx_band", "860003, |V_{z}| <= 30 cm, Vr <= 1 cm, pass-1 pile-up band;refMult;V_{z} (cm);ZDCx (kHz)",
                            300, 0, 300, 60, -30, 30, 30, 0, 3);
 
   TProfile* pRefRun = new TProfile("pRefMult_vs_run",    "860003, |V_{z}| <= 30 cm, Vr <= 1 cm;run index = (day-130)*100 + run-in-day;#LTrefMult#GT", 700, 0, 700);
@@ -110,6 +128,7 @@ void MakeRefMultCorrInputs_OO200(const char* fileList, const char* outName = "rm
       if(tof > rm + kTofLine) continue;
       hEvents->Fill(3.5);
       h3->Fill(rm, vz, zdc);
+      if(inBand(tof, rm)){ hEvents->Fill(4.5); h3b->Fill(rm, vz, zdc); }
       nPass++;
     }
     reader->Finish();
@@ -121,7 +140,8 @@ void MakeRefMultCorrInputs_OO200(const char* fileList, const char* outName = "rm
   std::cout << "\n860003 events: " << hEvents->GetBinContent(1)
             << ", |Vz|<=30: " << hEvents->GetBinContent(2)
             << ", Vr<=1: " << hEvents->GetBinContent(3)
-            << ", pile-up line: " << hEvents->GetBinContent(4) << std::endl;
+            << ", pile-up line: " << hEvents->GetBinContent(4)
+            << ", pile-up band: " << hEvents->GetBinContent(5) << std::endl;
   out->Close();
   std::cout << "Wrote " << outName << std::endl;
 }
