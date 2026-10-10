@@ -135,10 +135,30 @@ Then check the best point's `RatioChi2Files/Ratio_*.root`. `hRatio` (MC/data) sh
 
 The tables cover 5% classes and the wider ones in `StGlauberConstUtilities`: 0–10, 10–20, 20–40, 40–60, 60–80, 40–80 and others. The systematic error per class is the maximum deviation over the types.
 
+### Step 4: refMult corrections and trigger efficiency (Oct 2026)
+
+The fits above use raw refMult with |Vz| <= 2 cm. The StRefMultCorr-style corrections for
+trigger 860003 (Vz, luminosity, pile-up; see the main README, "StRefMultCorr-style
+centrality") produce a corrected refMult histogram, `hRefMultCorr_OO200.root` (TH1D
+`hRefMult`, unit bins from 0), for |Vz| <= 30 cm. To rescan on it, copy it to the name the
+scan reads (`cp hRefMultCorr_OO200.root hRefMult_OO200.root`, after keeping the old file),
+rerun `submit_doScan_OO200.pl` and `find_best_nbd_OO200.py`, and refill `Init_OO200GeV()`.
+
+Trigger/vertex efficiency below the fit threshold, from the best point's Ratio file:
+```csh
+root -l -b -q 'FitTriggerEfficiency_OO200.C+("Ratio_best_mc15/Ratio_npp2.750_k2.500_x0.170_eff0.060.root", 15)'
+```
+It fits data/MC with 1 - exp(-p0 m^p1) (the form `StCentrality::GetReweighting` uses; the
+lowrw/highrw +-2 sigma values are printed) and with 1 - p0 exp(-p1 m^p2), which allows a
+nonzero efficiency at m = 0, and writes `OO200_TrigEff_params.txt` and `OO200_TrigEff.png`.
+To use the weights in the Glauber tables, put the form-(1 - exp) parameters into
+`Init_OO200GeV()` (`mParReweighting`) and run `all_doAnalysisMaker.csh OO_200GeV kTRUE kFALSE`
+with `lowrw`/`highrw` added to its list.
+
 ## Things to keep in mind for O+O
 
 **Multiplicity granularity.** refMult is a small integer here, so a 5% class cannot be exactly 5%. The printed edge is the integer whose cumulative fraction is closest. Quote the actual fraction each class selects, from the data histogram above the fit range and from the MC below it.
 
-**No refMult corrections.** STAR's procedure expects luminosity- and Vz-corrected refMult. With |Vz| ≤ 2 cm, the Vz dependence is small, but ⟨refMult⟩ vs ZDC coincidence rate has not been checked for this dataset.
+**refMult corrections.** STAR's procedure expects luminosity- and Vz-corrected refMult. The raw-refMult fit above uses |Vz| ≤ 2 cm, where the Vz dependence is small. The corrections are being derived in Step 4 (Oct 2026); until the rescan on corrected refMult is done, the table above is for raw refMult.
 
 **Nuclear structure.** ¹⁶O is generated spherical with uncorrelated nucleons. α-clustering and short-range correlations are not in STAR's model.

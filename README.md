@@ -63,6 +63,44 @@ compatible and must be regenerated. `RunZFitter.C`'s `nCentToRun`, `RunRawSpectr
 scheme is actually configured here (currently 6) -- they're kept in sync manually, not
 read from `CutClass` automatically, so double-check all three if you change this again.
 
+### StRefMultCorr-style centrality for trigger 860003 (in progress, Oct 2026)
+
+The cuts above predate the analysis's own NBD x Glauber fit
+(`centrality/star_glauber/`, see its `README_OO200.md`). That fit gives refMult edges
+43/36/30/26/23/20/17/15/13/11/9/7/5/3/1/0 for 0-5% ... 75-80%; refMult = 0 holds roughly
+75-100%, so 80% cannot be a class boundary with raw refMult. The new class scheme is
+still to be decided, so `SetCutClass.C` has not been changed yet.
+
+STAR's official Run 21 O+O StRefMultCorr (`refmult6`, `totnMIP`) is calibrated for
+triggers 860001/860002/860011/860012. This analysis needs eTOF, which only trigger
+860003 reads out, so it builds its own StRefMultCorr-style corrections for refMult
+with 860003, over |Vz| <= 30 cm, following STAR's procedure:
+
+1. Inputs: `macros/MakeRefMultCorrInputs_OO200.C` via
+   `xml/runRefMultCorrInputs_OO200_SDCC.xml` (Event branch only). Fills refMult vs Vz,
+   vs ZDCx, vs nBTOFMatch and per run, plus a refMult x Vz x ZDCx histogram.
+   ```
+   hadd -f rmc_OO200_all.root /star/data03/pwg/liggett/RefMultCorr_OO200/*_rmc.root
+   ```
+2. Corrections: `root -l -b -q 'macros/FitRefMultCorr_OO200.C+("rmc_OO200_all.root")'`
+   fits the Vz correction (<refMult> for refMult >= 15 per 1 cm Vz bin, relative to
+   |Vz| <= 2 cm), the luminosity correction (<refMult> vs ZDCx), and a pile-up band
+   (refMult vs nBTOFMatch, +-5 sigma, pol4; coefficients in StRefMultCorr's b0..b4 /
+   c0..c4 order). It writes `OO200_RefMultCorr_params.txt`, four `OO200_RMC_*.png`, and
+   `hRefMultCorr_OO200.root`, whose `hRefMult` is the corrected, [0,1)-smeared refMult in
+   the format the NBD scan reads.
+3. NBD rescan on the corrected refMult (`centrality/star_glauber/`, same scan scripts,
+   with `hRefMultCorr_OO200.root` as the data input).
+4. Trigger/vertex efficiency weights:
+   `centrality/star_glauber/FitTriggerEfficiency_OO200.C` fits data/MC below the NBD fit
+   threshold (event weight = 1/efficiency) and prints the overall efficiency of the
+   recorded sample.
+5. Not yet done: a small StRefMultCorr-like class in the repo, used by `CutClass`, and
+   the rerun of PicoBinner with the new classes.
+
+Run list: since Oct 2026 all jobs use the 56 good 860003 runs in
+`runlists/OO200_860003_runs.txt` (see "Before you can submit" below).
+
 ## PicoDst reader version
 
 `submodule/PicoDstReader_SL24y/` vendors STAR's PicoDst class definitions (StPicoEvent,
