@@ -7,10 +7,12 @@
 #        ./submit_doScan_OO200.pl -run   (submits)
 #        add -fine for the finer grid around the coarse minimum (move LOG_Scan aside first)
 #        add -local -multcut 10 (or 20) for the fit-range check around the fine minimum (logs in LOG_Scan_mc10/20)
+#        add -wide for the extended grid used on the corrected refMult (|Vz| <= 30 cm) histogram
 #----------------------------------------------------------------------------------------------------
 my $run  = (grep { $_ eq "-run" }  @ARGV) ? 1 : 0 ;
 my $fine = (grep { $_ eq "-fine" } @ARGV) ? 1 : 0 ;   # finer grid around the coarse-scan minimum
 my $local = (grep { $_ eq "-local" } @ARGV) ? 1 : 0 ; # small grid around the fine-scan minimum (for the multCut checks)
+my $wide  = (grep { $_ eq "-wide" }  @ARGV) ? 1 : 0 ; # extended grid for the corrected refMult, |Vz| <= 30 cm
 my $multcut = 15;                                      # fit range refMult >= multcut; -multcut N to change
 for (my $a=0; $a<=$#ARGV; $a++) { $multcut = $ARGV[$a+1] if ($ARGV[$a] eq "-multcut" && defined $ARGV[$a+1]); }
 my $logdir = ($multcut == 15) ? "LOG_Scan" : "LOG_Scan_mc$multcut";   # keep each fit range's logs apart
@@ -33,6 +35,14 @@ if ($local) {
   ($kbin,   $kmin,   $kmax)   = (3, 2.0,  3.0);    # step 0.5
   ($xbin,   $xmin,   $xmax)   = (7, 0.14, 0.20);   # step 0.01 (inside each job)
   ($effbin, $effmin, $effmax) = (3, 0.04, 0.08);   # step 0.02
+}
+# -wide: corrected refMult, |Vz| <= 30 cm (Oct 13 2026). The -local scan of it put the best point (2.65, 2.5, 0.20, 0.04),
+# chi2/ndf 1.00, on the npp, x and d edges, along the npp-x valley; extend all three. 135 jobs, 13 x values each.
+if ($wide) {
+  ($nppbin, $nppmin, $nppmax) = (9,  2.45, 2.85);  # step 0.05
+  ($kbin,   $kmin,   $kmax)   = (3,  2.0,  3.0);   # step 0.5
+  ($xbin,   $xmin,   $xmax)   = (13, 0.14, 0.26);  # step 0.01 (inside each job)
+  ($effbin, $effmin, $effmax) = (5,  0.00, 0.08);  # step 0.02
 }
 if ($run && !-d $logdir) { mkdir($logdir) or die "cannot create $logdir\n"; }
 
