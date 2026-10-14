@@ -1,0 +1,46 @@
+<!--
+  runEpdCentInputs_OO200_SDCC.xml - lightflavorspectra_OO200
+
+  star-submit job for macros/MakeEpdCentInputs_OO200.C: EPD totnMIP histograms (vs Vz, ZDCx,
+  nBTOFMatch, refMult, run; per-row profiles; 860001/2 comparison set) for an EPD-based centrality,
+  trigger 860003, |Vz| <= 30 cm. Same catalog query and 56-run list as runRefMultCorrInputs_OO200_SDCC.xml,
+  12 files per job. Reads the Event and EpdHit branches.
+  Merge:
+    hadd -f epd_OO200.root /star/data03/pwg/liggett/EpdCent_OO200/*_epd.root
+
+  Before submitting (RCF host, repo root):
+    mkdir -p /star/data03/pwg/liggett/EpdCent_OO200 /star/data03/scratch/liggett/schedFiles/epdCent_OO200 /star/data03/scratch/liggett/epdCent_OO200/stdout_stderr
+  Submit with:  rm -f EpdCent_OO200.zip; star-submit xml/runEpdCentInputs_OO200_SDCC.xml
+  (SUMS reuses an existing sandbox zip without repacking it: delete it after any code change.)
+-->
+
+<job name="epdCent_OO200" maxFilesPerProcess="12" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="false">
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
+
+  <stdout URL="file:/star/data03/scratch/liggett/epdCent_OO200/stdout_stderr/$JOBID.out" />
+  <stderr URL="file:/star/data03/scratch/liggett/epdCent_OO200/stdout_stderr/$JOBID.err" />
+
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="all" />
+
+  <Generator><Location>
+    /star/data03/scratch/liggett/schedFiles/epdCent_OO200
+  </Location></Generator>
+
+  <SandBox installer="ZIP">
+    <Package name="EpdCent_OO200">
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/PicoDstReader_SL24y</File>
+    </Package>
+  </SandBox>
+
+  <command>
+    starver SL24y
+    awk '{print $1}' ${FILELIST} > ${JOBID}.list
+    ./scripts/run_cutflow_sdcc.bash ${JOBID}.list ${SCRATCH}/${JOBID}_epd.root MakeEpdCentInputs_OO200.C
+  </command>
+
+  <output fromScratch="*_epd.root" toURL="file:/star/data03/pwg/liggett/EpdCent_OO200/" />
+</job>
