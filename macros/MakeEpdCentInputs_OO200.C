@@ -34,6 +34,8 @@
 //   root -l -b -q macros/LoadCutFlowLibs.C 'macros/MakeEpdCentInputs_OO200.C+("files.list","epd_part0.root")'
 // Output is additive (hadd).
 
+#include <cstdio>
+#include <unistd.h>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -191,4 +193,10 @@ void MakeEpdCentInputs_OO200(const char* fileList, const char* outName = "epd_OO
             << ", of which totnMIP = 0: " << hEvents->GetBinContent(5) << std::endl;
   out->Close();
   std::cout << "Wrote " << outName << std::endl;
+  // Leave without ROOT's teardown. The PicoDst classes are registered twice (submodule library and
+  // STAR's; see the "already in TClassTable" warnings), and freeing them twice at exit aborts with
+  // "corrupted double-linked list" (exit 6), which can hang in the crash handler on worker nodes.
+  // The output file is already closed here. Batch use only (root -b -q): this ends the session.
+  std::cout.flush(); fflush(stdout); fflush(stderr);
+  _exit(0);
 }
