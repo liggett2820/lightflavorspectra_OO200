@@ -55,6 +55,13 @@
 #include "TMath.h"
 #include "TString.h"
 
+// ROOT 5 rootcint could not parse this file ("function not defined in current scope"). Only the
+// declaration below is shown to rootcint; the helpers and the body are hidden from it and compiled
+// by the C++ compiler as usual.
+void FitEpdCent_OO200(const char* inName = "epd_OO200.root");
+
+#ifndef __CINT__
+
 namespace {
   const double kMipMean   = 100.;  // totnMIP threshold for the Vz and luminosity means (~ 50% centrality in the official table)
   const double kVzCenter  = 2.;    // |Vz| <= 2 cm defines the reference
@@ -116,7 +123,7 @@ namespace {
   }
 }
 
-void FitEpdCent_OO200(const char* inName = "epd_OO200.root"){
+void FitEpdCent_OO200(const char* inName){
   gStyle->SetOptStat(0);
   TFile* in = TFile::Open(inName);
   if(!in || in->IsZombie()){ std::cout << "Cannot open " << inName << std::endl; return; }
@@ -396,3 +403,4 @@ void FitEpdCent_OO200(const char* inName = "epd_OO200.root"){
   std::cout << "totnMIP pile-up band keeps " << (all > 0 ? 100.*inBand/all : 0) << "% of events" << std::endl;
   std::cout << "Wrote OO200_EpdCent_params.txt, hTotnMIPCorr_OO200.root and OO200_EPD_*.png" << std::endl;
 }
+#endif // __CINT__
