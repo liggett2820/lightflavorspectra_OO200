@@ -347,7 +347,11 @@ void FitEpdCent_OO200(const char* inName){
   TH1D* c1n = (TH1D*) hCorr->Clone("c1n"); c1n->Scale(1./c1n->Integral());
   r1->SetLineColor(kBlack); c1n->SetLineColor(kRed);
   r1->SetTitle("totnMIP, 860003;totnMIP;normalized");
-  r1->GetXaxis()->SetRangeUser(0, 600); r1->Draw("hist"); c1n->Draw("hist same");
+  // full histogram range (was cut at 600) and a y maximum that covers all curves (the 860001/2 peak is the highest)
+  double ymax4 = TMath::Max(r1->GetMaximum(), c1n->GetMaximum());
+  if(hOff && hOff->Integral() > 0) ymax4 = TMath::Max(ymax4, hOff->GetMaximum()/hOff->Integral());
+  r1->SetMaximum(3.0*ymax4); r1->SetMinimum(1e-7);
+  r1->GetXaxis()->SetRangeUser(0, mipMax); r1->Draw("hist"); c1n->Draw("hist same");
   TLegend* l4 = new TLegend(0.55, 0.7, 0.88, 0.88);
   l4->AddEntry(r1, "860003 raw", "l"); l4->AddEntry(c1n, "860003 corrected", "l");
   if(hOff && hOff->Integral() > 0){
@@ -356,6 +360,14 @@ void FitEpdCent_OO200(const char* inName){
   }
   l4->Draw();
   c4->Print("OO200_EPD_TotnMIP.png");
+  // events above the histogram range (totnMIP >= mipMax) are in the y overflow of hTotnMIP_vs_Vz only;
+  // hTotnMIP and the NBD input drop them, so report how many
+  {
+    const int nyb = hRawNoBand->GetNbinsX();
+    const double fOver = hRawNoBand->GetBinContent(nyb+1)/hRawNoBand->Integral(0, nyb+1);
+    std::cout << Form("totnMIP >= %.0f (overflow, not in hTotnMIP / NBD input): %.3g of 860003 events", mipMax, fOver) << std::endl;
+    par << Form("\n[Overflow] fraction of 860003 events (|Vz|<=30, Vr<=1, no band) with totnMIP >= %.0f: %.3g\n", mipMax, fOver);
+  }
 
   if(hRef){
     TCanvas* c5 = new TCanvas("c5", "", 900, 700); c5->SetLogz();

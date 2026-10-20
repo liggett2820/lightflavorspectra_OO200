@@ -75,7 +75,7 @@ void PlotTrigRatio_OO200(const char* inName){
   dO->SetLineColor(kGray+2); dO->SetLineWidth(2); d3->SetLineColor(kAzure+2); d3->SetLineWidth(2);
   dO->SetTitle(";;Events per unit totnMIP");
   dO->GetXaxis()->SetLabelSize(0); dO->GetYaxis()->SetTitleSize(0.055); dO->GetYaxis()->SetLabelSize(0.05); dO->GetYaxis()->SetTitleOffset(0.85);
-  dO->GetXaxis()->SetRangeUser(0, 600);
+  dO->GetXaxis()->SetRangeUser(0, 400);
   dO->Draw("hist"); d3->Draw("hist same");
   TLegend* l = new TLegend(0.55, 0.72, 0.88, 0.88); l->SetBorderSize(0);
   l->AddEntry(dO, "860001 or 860002 (min. bias)", "l"); l->AddEntry(d3, "860003 (min. bias + eTOF)", "l"); l->Draw();
@@ -83,20 +83,22 @@ void PlotTrigRatio_OO200(const char* inName){
   tx.DrawLatex(0.12, 0.92, "O+O 200 GeV, Run 21, |V_{z}| #leq 30 cm, V_{r} #leq 1 cm");
 
   bot->cd();
-  TH1D* frame = new TH1D("frame", ";EPD totnMIP;N(860003) / N(min. bias)", 10, 0, 600);
+  TH1D* frame = new TH1D("frame", ";EPD totnMIP;N(860003) / N(min. bias)", 10, 0, 400);
   frame->SetMinimum(0.5); frame->SetMaximum(1.05);
   frame->GetXaxis()->SetTitleSize(0.08); frame->GetXaxis()->SetLabelSize(0.07);
   frame->GetYaxis()->SetTitleSize(0.07); frame->GetYaxis()->SetLabelSize(0.065); frame->GetYaxis()->SetTitleOffset(0.6);
   frame->GetYaxis()->SetNdivisions(505);
   frame->Draw();
-  TLine one; one.SetLineStyle(2); one.SetLineColor(kGray+1); one.DrawLine(0, 1, 600, 1);
+  TLine one; one.SetLineStyle(2); one.SetLineColor(kGray+1); one.DrawLine(0, 1, 400, 1);
   // official class edges every 10%
   TLatex lab; lab.SetTextSize(0.05); lab.SetTextColor(kGray+2); lab.SetTextAlign(21);
   TLine edge; edge.SetLineStyle(3); edge.SetLineColor(kGray+1);
+  int nlab = 0;
   for(int k = 0; k < kNOff; k++){
     if(((int)kOffPct[k]) % 10 != 0) continue;
     edge.DrawLine(kOffCut[k], 0.5, kOffCut[k], 1.05);
-    lab.DrawLatex(kOffCut[k], 0.52, Form("%.0f%%", kOffPct[k]));
+    lab.DrawLatex(kOffCut[k], (nlab % 2 == 0) ? 0.52 : 0.56, Form("%.0f%%", kOffPct[k]));   // staggered so close edges do not overlap
+    nlab++;
   }
   g->SetMarkerStyle(20); g->SetMarkerSize(0.8); g->SetMarkerColor(kAzure+2); g->SetLineColor(kAzure+2);
   g->Draw("P same");
