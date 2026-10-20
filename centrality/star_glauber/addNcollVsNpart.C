@@ -1,7 +1,10 @@
 
 //____________________________________________________________________________________________________
+// outputFileName: default "ncoll_npart.root" (what doScanX_OO200.csh reads). For the Glauber systematic
+// variations write ncoll_npart_<type>.root instead, so the default file is never touched while scans run.
 void addNcollVsNpart(
-		const Char_t* inputFileList = "./LIST/tree.default.list"
+		const Char_t* inputFileList = "./LIST/tree.default.list",
+		const Char_t* outputFileName = "ncoll_npart.root"
 		)
 {
 	gSystem->Load("St_base");
@@ -35,7 +38,7 @@ void addNcollVsNpart(
 	t.Draw("ncoll:npart>>hNcoll_Npart", "npart>=2&&ncoll>=1");
 
 	// Write output ROOT file
-	TFile* outputFile = TFile::Open("ncoll_npart.root", "recreate");
+	TFile* outputFile = TFile::Open(outputFileName, "recreate");
 	hNcoll_Npart->Print();
 	hNcoll_Npart->Write();
 	outputFile->Close();
