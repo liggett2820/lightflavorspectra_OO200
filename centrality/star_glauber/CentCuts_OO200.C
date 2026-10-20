@@ -9,8 +9,8 @@
 // Input : RatioChi2Files/Ratio_npp..._k..._x..._eff....root of the best point (find_best_nbd_OO200.py prints it).
 //         It holds "hRefMult" (data = corrected totnMIP, unit bins [n, n+1) from 0) and "hRefMultSim"
 //         (MC, already normalized to data for totnMIP >= multCut by StNbdFitMaker::Fit).
-// Method: N_tot = all MC events (Npart >= 2, Ncoll >= 1, including MC events with totnMIP = 0).
-//         N(>= c) = data above multCut (where 860003 is efficient) + MC between c and multCut.
+// Method: N(>= c) = data above multCut (where 860003 is efficient) + MC between c and multCut;
+//         N_tot = N(>= 0), the same hybrid (MC events with totnMIP = 0 included).
 //         Each 5% boundary is the integer c whose N(>= c)/N_tot is closest to the target; the class is
 //         totnMIP_corr >= c. Repeated with N_tot x 0.95 and x 1.05 (the usual +-5% total cross-section check).
 // Check : data/MC vs totnMIP is the 860003 trigger+vertex+event-cut efficiency. It is compared with the
@@ -86,8 +86,11 @@ void CentCuts_OO200(const char* ratioFile = "RatioChi2Files/Ratio_best.root",
   for(int c = 0; c <= nb; c++){
     nAbove[c] = (c >= mc) ? dAbove[c] : dAbove[mc] + (mAbove[c] - mAbove[mc]);
   }
-  const double nTot  = mAbove[0];
+  // N_tot is the same hybrid as N(>= c): data above multCut + MC below. Using the MC total instead would put
+  // any MC/data difference above multCut (shape mismatch, MC beyond the data range) into the most peripheral class.
+  const double nTot  = nAbove[0];
   const double nData = dAbove[0];
+  const double fitMatch = (mAbove[mc] > 0) ? dAbove[mc]/mAbove[mc] : 0;
 
   // 5% boundaries 5..95 for the three total cross-section scales
   const int nB = 19;
@@ -129,9 +132,10 @@ void CentCuts_OO200(const char* ratioFile = "RatioChi2Files/Ratio_best.root",
   for(int k = 0; k < 2; k++){
     FILE* fp = fps[k];
     fprintf(fp, "EPD totnMIP centrality from %s\n", ratioFile);
-    fprintf(fp, "data above multCut = %d, MC below. N_tot(MC) = %.4g, N_data(860003) = %.4g, overall data/MC = %.4f\n",
+    fprintf(fp, "data above multCut = %d, MC below. N_tot (hybrid) = %.4g, N_data(860003) = %.4g, overall 860003 efficiency = %.4f\n",
             mc, nTot, nData, nData/nTot);
     fprintf(fp, "MC events with totnMIP = 0: %.3f%% of N_tot\n", 100.*hM->GetBinContent(1)/nTot);
+    fprintf(fp, "data/MC for totnMIP >= %d (should be ~1 for a good fit): %.4f\n", mc, fitMatch);
     if(gR) fprintf(fp, "860003/MB plateau (totnMIP 250-400) = %.4f\n", rPlat);
     fprintf(fp, "class = totnMIP_corr >= lower edge. Columns: class, edge, achieved %%, edge(-5%% xsec), edge(+5%% xsec), "
                 "official edge, N_data, N_MC, data/MC%s\n", gR ? ", predicted (effMB_off x R/R_plat)" : "");
