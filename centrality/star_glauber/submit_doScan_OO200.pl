@@ -8,6 +8,7 @@
 #        add -fine for the finer grid around the coarse minimum (move LOG_Scan aside first)
 #        add -local -multcut 10 (or 20) for the fit-range check around the fine minimum (logs in LOG_Scan_mc10/20)
 #        add -wide for the extended grid used on the corrected refMult (|Vz| <= 30 cm) histogram
+#        add -totnmip -fine for the finer totnMIP grid around the coarse minimum (logs in LOG_Scan_totnmip_mcN_fine)
 #        add -totnmip for the EPD totnMIP scan (data hTotnMIPCorr_OO200.root, fit totnMIP >= 200 by default,
 #             logs in LOG_Scan_totnmip_mcN); combine with -multcut 150 / 250 for the fit-range check
 #----------------------------------------------------------------------------------------------------
@@ -63,6 +64,16 @@ if ($totnmip) {
   ($kbin,   $kmin,   $kmax)   = (5, 0.5,  12.5);   # step 3
   ($xbin,   $xmin,   $xmax)   = (7, 0.00, 0.30);   # step 0.05 (inside each job)
   ($effbin, $effmin, $effmax) = (3, 0.00, 0.08);   # step 0.04; eff = 0.98 (1 - d M/540), d = 0 is constant
+}
+# -totnmip -fine: around the coarse best point (npp, k, x, d) = (24, 3.5, 0.25, 0.08), chi2/ndf 455.6/432 = 1.055
+# (Oct 20 2026). The coarse top five lie along an npp-x valley from (24, 0.25) to (30, 0.05), and d sat on its
+# upper edge, so: npp 22-31, k 2-6, x 0-0.30, d up to 0.16. 10 x 5 x 5 = 250 jobs, 13 x values each.
+if ($totnmip && $fine) {
+  ($nppbin, $nppmin, $nppmax) = (10, 22.0, 31.0);  # step 1
+  ($kbin,   $kmin,   $kmax)   = (5, 2.0,  6.0);    # step 1
+  ($xbin,   $xmin,   $xmax)   = (13, 0.00, 0.30);  # step 0.025 (inside each job)
+  ($effbin, $effmin, $effmax) = (5, 0.00, 0.16);   # step 0.04
+  $logdir .= "_fine";
 }
 if ($run && !-d $logdir) { mkdir($logdir) or die "cannot create $logdir\n"; }
 
