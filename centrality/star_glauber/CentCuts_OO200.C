@@ -175,7 +175,11 @@ void CentCuts_OO200(const char* ratioFile = "RatioChi2Files/Ratio_best.root",
   p1->cd();
   hD->GetXaxis()->SetRangeUser(0, xmax); hD->SetLineColor(kBlack); hD->SetTitle("");
   hD->GetYaxis()->SetTitle("Events"); hD->GetXaxis()->SetLabelSize(0);
-  hD->SetMinimum(TMath::Max(1.0, 1e-7*hD->GetMaximum()));
+  // StNbdFitMaker::Fit multiplies the stored maximum by 10 on every call (7-13 times per scan job), so reset
+  // the stored range and set it from the bin contents
+  hD->SetMaximum(); hD->SetMinimum(); hM->SetMaximum(); hM->SetMinimum();
+  const double ymax = TMath::Max(hD->GetBinContent(hD->GetMaximumBin()), hM->GetBinContent(hM->GetMaximumBin()));
+  hD->SetMaximum(5.0*ymax); hD->SetMinimum(0.5);
   hD->Draw("hist"); hM->SetLineColor(kRed+1); hM->Draw("hist same");
   TLine fl; fl.SetLineStyle(2); fl.SetLineColor(kBlue); fl.DrawLine(mc, hD->GetMinimum(), mc, hD->GetMaximum());
   TLegend* lg = new TLegend(0.55, 0.70, 0.88, 0.88); lg->SetBorderSize(0);
@@ -200,9 +204,14 @@ void CentCuts_OO200(const char* ratioFile = "RatioChi2Files/Ratio_best.root",
   TLine one; one.SetLineStyle(2); one.DrawLine(0, 1, xmax, 1);
   TLine ed; ed.SetLineColor(kGray+1); ed.SetLineStyle(3);
   TLatex lab; lab.SetTextSize(0.05); lab.SetTextAlign(21);
+  // lines every 10%; labels skip 70% and 90% (too close to their neighbours at low totnMIP), three rows
+  int nlab = 0;
   for(int j = 1; j < nB; j += 2){
     ed.DrawLine(cut[0][j], 0, cut[0][j], 1.3);
-    lab.DrawLatex(cut[0][j], ((j/2) % 2 == 0) ? 0.05 : 0.13, Form("%d%%", 5*(j+1)));
+    const int pct = 5*(j+1);
+    if(pct == 70 || pct == 90) continue;
+    lab.DrawLatex(cut[0][j], 0.04 + 0.08*(nlab % 3), Form("%d%%", pct));
+    nlab++;
   }
   if(gP){
     TLegend* l2 = new TLegend(0.45, 0.28, 0.88, 0.42); l2->SetBorderSize(0); l2->SetTextSize(0.05);
