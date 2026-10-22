@@ -35,6 +35,10 @@ namespace {
   const int    kNOff = 16;
   const double kOffPct[kNOff] = {80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5};
   const double kOffCut[kNOff] = {37, 46, 55, 66, 77, 91, 105, 122, 141, 162, 186, 213, 242, 276, 315, 367};
+  // our classes: lower edges of 0-5%, 5-10%, ..., 90-95% (corrected totnMIP), NBD x Glauber fine-scan best point
+  // (npp, k, x, d) = (24, 6, 0.20, 0), CentCuts_OO200.C, Oct 22 2026. Drawn on raw totnMIP here (corrections <= 0.35%).
+  const int    kNOur = 19;
+  const double kOurCut[kNOur] = {364, 310, 269, 234, 203, 175, 151, 130, 111, 95, 82, 70, 60, 51, 44, 36, 29, 23, 16};
 }
 
 void PlotTrigRatio_OO200(const char* inName){
@@ -75,7 +79,7 @@ void PlotTrigRatio_OO200(const char* inName){
   dO->SetLineColor(kGray+2); dO->SetLineWidth(2); d3->SetLineColor(kAzure+2); d3->SetLineWidth(2);
   dO->SetTitle(";;Events per unit totnMIP");
   dO->GetXaxis()->SetLabelSize(0); dO->GetYaxis()->SetTitleSize(0.055); dO->GetYaxis()->SetLabelSize(0.05); dO->GetYaxis()->SetTitleOffset(0.85);
-  dO->GetXaxis()->SetRangeUser(0, 400);
+  dO->GetXaxis()->SetRangeUser(0, 650);
   dO->Draw("hist"); d3->Draw("hist same");
   TLegend* l = new TLegend(0.55, 0.72, 0.88, 0.88); l->SetBorderSize(0);
   l->AddEntry(dO, "860001 or 860002 (min. bias)", "l"); l->AddEntry(d3, "860003 (min. bias + eTOF)", "l"); l->Draw();
@@ -83,21 +87,22 @@ void PlotTrigRatio_OO200(const char* inName){
   tx.DrawLatex(0.12, 0.92, "O+O 200 GeV, Run 21, |V_{z}| #leq 30 cm, V_{r} #leq 1 cm");
 
   bot->cd();
-  TH1D* frame = new TH1D("frame", ";EPD totnMIP;N(860003) / N(min. bias)", 10, 0, 400);
+  TH1D* frame = new TH1D("frame", ";EPD totnMIP;N(860003) / N(min. bias)", 10, 0, 650);
   frame->SetMinimum(0.5); frame->SetMaximum(1.05);
   frame->GetXaxis()->SetTitleSize(0.08); frame->GetXaxis()->SetLabelSize(0.07);
   frame->GetYaxis()->SetTitleSize(0.07); frame->GetYaxis()->SetLabelSize(0.065); frame->GetYaxis()->SetTitleOffset(0.6);
   frame->GetYaxis()->SetNdivisions(505);
   frame->Draw();
-  TLine one; one.SetLineStyle(2); one.SetLineColor(kGray+1); one.DrawLine(0, 1, 400, 1);
-  // official class edges every 10%
+  TLine one; one.SetLineStyle(2); one.SetLineColor(kGray+1); one.DrawLine(0, 1, 650, 1);
+  // our class edges every 10% (labels skip 70% and 90%, too close to their neighbours; three rows)
   TLatex lab; lab.SetTextSize(0.05); lab.SetTextColor(kGray+2); lab.SetTextAlign(21);
   TLine edge; edge.SetLineStyle(3); edge.SetLineColor(kGray+1);
   int nlab = 0;
-  for(int k = 0; k < kNOff; k++){
-    if(((int)kOffPct[k]) % 10 != 0) continue;
-    edge.DrawLine(kOffCut[k], 0.5, kOffCut[k], 1.05);
-    lab.DrawLatex(kOffCut[k], (nlab % 2 == 0) ? 0.52 : 0.56, Form("%.0f%%", kOffPct[k]));   // staggered so close edges do not overlap
+  for(int j = 1; j < kNOur; j += 2){
+    const int pct = 5*(j+1);
+    edge.DrawLine(kOurCut[j], 0.5, kOurCut[j], 1.05);
+    if(pct == 70 || pct == 90) continue;
+    lab.DrawLatex(kOurCut[j], 0.52 + 0.04*(nlab % 3), Form("%d%%", pct));
     nlab++;
   }
   g->SetMarkerStyle(20); g->SetMarkerSize(0.8); g->SetMarkerColor(kAzure+2); g->SetLineColor(kAzure+2);
@@ -115,6 +120,17 @@ void PlotTrigRatio_OO200(const char* inName){
     int b1 = p3->FindBin(lo + 1e-6), b2 = (hi > 1e8) ? p3->GetNbinsX() + 1 : p3->FindBin(hi - 1e-6);
     double n3 = p3->Integral(b1, b2), no = po->Integral(b1, b2);
     TString cls = (k < 0) ? Form(">%.0f%%", kOffPct[0]) : Form("%.0f-%.0f%%", (k + 1 < kNOff) ? kOffPct[k+1] : 0., kOffPct[k]);
+    std::cout << Form("%-12s [%5.0f,%5s)   %12.0f  %12.0f   %.4f\n", cls.Data(), lo, (hi > 1e8) ? "inf" : Form("%.0f", hi), n3, no, no > 0 ? n3/no : 0.);
+  }
+  // ---- table in our classes
+  std::cout << "\nN(860003)/N(860001|860002) in our totnMIP classes (fine-scan best point; raw totnMIP, |Vz|<=30, Vr<=1)\n";
+  std::cout << "class        totnMIP range     N(860003)     N(min bias)   ratio\n";
+  for(int c = 0; c <= kNOur; c++){
+    lo = (c < kNOur) ? kOurCut[c] : 0.;
+    hi = (c == 0) ? 1e9 : kOurCut[c-1];
+    int b1 = p3->FindBin(lo + 1e-6), b2 = (hi > 1e8) ? p3->GetNbinsX() + 1 : p3->FindBin(hi - 1e-6);
+    double n3 = p3->Integral(b1, b2), no = po->Integral(b1, b2);
+    TString cls = Form("%d-%d%%", 5*c, 5*(c+1));
     std::cout << Form("%-12s [%5.0f,%5s)   %12.0f  %12.0f   %.4f\n", cls.Data(), lo, (hi > 1e8) ? "inf" : Form("%.0f", hi), n3, no, no > 0 ? n3/no : 0.);
   }
   TFile* out = TFile::Open("OO200_EPD_TrigRatio.root", "RECREATE");
