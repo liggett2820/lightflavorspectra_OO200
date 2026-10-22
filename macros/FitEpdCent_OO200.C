@@ -372,7 +372,7 @@ void FitEpdCent_OO200(const char* inName){
   if(hRef){
     TCanvas* c5 = new TCanvas("c5", "", 900, 700); c5->SetLogz();
     hRef->SetTitle("totnMIP vs refMult, 860003, refMult band;refMult;totnMIP");
-    hRef->GetXaxis()->SetRangeUser(0, 80); hRef->GetYaxis()->SetRangeUser(0, 600);
+    hRef->GetXaxis()->SetRangeUser(0, 80); hRef->GetYaxis()->SetRangeUser(0, mipMax);
     hRef->Draw("colz");
     TProfile* pr = hRef->ProfileX("pTotnMIP_vs_refMult_prof"); pr->SetMarkerStyle(20); pr->SetMarkerSize(0.6); pr->Draw("same");
     c5->Print("OO200_EPD_vsRefMult.png");
