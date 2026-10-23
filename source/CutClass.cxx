@@ -9,6 +9,7 @@ CutClass::CutClass(){
   m_variableMtM0BinEdges = false;
   m_cutOnTriggers        = false;
   m_useStRefMultCorr     = false;
+  m_useEpdCentrality     = false;
   m_beamXCenter = 0;
   m_beamYCenter = 0;
   m_ZLowCut     = -400;
@@ -1580,7 +1581,7 @@ bool CutClass::isPileUp(int a_centVariable, int a_tofmatch){
 }
 
 
-int CutClass::centralityIndex(int a_mult){
+int CutClass::centralityIndex(double a_mult){
   //if(isPileUp(a_mult)){ return -1;
   //}else{
   if(!m_useStRefMultCorr){

@@ -390,7 +390,10 @@ public:
   //bool isGoodDeDxBtof(double a_dEdx, double a_betaGama);
 
   // If using StRefMultCorr, 0 is most central (purpously reversed from standard)
-  int    centralityIndex(int a_mult); //returns -1 if not found //a_mult is neglected if StRefMultCorr is defined
+  int    centralityIndex(double a_mult); //returns -1 if not found //a_mult is neglected if StRefMultCorr is defined
+  // O+O: centrality from corrected EPD totnMIP (headers/EpdCentrality_OO200.h) instead of raw refMult
+  void   setUseEpdCentrality(bool a_toggle){m_useEpdCentrality = a_toggle;};
+  bool   useEpdCentrality(){return m_useEpdCentrality;};
   int    getNCentBins(){return m_numCentralities;};
   vector<unsigned int> getTriggers(){return m_triggers;};
   bool   getLogMTBinning(){return m_useLogMTBinning;};
@@ -506,6 +509,7 @@ private:
   bool m_useLogMTBinning;
   bool m_variableMtM0BinEdges;
   bool m_useStRefMultCorr;
+  bool m_useEpdCentrality;
   bool m_cutOnTriggers;
   bool m_usePhiCut;
   bool m_useEtaCut;

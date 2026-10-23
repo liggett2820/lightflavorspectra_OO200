@@ -144,9 +144,17 @@ void SetCutClass(CutClass *cuts){
   // return -1), the same way the 0-5% bin's upper "no limit" edge is handled by pushing
   // a large sentinel in CutClass::setCentralities(). refMult=0 as the floor is exact
   // (not derived/estimated), so this doesn't need DeriveCentralityEdges.C to add.
-  double centCutsArray[6] = {44,37,28,17,5,0};
+  // EPD centrality (Oct 2026): the six classes are cut on corrected EPD totnMIP
+  // (headers/EpdCentrality_OO200.h), edges from the NBD-Glauber fit to totnMIP >= 200
+  // (fine scan, npp 24, k 6, x 0.20, d 0, chi2/ndf 0.94; CentCuts_OO200.C, OO200_NBD_fine_cuts.txt).
+  // Class = totnMIP_corr >= edge. PROVISIONAL until the fit-range checks (150, 250) are done.
+  // To go back to the raw-refMult classes: setUseEpdCentrality(false) and the refMult edges below.
+  cuts->setUseEpdCentrality(true);
+  double centCutsArray[6] = {364,310,234,130,36,0};
   int percents[6] = {5,10,20,40,80,100};
   cuts->setCentralities(6, &centCutsArray[0], &percents[0]);
+  // raw-refMult edges used until Oct 2026 (same six classes):
+  //   double centCutsArray[6] = {44,37,28,17,5,0};
 
   // Previous 9-bin scheme (0-5,5-10,10-20,20-30,30-40,40-50,50-60,60-70,70-80) -- kept
   // here, not deleted, in case you need to revert or compare. Shown here ALREADY

@@ -29,7 +29,7 @@
 #include <iostream>
 
 void CompareVzCent_OO200(const char* inName = "hTotnMIPCorr_OO200.root",
-                         const char* edgeList = "364,310,269,234,203,175,151,130,111,95,82,70,60,52,44,36,28,21,14")
+                         const char* edgeList = "364,310,269,234,203,175,151,130,111,95,82,70,60,51,44,36,29,23,16")
 {
   gStyle->SetOptStat(0);
   TFile* in = TFile::Open(inName);

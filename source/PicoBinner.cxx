@@ -127,6 +127,7 @@
 #include "../headers/HistogramUtilities.h"
 #include "../headers/PhysMath.h"
 #include "../headers/CutClass.h"
+#include "../headers/EpdCentrality_OO200.h"
 #include "../headers/CalibrationClass.h"
 using namespace std;
 
@@ -332,6 +333,12 @@ void PicoBinner(string    a_filelist,
     centEventsSuffix = particleInfo->GetParticleName(a_partIndex,0);
   }
 
+  // corrected EPD totnMIP of every event that passes the event cuts (before the centrality and
+  // pile-up selections), filled whether or not it is the centrality variable
+  TH1D* totnMIPCorrHisto = new TH1D(Form("totnMIPCorr%s",centEventsSuffix.c_str()),
+                                    "Corrected EPD totnMIP; totnMIP_{corr}; Number of Events",1000,0,1000);
+  TH2D* totnMIPCorrVsRefMult = new TH2D(Form("totnMIPCorr_vs_refMult%s",centEventsSuffix.c_str()),
+                                    "Corrected EPD totnMIP vs refMult; refMult; totnMIP_{corr}",300,0,300,650,0,650);
   TH1I* centEvents = new TH1I(Form("centEvents%s",centEventsSuffix.c_str()),"Number of Events for Each Centrality Bin; Centrality Bin; Number of Events",
                         numCentBins, -0.5, ((double) numCentBins) - 0.5);
   std::vector< TH1I *> centVarHisto(numCentBins,(TH1I *)NULL);
@@ -1465,7 +1472,22 @@ void PicoBinner(string    a_filelist,
     if(a_cutClass->getVertexConfig() == "Center")     centVariable = refMultVar;
     if(a_cutClass->getVertexConfig() == "OffsetLow")  centVariable = refMultLowVar;
     if(a_cutClass->getVertexConfig() == "OffsetHigh") centVariable = refMultHighVar;
-    centralityIndex = a_cutClass->centralityIndex(centVariable);
+    // corrected EPD totnMIP (same definition as the NBD-Glauber fit input)
+    double totnMIPRaw = 0;
+    for(int epdIndex = 0; epdIndex < (int) dst->numberOfEpdHits(); epdIndex++){
+      StPicoEpdHit* epdHit = dst->epdHit(epdIndex);
+      if(!epdHit) continue;
+      totnMIPRaw += EpdCentOO200::truncMip(epdHit->nMIP());
+    }
+    const double totnMIPCorr = EpdCentOO200::correct(totnMIPRaw, event->primaryVertex().Z(), event->ZDCx());
+    totnMIPCorrHisto->Fill(totnMIPCorr);
+    totnMIPCorrVsRefMult->Fill(refMultVar, totnMIPCorr);
+
+    // centrality class: corrected EPD totnMIP when the cut class asks for it, else raw refMult.
+    // The pile-up cuts below stay on refMult (centVariable) either way: the EPD fit inputs were
+    // selected with the refMult-nBTOFMatch band.
+    const double centClassVariable = a_cutClass->useEpdCentrality() ? totnMIPCorr : (double) centVariable;
+    centralityIndex = a_cutClass->centralityIndex(centClassVariable);
 
     //pileup cut
     if((useHuiPileup && a_cutClass->isPileUp(centVariable, event->btofTrayMultiplicity()))
@@ -1495,7 +1517,7 @@ void PicoBinner(string    a_filelist,
     }
 
     centEvents->Fill(centralityIndex);
-    centVarHisto[centralityIndex]->Fill(centVariable);
+    centVarHisto[centralityIndex]->Fill(centClassVariable);
     if(a_makeBasicHistos) zHisto->Fill(event->primaryVertex().Z());
     if(a_makeBasicHistos) xyHisto->Fill(event->primaryVertex().X(),event->primaryVertex().Y());
 
@@ -2001,6 +2023,8 @@ void PicoBinner(string    a_filelist,
   for(int iii = 0; iii < (int) centVarHisto.size(); iii++){
     HistogramUtilities::ConditionalWrite(centVarHisto[iii]);
   }
+  HistogramUtilities::ConditionalWrite(totnMIPCorrHisto);
+  HistogramUtilities::ConditionalWrite(totnMIPCorrVsRefMult);
 
   if(a_makeBasicHistos){
     HistogramUtilities::ConditionalWrite(zHisto);
