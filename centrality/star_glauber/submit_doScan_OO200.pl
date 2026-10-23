@@ -9,6 +9,7 @@
 #        add -local -multcut 10 (or 20) for the fit-range check around the fine minimum (logs in LOG_Scan_mc10/20)
 #        add -wide for the extended grid used on the corrected refMult (|Vz| <= 30 cm) histogram
 #        add -totnmip -fine for the finer totnMIP grid around the coarse minimum (logs in LOG_Scan_totnmip_mcN_fine)
+#        add -glauber TYPE (small, large, smallXsec, largeXsec, gauss) for the Glauber systematic refits (runs in glauber_TYPE/)
 #        add -totnmip for the EPD totnMIP scan (data hTotnMIPCorr_OO200.root, fit totnMIP >= 200 by default,
 #             logs in LOG_Scan_totnmip_mcN); combine with -multcut 150 / 250 for the fit-range check
 #----------------------------------------------------------------------------------------------------
@@ -17,6 +18,9 @@ my $fine = (grep { $_ eq "-fine" } @ARGV) ? 1 : 0 ;   # finer grid around the co
 my $local = (grep { $_ eq "-local" } @ARGV) ? 1 : 0 ; # small grid around the fine-scan minimum (for the multCut checks)
 my $wide  = (grep { $_ eq "-wide" }  @ARGV) ? 1 : 0 ; # extended grid for the corrected refMult, |Vz| <= 30 cm
 my $totnmip = (grep { $_ eq "-totnmip" } @ARGV) ? 1 : 0 ; # EPD totnMIP instead of refMult
+my $glauber = "";                                        # -glauber TYPE: Glauber systematic variation (implies -totnmip)
+for (my $a=0; $a<=$#ARGV; $a++) { $glauber = $ARGV[$a+1] if ($ARGV[$a] eq "-glauber" && defined $ARGV[$a+1]); }
+$totnmip = 1 if $glauber;
 my $multcut = $totnmip ? 200 : 15;                     # fit range mult >= multcut; -multcut N to change
 for (my $a=0; $a<=$#ARGV; $a++) { $multcut = $ARGV[$a+1] if ($ARGV[$a] eq "-multcut" && defined $ARGV[$a+1]); }
 my $logdir = ($multcut == 15) ? "LOG_Scan" : "LOG_Scan_mc$multcut";   # keep each fit range's logs apart
@@ -74,6 +78,32 @@ if ($totnmip && $fine) {
   ($xbin,   $xmin,   $xmax)   = (13, 0.00, 0.30);  # step 0.025 (inside each job)
   ($effbin, $effmin, $effmax) = (5, 0.00, 0.16);   # step 0.04
   $logdir .= "_fine";
+}
+# -glauber TYPE (small, large, smallXsec, largeXsec, gauss): refit totnMIP with ncoll_npart_TYPE.root (made by
+# addNcollVsNpart.C) on a grid around the default fine-scan valley (best (24, 6, 0.20, 0), chi2/ndf 0.94; valley
+# npp 24-30, x 0.20-0.025, k 3-6, d 0-0.04; Oct 20 2026). Each variation runs in its own directory glauber_TYPE/
+# (symlinks to the scripts, libraries and data; ncoll_npart.root -> ../ncoll_npart_TYPE.root), because
+# RatioChi2Files/ names carry only (npp, k, x, d) and would overwrite the default fit's files.
+# 5 x 4 x 2 = 40 jobs per variation, 13 x values each. Logs in glauber_TYPE/LOG_Scan_totnmip_mcN.
+if ($glauber) {
+  ($nppbin, $nppmin, $nppmax) = (5, 22.0, 30.0);   # step 2
+  ($kbin,   $kmin,   $kmax)   = (4, 3.0,  6.0);    # step 1
+  ($xbin,   $xmin,   $xmax)   = (13, 0.00, 0.30);  # step 0.025 (inside each job)
+  ($effbin, $effmin, $effmax) = (2, 0.00, 0.04);   # step 0.04
+  $logdir = "LOG_Scan_totnmip_mc$multcut";
+  my $gdir = "glauber_$glauber";
+  print "Glauber variation $glauber: jobs run in $gdir/ with ncoll_npart.root -> ../ncoll_npart_$glauber.root\n";
+  if ($run) {
+    die "-glauber: ncoll_npart_$glauber.root not found; make it with addNcollVsNpart.C first\n" unless -e "ncoll_npart_$glauber.root";
+    mkdir($gdir) unless -d $gdir;
+    mkdir("$gdir/RatioChi2Files") unless -d "$gdir/RatioChi2Files";
+    foreach my $f ("doScanX_OO200.csh", "submit_condor.pl", "doNbdFitMaker_OO200.C", $datafile,
+                   "CentCuts_OO200.C", "find_best_nbd_OO200.py", glob(".sl*")) {
+      symlink("../$f", "$gdir/$f") unless -e "$gdir/$f" || -l "$gdir/$f";
+    }
+    symlink("../ncoll_npart_$glauber.root", "$gdir/ncoll_npart.root") unless -l "$gdir/ncoll_npart.root";
+    chdir($gdir) or die "cannot cd to $gdir\n";
+  }
 }
 if ($run && !-d $logdir) { mkdir($logdir) or die "cannot create $logdir\n"; }
 
