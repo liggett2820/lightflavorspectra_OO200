@@ -18,6 +18,9 @@
 //   root -l -b -q 'NpartPerClass_OO200.C+'
 // Output: printed tables and NpartPerClass_OO200.txt
 //______________________________________________________________________________
+// rootcint (ROOT 5 dictionary generation for ACLiC) cannot parse the variation table below,
+// so it only sees the function declaration; the compiler sees everything.
+#if !defined(__CINT__) || !defined(__MAKECINT__)
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -159,3 +162,6 @@ void NpartPerClass_OO200(const Int_t nevents = 2000000, const UInt_t seed = 2026
   out.close();
   std::cout << "\nWritten NpartPerClass_OO200.txt" << std::endl;
 }
+#else
+void NpartPerClass_OO200(const Int_t nevents = 2000000, const UInt_t seed = 20261023);
+#endif
