@@ -9,8 +9,9 @@
 //   (Npart, Ncoll) from hNcoll_Npart with GetRandom2, floored to integers (SetIntegerGlauberSampling),
 //   events with Npart < 2 or Ncoll < 1 skipped;
 //   multiplicity as in StNegativeBinomial::GetMultiplicity: sum of Nint((1-x)Npart/2 + x Ncoll)
-//   draws from the NBD(npp, k) histogram (100 unit bins), then 2*multIdeal trials kept with
-//   efficiency 0.98 (1 - d multIdeal/540) (multiplicity-dependent mode, trigger bias 1).
+//   draws from the NBD(npp, k) histogram (100 unit bins), then 2*multIdeal trials, each kept when
+//   a uniform number on (0, 2) is <= 0.98 (1 - d multIdeal/540) (StGlauberUtilities::GetUniform2;
+//   multiplicity-dependent mode, trigger bias 1).
 // A class is totnMIP >= lower edge (and below the next class's edge), as in CentCuts_OO200.C.
 //
 // Run from centrality/star_glauber (needs ncoll_npart.root and ncoll_npart_<type>.root), in the
@@ -108,7 +109,9 @@ void NpartPerClass_OO200(const Int_t nevents = 2000000, const UInt_t seed = 2026
       for (Int_t ich = 0; ich < nchInt; ich++) multIdeal += (Int_t) hNbd.GetRandom();
       const Double_t eff = 0.98 * (1.0 - multIdeal * v.d / 540.0);
       Int_t mult = 0;
-      for (Int_t im = 0; im < 2 * multIdeal; im++) if (rnd.Rndm() <= eff) mult++;
+      // StGlauberUtilities::GetUniform2() is uniform on (0, 2): 2*multIdeal trials each kept with
+      // probability eff/2, i.e. on average eff * multIdeal
+      for (Int_t im = 0; im < 2 * multIdeal; im++) if (rnd.Uniform(0, 2) <= eff) mult++;
 
       const Int_t ic = ClassOf(mult, v.edge);
       n[ic] += 1; s1[ic] += npart; s2[ic] += npart * npart; c1[ic] += ncoll; c2[ic] += ncoll * ncoll;
