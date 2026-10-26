@@ -198,6 +198,17 @@ public:
        m_pileUpLineCuts[2] = a_lowSlope;
        m_pileUpLineCuts[3] = a_lowIntercept;
   };
+  // Polynomial refMult-nBTOFMatch pile-up band: an event is kept when
+  // lo(nBTOFMatch) <= refMult <= up(nBTOFMatch), each edge a pol4 in nBTOFMatch up to a_xMax and
+  // continued linearly (with the pol4's slope at a_xMax) beyond it. Same definition as the
+  // inBand() of macros/MakeEpdCentInputs_OO200.C and macros/MakeRefMultCorrInputs_OO200.C.
+  void setPileUpPolyBand(const double* a_up, const double* a_lo, double a_xMax){
+       for(int i = 0; i < 5; i++){ m_pileUpBandUp[i] = a_up[i]; m_pileUpBandLo[i] = a_lo[i]; }
+       m_pileUpBandXMax = a_xMax;
+       m_usePileUpPolyBand = true;
+       cout << "Pile-up band: pol4 refMult edges in nBTOFMatch, linear beyond nBTOFMatch = " << a_xMax << endl;
+  };
+  bool usePileUpPolyBand(){return m_usePileUpPolyBand;};
   void setPileUpLinearCutsByLowPoints(double a_x1, double a_y1, double a_x2, double a_y2,double a_x3, double a_y3,double a_x4, double a_y4){
        //m_pileUpLineCuts[0] = a_highSlope;
        //m_pileUpLineCuts[1] = a_highIntercept;
@@ -385,6 +396,7 @@ public:
   #endif
 
   bool isPileUp(int a_centVariable, int a_tofmatch);
+  double pileUpBandEdge(const double* a_p, double a_tofmatch);
   //doesn't work with refmult
   bool isLinPileUp(int a_centVariable){if(!m_useStRefMultCorr) return (a_centVariable > m_pileUpCut); else return false;};
   //bool isGoodDeDxBtof(double a_dEdx, double a_betaGama);
@@ -532,6 +544,10 @@ private:
   int    m_nTofT0Cut;   // n >= cut
   double m_pileUpCut;
   double m_pileUpLineCuts[6];
+  bool   m_usePileUpPolyBand;
+  double m_pileUpBandUp[5];
+  double m_pileUpBandLo[5];
+  double m_pileUpBandXMax;
 
 
   // TRACK INFO/CUTS

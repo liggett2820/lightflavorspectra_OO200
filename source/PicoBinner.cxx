@@ -1485,7 +1485,7 @@ void PicoBinner(string    a_filelist,
 
     // centrality class: corrected EPD totnMIP when the cut class asks for it, else raw refMult.
     // The pile-up cuts below stay on refMult (centVariable) either way: the EPD fit inputs were
-    // selected with the refMult-nBTOFMatch band.
+    // selected with the pass-1 refMult-nBTOFMatch band, which SetCutClass.C sets via setPileUpPolyBand.
     const double centClassVariable = a_cutClass->useEpdCentrality() ? totnMIPCorr : (double) centVariable;
     centralityIndex = a_cutClass->centralityIndex(centClassVariable);
 

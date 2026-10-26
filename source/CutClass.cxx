@@ -23,6 +23,9 @@ CutClass::CutClass(){
   m_pileUpLineCuts[3] = -10;
   m_pileUpLineCuts[4] = 0.0;
   m_pileUpLineCuts[5] = -10;
+  m_usePileUpPolyBand = false;
+  for(int i = 0; i < 5; i++){ m_pileUpBandUp[i] = 0.0; m_pileUpBandLo[i] = 0.0; }
+  m_pileUpBandXMax = 0.0;
 
   m_tofMatchCut = -1; //Greater or Equal To
 
@@ -1572,12 +1575,26 @@ bool CutClass::isPileUp(int a_centVariable, int a_tofmatch){
     double top     =  (m_pileUpLineCuts[0]*xVar) + m_pileUpLineCuts[1];
     double bottom  =  (m_pileUpLineCuts[2]*xVar) + m_pileUpLineCuts[3];
     double bottom2 =  (m_pileUpLineCuts[4]*xVar) + m_pileUpLineCuts[5];
+    // polynomial band: refMult (xVar) must lie between the edges evaluated at nBTOFMatch (yVar)
+    if(m_usePileUpPolyBand && (xVar < pileUpBandEdge(m_pileUpBandLo, yVar) || xVar > pileUpBandEdge(m_pileUpBandUp, yVar))){
+     m_rejectedEvents->Fill(7.5);
+     return true;
+    }
     if( top < yVar || bottom > yVar || bottom2 > yVar || (double) a_centVariable > m_pileUpCut){
      m_rejectedEvents->Fill(7.5);
      return true;
     }
     return false;
   }
+}
+
+
+double CutClass::pileUpBandEdge(const double* a_p, double a_tofmatch){
+  const double xm = m_pileUpBandXMax;
+  const double t  = (a_tofmatch <= xm) ? a_tofmatch : xm;
+  double v = a_p[0] + a_p[1]*t + a_p[2]*t*t + a_p[3]*t*t*t + a_p[4]*t*t*t*t;
+  if(a_tofmatch > xm) v += (a_p[1] + 2*a_p[2]*xm + 3*a_p[3]*xm*xm + 4*a_p[4]*xm*xm*xm) * (a_tofmatch - xm);
+  return v;
 }
 
 

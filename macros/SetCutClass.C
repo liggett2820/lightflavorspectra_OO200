@@ -74,6 +74,13 @@ void SetCutClass(CutClass *cuts){
   cuts->setBeamEnergy(100);
   cuts->setBeamLocation(0.0,0.0);
   cuts->setPileUpCut(260); // added 2026-07-03 -- absent here before, present in the SDCC file
+  // Pass-1 refMult-nBTOFMatch pile-up band (added 2026-10-26). Same constants as kBandUp/kBandLo/
+  // kBandXm in MakeEpdCentInputs_OO200.C and MakeRefMultCorrInputs_OO200.C, so PicoBinner keeps the
+  // same events the EPD and refMult centrality fits were made from. Before this, only the default
+  // linear lines (nBTOFMatch > refMult + 100) and refMult > 260 were applied here.
+  double pileUpBandUp[5] = {5.91052, 2.22934, -0.0221511, 0.000203259, -7.82252e-07};
+  double pileUpBandLo[5] = {-4.67124, -0.259727, 0.0274938, -0.00035788, 1.67535e-06};
+  cuts->setPileUpPolyBand(pileUpBandUp, pileUpBandLo, 85.);
   unsigned int trigs[1] = {860003}; // was 860002 -- changed 2026-07-24 per Andrew's advisor-confirmed trigger ID; before that, was trigs[6]={860001} (both size and ID wrong, fixed 2026-07-03)
   cuts->setTriggers(1, &trigs[0]);
 
