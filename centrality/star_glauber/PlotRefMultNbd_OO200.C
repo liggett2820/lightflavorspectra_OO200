@@ -38,7 +38,12 @@ void PlotRefMultNbd_OO200(const char* ratioFile, double multCut = 15, const char
   hD->GetXaxis()->SetRangeUser(0, xmax);
   hD->SetMarkerStyle(20); hD->SetMarkerSize(0.6); hD->SetMarkerColor(1); hD->SetLineColor(1);
   hD->GetYaxis()->SetTitle("Events"); hD->GetYaxis()->SetTitleSize(0.05); hD->GetXaxis()->SetLabelSize(0);
-  hD->SetMinimum(10); hD->SetMaximum(5*hD->GetMaximum());
+  // the stored histogram carries a plotting maximum (fMaximum) from the scan, which GetMaximum()
+  // would return; clear it and take the highest bin instead
+  hD->SetMaximum(); hD->SetMinimum();
+  double yPeak = 0;
+  for(int b = 1; b <= hD->GetNbinsX(); b++) if(hD->GetBinCenter(b) <= xmax && hD->GetBinContent(b) > yPeak) yPeak = hD->GetBinContent(b);
+  hD->SetMinimum(10); hD->SetMaximum(5*yPeak);
   hD->Draw("P");
   hM->SetLineColor(632+1); hM->SetLineWidth(2); hM->Draw("hist same");
   up->Update();
