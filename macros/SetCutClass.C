@@ -45,7 +45,11 @@ void SetCutClass(CutClass *cuts){
 
   string mode = "Center"; // O+O 200 GeV is always run in Center mode in the original
   cuts->setVertexConfig(mode);
-  cuts->setZRange(-2,2); // was (-70,70) -- corrected 2026-07-03 to match the SDCC file actually used
+  // |Vz| <= 30 cm (changed 2026-10-26 from (-2,2)). Same window as the EPD and refMult centrality
+  // inputs, their Vz corrections and the pile-up band, and as Matt's 19.6/27 GeV collider configs;
+  // about 7x the events of +-2 cm. (-2,2) had been copied on 2026-07-03 from the SDCC file that
+  // produced the July yields; before that this repo had (-70,70).
+  cuts->setZRange(-30,30);
 
   // ---- _OO_200_COL_ specific values (from the original's #ifdef _OO_200_COL_ block) ----
   // HISTORICAL (2026-07-03 through 2026-07-15, superseded below): this used to say
@@ -154,7 +158,8 @@ void SetCutClass(CutClass *cuts){
   // EPD centrality (Oct 2026): the six classes are cut on corrected EPD totnMIP
   // (headers/EpdCentrality_OO200.h), edges from the NBD-Glauber fit to totnMIP >= 200
   // (fine scan, npp 24, k 6, x 0.20, d 0, chi2/ndf 0.94; CentCuts_OO200.C, OO200_NBD_fine_cuts.txt).
-  // Class = totnMIP_corr >= edge. PROVISIONAL until the fit-range checks (150, 250) are done.
+  // Class = totnMIP_corr >= edge. Fit-range checks done 2026-10-26: refits to totnMIP >= 150 and >= 250
+  // give edges 365/311/235/130/36 and 364/310/233/130/36, and per-class 860003 efficiencies within 0.02.
   // To go back to the raw-refMult classes: setUseEpdCentrality(false) and the refMult edges below.
   cuts->setUseEpdCentrality(true);
   double centCutsArray[6] = {364,310,234,130,36,0};
