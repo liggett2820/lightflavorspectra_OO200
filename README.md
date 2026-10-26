@@ -47,9 +47,11 @@ compiles `SetCutClass.C` via `gSystem->CompileMacro()`, which only recompiles wh
 sees the source as newer than the existing `bin/SetCutClass_C.so`. If the updated
 `SetCutClass.C` reaches SDCC in a way that preserves an older mtime (e.g. `rsync`/`scp
 -p`), that check silently passes and SDCC keeps running the previously-compiled (old-cut)
-binary even though the source text is correct. Fix: `root -l -q -b
-'macros/makeLibs_SL24y.C("clean")'` (wipes `bin/*`) then rebuild with `root -l -q -b
-macros/makeLibs_SL24y.C` before re-running PicoBinner. `macros/DeriveCentralityEdges.C` (reads
+binary even though the source text is correct. Fix: a clean rebuild with
+`./scripts/rebuild_libs.sh` before re-running PicoBinner. (Running `makeLibs_SL24y.C("clean")`
+and then `makeLibs_SL24y.C` by hand is not enough: "clean" wipes `bin/*`, including
+`libStPicoDst.so`, and the build then fails with "libStPicoDst.so does not exist" unless the
+PicoDst reader submodule is rebuilt and copied back first -- the script does that.) `macros/DeriveCentralityEdges.C` (reads
 a yield file's `refMult` histogram and reports the refMult value at each percentile
 boundary) is available as an independent sanity check against the official cuts, not a
 replacement for them.
@@ -185,8 +187,12 @@ links.
    several minutes the first time (ZFitter.cxx and SpectraFitter.cxx are each tens of
    thousands of lines once their `#include` chains are counted).
 
-   Re-run `root -l -q -b 'macros/makeLibs_SL24y.C("clean")'` then re-run the build if you ever need
-   a clean rebuild (e.g. after editing a header any class depends on).
+   For a clean rebuild (e.g. after editing a header any class depends on), run
+   `./scripts/rebuild_libs.sh` from the repo root (or `bash scripts/rebuild_libs.sh`). It rebuilds
+   the PicoDst reader submodule, wipes `bin/` with `makeLibs_SL24y.C("clean")`, copies
+   `libStPicoDst.so` back into `bin/`, and runs `makeLibs_SL24y.C`. Do not run the "clean" macro
+   on its own followed by the build: "clean" also deletes `libStPicoDst.so`, and the build then
+   fails to link PicoBinner (undefined references to `StPicoDst::picoArrays` etc.).
 
 ## Pipeline stages
 
@@ -390,7 +396,8 @@ template, every `/liggett` path needs updating to their own account first.
    then `root -l -q -b macros/makeLibs_SL24y.C`) there -- the `<SandBox>` packages whatever's
    actually in `bin/` at submission time, so it needs to already be genuine Linux
    binaries built from the code you just pulled. If in doubt whether a change actually
-   recompiled, force it: `root -l -q -b 'macros/makeLibs_SL24y.C("clean")'` then rebuild (see
+   recompiled, force it with `./scripts/rebuild_libs.sh` (a full clean rebuild, including
+   `libStPicoDst.so`; see
    "Centrality binning" above for a case where a stale `.so` silently kept running old
    cut values even though the source was correct).
 3. **If you're not liggett2820, update every `/liggett` path in the XML** -- the scratch
