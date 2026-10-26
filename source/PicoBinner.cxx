@@ -341,6 +341,8 @@ void PicoBinner(string    a_filelist,
                                     "Corrected EPD totnMIP vs refMult; refMult; totnMIP_{corr}",300,0,300,650,0,650);
   TH1I* centEvents = new TH1I(Form("centEvents%s",centEventsSuffix.c_str()),"Number of Events for Each Centrality Bin; Centrality Bin; Number of Events",
                         numCentBins, -0.5, ((double) numCentBins) - 0.5);
+  TH2I* vzStudyEvents = new TH2I(Form("vzStudy_Events%s",centEventsSuffix.c_str()),"Events per V_{z} slice and centrality class;V_{z} (cm);centrality index",
+                        12, -30.0, 30.0, numCentBins, -0.5, ((double) numCentBins) - 0.5);
   std::vector< TH1I *> centVarHisto(numCentBins,(TH1I *)NULL);
   for (int centIndex = 0; centIndex < numCentBins; centIndex++){
     centVarHisto.at(centIndex) =
@@ -716,6 +718,17 @@ void PicoBinner(string    a_filelist,
   std::vector<std::vector<TH2I *> > TPCTracksMinus_ForBTOF(nParticles,vector<TH2I *>(numCentBins,(TH2I *)NULL));
   std::vector<std::vector<TH2I *> > BTOFTracksMinus(nParticles,vector<TH2I *>(numCentBins,(TH2I *)NULL));
 
+  // Vz study (2026-10-26): the same nSigma-selected TPC tracks and their BTOF-matched subset as above,
+  // vs (y, mT-m0, Vz) in 5 cm Vz slices over +-30 cm, all centrality classes together. With
+  // vzStudy_Events (events per Vz slice and class) this gives per-event raw yields and the BTOF
+  // matching efficiency in each Vz slice (macros/VzStudy_OO200.C).
+  std::vector<TH3I *> vzStudyTPCPlus(nParticles,(TH3I *)NULL);
+  std::vector<TH3I *> vzStudyBTOFPlus(nParticles,(TH3I *)NULL);
+  std::vector<TH3I *> vzStudyTPCMinus(nParticles,(TH3I *)NULL);
+  std::vector<TH3I *> vzStudyBTOFMinus(nParticles,(TH3I *)NULL);
+  vector<double> vzStudyEdges;
+  for(int iVz = 0; iVz <= 12; iVz++) vzStudyEdges.push_back(-30.0 + 5.0*iVz);
+
   #ifdef _PICOBINNER_ETA_PT_EFF_
     std::vector<std::vector<TH2I *> > TPCTracksPlus_ForBTOF_EtaPt(nParticles,vector<TH2I *>(numCentBins,(TH2I *)NULL));
     std::vector<std::vector<TH2I *> > BTOFTracksPlus_EtaPt(nParticles,vector<TH2I *>(numCentBins,(TH2I *)NULL));
@@ -807,6 +820,19 @@ void PicoBinner(string    a_filelist,
     else btofMtM0Edges = mtm0Edges;
     if(a_cutClass->getRapMtM0BinStructure(partIndex,5)) etofMtM0Edges = HistogramUtilities::getBinEdges(a_cutClass->getRapMtM0BinStructure(partIndex,5));
     else etofMtM0Edges = mtm0Edges;
+
+    { // Vz study histograms (see declaration)
+      TString vzName = particleInfo->GetParticleName(partIndex,0);
+      TString vzAxes = Form(";y;%s;V_{z} (cm)", transverseAxisLabel.c_str());
+      vzStudyTPCPlus[partIndex]   = new TH3I(Form("vzStudy_nTPCTracksPlus_ForBTOF_%s",vzName.Data()), "TPC tracks, +"+vzAxes,
+                                             nRapidityBins_btof,&btofRapEdges[0],btofMtM0Edges.size()-1,&btofMtM0Edges[0],vzStudyEdges.size()-1,&vzStudyEdges[0]);
+      vzStudyBTOFPlus[partIndex]  = new TH3I(Form("vzStudy_nBTOFTracksPlus_%s",vzName.Data()), "BTOF-matched tracks, +"+vzAxes,
+                                             nRapidityBins_btof,&btofRapEdges[0],btofMtM0Edges.size()-1,&btofMtM0Edges[0],vzStudyEdges.size()-1,&vzStudyEdges[0]);
+      vzStudyTPCMinus[partIndex]  = new TH3I(Form("vzStudy_nTPCTracksMinus_ForBTOF_%s",vzName.Data()), "TPC tracks, -"+vzAxes,
+                                             nRapidityBins_btof,&btofRapEdges[0],btofMtM0Edges.size()-1,&btofMtM0Edges[0],vzStudyEdges.size()-1,&vzStudyEdges[0]);
+      vzStudyBTOFMinus[partIndex] = new TH3I(Form("vzStudy_nBTOFTracksMinus_%s",vzName.Data()), "BTOF-matched tracks, -"+vzAxes,
+                                             nRapidityBins_btof,&btofRapEdges[0],btofMtM0Edges.size()-1,&btofMtM0Edges[0],vzStudyEdges.size()-1,&vzStudyEdges[0]);
+    }
 
     vector< double > zTPCEdges = HistogramUtilities::makeEvenBinEdges(numZTPCBins,-ZTPC_HW,ZTPC_HW);
     vector< double > zBTOFEdges;
@@ -1517,6 +1543,7 @@ void PicoBinner(string    a_filelist,
     }
 
     centEvents->Fill(centralityIndex);
+    vzStudyEvents->Fill(eventVertex.Z(), centralityIndex);
     centVarHisto[centralityIndex]->Fill(centClassVariable);
     if(a_makeBasicHistos) zHisto->Fill(event->primaryVertex().Z());
     if(a_makeBasicHistos) xyHisto->Fill(event->primaryVertex().X(),event->primaryVertex().Y());
@@ -1971,6 +1998,8 @@ void PicoBinner(string    a_filelist,
           if(track->charge()>0){
             TPCTracksPlus_ForBTOF[partBaseIndex][centralityIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex]);
             if(preciseBTOF) BTOFTracksPlus[partBaseIndex][centralityIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex]);
+            vzStudyTPCPlus[partBaseIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex],eventVertex.Z());
+            if(preciseBTOF) vzStudyBTOFPlus[partBaseIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex],eventVertex.Z());
             #ifdef _PICOBINNER_ETA_PT_EFF_
               TPCTracksPlus_ForBTOF_EtaPt[partBaseIndex][centralityIndex]->Fill(eta,pT);
               if(preciseBTOF) BTOFTracksPlus_EtaPt[partBaseIndex][centralityIndex]->Fill(eta,pT);
@@ -1984,6 +2013,8 @@ void PicoBinner(string    a_filelist,
           }else{
             TPCTracksMinus_ForBTOF[partBaseIndex][centralityIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex]);
             if(preciseBTOF) BTOFTracksMinus[partBaseIndex][centralityIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex]);
+            vzStudyTPCMinus[partBaseIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex],eventVertex.Z());
+            if(preciseBTOF) vzStudyBTOFMinus[partBaseIndex]->Fill(rapidity_part[partBaseIndex],mTm0_part[partBaseIndex],eventVertex.Z());
             #ifdef _PICOBINNER_ETA_PT_EFF_
               TPCTracksMinus_ForBTOF_EtaPt[partBaseIndex][centralityIndex]->Fill(eta,pT);
               if(preciseBTOF) BTOFTracksMinus_EtaPt[partBaseIndex][centralityIndex]->Fill(eta,pT);
@@ -2159,6 +2190,18 @@ void PicoBinner(string    a_filelist,
       HistogramUtilities::ConditionalWrite(DCA_by_cent_ProtonMinus[centIndex]);
       HistogramUtilities::ConditionalWrite(DCA_by_cent_PionMinus[centIndex]);
     }
+  }
+
+  // Vz study histograms in their own directory
+  outFile->mkdir("VzStudy");
+  outFile->cd("VzStudy");
+  HistogramUtilities::ConditionalWrite(vzStudyEvents);
+  for(int partIndex = 0; partIndex < nParticles; partIndex++){
+    if(partIndex == 3 || partIndex == 8) continue;
+    HistogramUtilities::ConditionalWrite(vzStudyTPCPlus[partIndex]);
+    HistogramUtilities::ConditionalWrite(vzStudyBTOFPlus[partIndex]);
+    HistogramUtilities::ConditionalWrite(vzStudyTPCMinus[partIndex]);
+    HistogramUtilities::ConditionalWrite(vzStudyBTOFMinus[partIndex]);
   }
 
   //Write Y and mT-m0  in it's own directory

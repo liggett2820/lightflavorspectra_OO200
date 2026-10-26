@@ -1,0 +1,166 @@
+<!--
+  runPicoBinner_OO200_VzStudy.xml - lightflavorspectra_OO200
+
+  Vz-window study (2026-10-26): a copy of runPicoBinner_OO200_SDCC_template.xml run on a subset
+  of the files (nFiles="1500" below) with the production cuts (|Vz| <= 30 cm). Its output feeds
+  macros/VzStudy_OO200.C, which compares per-event raw yields and BTOF matching in 5 cm Vz slices
+  (VzStudy/ directory written by PicoBinner). PION by default; for another species change PION in
+  the job name, the command line and the three output paths. Note the catalog returns the first
+  1500 matching files, which need not be spread evenly over the runs.
+  The rest of this header is the production template's.
+
+
+  SDCC/RCF star-submit job description for stage 1 (PicoBinner) only, against a real
+  production PicoDst dataset. This is the ONLY pipeline stage this repo runs on SDCC -
+  ZFitter/RawSpectraModifier/SpectraFitter are run locally on a laptop against
+  PicoBinner's output (see "Moving output back to a laptop" in the README's SDCC
+  section).
+
+  Restructured to follow the format of a real, working O+O 200 GeV job
+  (lightflavorspectra_etof's pions_OO_200GeV job), including the <shell> singularity
+  container line SDCC now requires and the filesPerHour attribute. library=/production=
+  are kept at THIS repo's SL24y/P24iy port rather than reverting to that job's
+  SL23c/P23ic - see the CATALOG QUERY note below. Paths are filled in for
+  liggett2820's real SDCC/RCF username and scratch/pwg layout - if someone else runs
+  this, update every /liggett path below.
+
+  *** BEFORE SUBMITTING: rebuild this repo's libraries ON THE SDCC/RCF NODE ***
+  The .so files this template packages (see <SandBox> below) are NOT committed to
+  git (see .gitignore) because the ones on a laptop are macOS/arm64 Mach-O binaries -
+  they will not load on BNL's Linux nodes. After cloning this repo onto SDCC, run the
+  README's "One-time build setup" section THERE first (builds submodule/PicoDstReader_SL24y
+  and runs macros/makeLibs_SL24y.C) so bin/*.so are genuine Linux binaries before this XML's
+  SandBox packages them.
+
+  *** SPECIES: this template runs ONE species per job, same convention the reference
+  etof job used. Make three copies of this file (or three separate submissions),
+  changing only the PARTNAME line inside <command> and the job name/output paths, to
+  cover PION / KAON / PROTON.
+
+  *** CATALOG QUERY: trgsetupname copied verbatim from lightflavorspectra_etof's real,
+  working pions_OO_200GeV job; library= and production= kept at SL24y/P24iy to match
+  this repo's port (the reference job instead paired library=SL23c with
+  production=P23ic). The runnumber whitelist from that reference job is carried over
+  below - runnumbers identify actual collision runs, not the reprocessing pass, so the
+  same runs should exist under P24iy/SL24y too, but this has NOT been independently
+  confirmed against the current StarCatalog. Two typos in the reference job's original
+  list (a single "|" instead of "||" between 22131018 and 22131019, and a stray "||||"
+  between 22131065 and 22130029) have been corrected below.
+  This SL24y/P24iy pairing (with the runnumber whitelist) has NOT been independently
+  verified against the current StarCatalog - confirm it actually resolves to files
+  before relying on it.
+  UPDATED Oct 8 2026: the whitelist is now the 56-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014, which has no P24iy picoDsts, and minus 22133032, 22133037, 22133038 and 22135039, which are on the official O+O bad-run list in StRefMultCorr/BadRun.h; also in runlists/OO200_860003_runs.txt).
+  The cut flow (Oct 2026) found 860003 only in these runs; the other 60 runs of the old
+  120-run list contributed no 860003 events. The old list is in git history.
+-->
+
+<job name="picoBinner_OO200_VzStudy_PION" maxFilesPerProcess="12" fileListSyntax="xrootd" simulateSubmission="false" filesPerHour="1000" copyInputLocally="true">
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
+
+  <!-- Scheduler log files -->
+  <stdout URL="file:/star/data03/scratch/liggett/picoBinner_OO200/stdout_stderr/" />
+  <stderr URL="file:/star/data03/scratch/liggett/picoBinner_OO200/stdout_stderr/" />
+
+  <!-- O+O 200 GeV production catalog query - see header note above about the
+       production=/library= pairing and the runnumber whitelist before relying on this. -->
+  <input URL="catalog:star.bnl.gov?filename~st_physics,trgsetupname=production_OO_200GeV_2021,production=P24iy,library=SL24y,storage=local,storage!=HPSS,filetype=daq_reco_picoDst,runnumber=22136001||22136002||22136003||22136004||22136005||22136006||22136007||22136008||22136009||22136010||22135001||22135025||22135026||22135027||22135028||22135029||22135030||22135031||22135032||22135035||22135036||22135037||22135038||22135040||22135041||22135042||22134001||22134002||22134003||22134004||22134005||22134006||22134008||22134009||22134010||22134011||22134012||22134013||22134015||22134018||22134019||22134026||22134027||22134028||22134029||22134030||22134031||22134032||22134033||22134034||22133039||22133040||22133042||22133043||22133044||22133045" nFiles="1500" />
+
+  <!-- Scheduler's own auxiliary files -->
+  <Generator><Location>
+    /star/data03/scratch/liggett/schedFiles/picoBinner_OO200_VzStudy
+  </Location></Generator>
+
+  <!--
+  <ResourceUsage>
+    <Memory>
+      <MinMemory>2500</MinMemory>
+      <MaxMemory>3500</MaxMemory>
+    </Memory>
+  </ResourceUsage>
+  -->
+
+  <!-- 2026-07-04: rewritten to package whole DIRECTORIES rather than an
+       individually-enumerated <File> list, matching the pattern
+       lightflavorspectra_etof's own real, working production job
+       (runPicoBinner_27GeV2018.xml) actually uses. The per-file approach hit two
+       separate, serious bugs in a row:
+         1. Relative "file:./..." paths are resolved by star-submit against
+            whatever directory it's invoked from, not the XML's own location or the
+            repo root reliably; submitting from xml/ instead of the repo root
+            silently produced a SandBox zip with only empty directory entries and
+            zero actual file content (confirmed via `unzip -l`: all entries 0 bytes).
+         2. Switching individual <File> entries to absolute paths fixed that, but
+            absolute paths get flattened to their basename in the packaged zip;
+            confirmed via `unzip -l` showing every file present with real, correct
+            sizes, but with NO bin/, headers/, macros/, scripts/, submodule/
+            subdirectories at all, breaking the <command> block's `cd scripts`,
+            `ls bin`, and nested `cp` calls.
+       Packaging whole directories (as below) sidesteps both problems: a directory
+       entry preserves its own internal structure when zipped regardless of whether
+       the top-level path given is absolute or relative, so this uses absolute paths
+       (immune to invocation-directory ambiguity) while still producing the correct
+       nested layout. If someone else runs this, update every
+       /star/u/liggett2820/lightflavorspectra_OO200 path below to their own checkout.
+
+       Note bin/StPicoDst_Dict_rdict.pcm: the local (macOS) build of
+       submodule/PicoDstReader_SL24y produces this pcm sidecar, but SDCC's
+       ROOT/rootcling (via `starver SL24y`) does not generate one at all when
+       building the same submodule there (confirmed via a real SDCC build directory
+       listing: every .o file plus StPicoDst_Dict.C/.h present, no pcm); and it's
+       not needed there either, confirmed by etof's own job above, which packages
+       only libStPicoDst.so and never references a .pcm file. Packaging the whole
+       bin/ directory here is harmless either way: if the pcm exists locally it gets
+       included, if not (as on a fresh SDCC build) nothing breaks. -->
+  <SandBox installer="ZIP">
+    <Package name="PicoBinner_OO200">
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/makefile_toggles.h</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/source</File>
+    </Package>
+  </SandBox>
+
+  <!-- starver must match the catalog query's library= tag above (SL24y). -->
+  <command>
+
+    starver SL24y
+
+    pwd
+    ls
+    echo LS TO BIN:
+    ls bin
+
+    <!-- Defensive copy so ParticleInfo::ReadBichselFile()'s directory-probing logic
+         (which tries cwd, cwd/.., and a couple of submodule-relative paths) is
+         guaranteed to find it regardless of the SandBox's unpacked layout - matches
+         the same defensive step the reference etof job takes (it copies to both
+         macros/ and scripts/). -->
+    cp ./submodule/ParticleInfo/PidFunctions_Data/dev_BichselCurves.root .
+    cp ./dev_BichselCurves.root macros/.
+    cp ./dev_BichselCurves.root scripts/.
+
+    cd scripts
+
+    echo starting awk command to remove numEvents after file name in list
+    set newList="$PWD"/"$JOBID".list
+    awk '{print $1}' ${FILELIST} > $newList
+
+    pwd
+    ls
+
+    <!-- args: fileList outputDir PARTNAME makeBasicHistos correctT0 ignoreBTOFNonPOI doMassSquared -->
+    ./run_picobinner_sdcc.bash $newList ${SCRATCH}/ PION true false false false
+
+    <!-- Permanent output area - SCRATCH is wiped after the job -->
+    mv ${SCRATCH}/*_Processed.root /star/data03/pwg/liggett/PicoBinner_OO200/VzStudy_PION/
+    rm ${SCRATCH}/*_Processed.root
+
+  </command>
+
+  <!-- Same permanent output area as the mv above -->
+  <output fromScratch="*_Processed.root" toURL="file:/star/data03/pwg/liggett/PicoBinner_OO200/VzStudy_PION/" />
+</job>
