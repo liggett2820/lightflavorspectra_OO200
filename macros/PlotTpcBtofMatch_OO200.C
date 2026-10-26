@@ -21,6 +21,8 @@
 // divided by their total dy and by d(mT-m0), so the TPC and BTOF binnings can differ. Centrality
 // classes are labelled from the six-class scheme (0-5 ... 80-100%).
 //
+// Optional: xVar = "pT" puts pT on the x axis (pT = sqrt(mT^2 - m0^2), exact at any y);
+// xSwitch draws a dashed line at a switching point, in the x variable chosen.
 // Usage (ROOT 5 or 6, no analysis libraries needed):
 //   root -l -b -q 'PlotTpcBtofMatch_OO200.C+("Pion","spectra_OO200_Pion_Merged.root","yieldHistos_OO200_pion.root",0.25)'
 // Output: <outPrefix>_<Sp>.pdf (4 pages), <outPrefix>_<Sp>_pN.png, <outPrefix>_<Sp>.txt (numbers)
@@ -45,6 +47,18 @@
 namespace TpcBtof {
 
 const int kMaxCent = 6;
+bool   gUsePt = false;   // x axis: pT instead of mT-m0 (set from the xVar argument)
+double gMass  = 0;
+
+// x value for an mT-m0 value: itself, or pT = sqrt(mT^2 - m0^2)
+double XV(double mtm0){
+  if(!gUsePt) return mtm0;
+  double mt = mtm0 + gMass;
+  return TMath::Sqrt(TMath::Max(mt*mt - gMass*gMass, 0.0));
+}
+const char* XTitle(){ return gUsePt ? "p_{T} (GeV/c)" : "m_{T}-m_{0} (GeV/c^{2})"; }
+// point position and half-width for an mT-m0 bin [lo, hi] in the chosen x variable
+void XPoint(double lo, double hi, double& x, double& ex){ x = 0.5*(XV(lo) + XV(hi)); ex = 0.5*(XV(hi) - XV(lo)); }
 const char* kCentLabel[kMaxCent] = {"0-5%","5-10%","10-20%","20-40%","40-80%","80-100%"};
 const int kCentColor[kMaxCent]   = {632+1, 800+7, 416+2, 860+2, 600+2, 880+1}; // red, orange, green, azure, blue, violet
 
@@ -131,8 +145,9 @@ TGraphErrors* ToGraph(const TH1D* h, int color, int marker, double xMax = 1e9){
   for(int j = 1; j <= h->GetNbinsX(); j++){
     if(h->GetBinContent(j) <= 0 || h->GetBinCenter(j) > xMax) continue;
     int n = g->GetN();
-    g->SetPoint(n, h->GetBinCenter(j), h->GetBinContent(j));
-    g->SetPointError(n, 0.5*h->GetBinWidth(j), h->GetBinError(j));
+    double xx, ex; XPoint(h->GetBinLowEdge(j), h->GetBinLowEdge(j+1), xx, ex);
+    g->SetPoint(n, xx, h->GetBinContent(j));
+    g->SetPointError(n, ex, h->GetBinError(j));
   }
   g->SetMarkerColor(color); g->SetLineColor(color); g->SetMarkerStyle(marker); g->SetMarkerSize(0.8);
   return g;
@@ -151,8 +166,9 @@ TGraphErrors* RatioAtCentres(const TH1D* num, const TH1D* den, int color, int ma
     double r = v/d;
     double rel = TMath::Sqrt(TMath::Power(num->GetBinError(k)/v, 2) + TMath::Power(den->GetBinError(j)/d, 2));
     int n = g->GetN();
-    g->SetPoint(n, den->GetBinCenter(j), r);
-    g->SetPointError(n, 0.5*den->GetBinWidth(j), r*rel);
+    double xx, ex; XPoint(den->GetBinLowEdge(j), den->GetBinLowEdge(j+1), xx, ex);
+    g->SetPoint(n, xx, r);
+    g->SetPointError(n, ex, r*rel);
   }
   g->SetMarkerColor(color); g->SetLineColor(color); g->SetMarkerStyle(marker); g->SetMarkerSize(0.8);
   return g;
@@ -210,8 +226,9 @@ TGraphErrors* CommonRatio(const TH2* hT, const TH2* hB, const TH2* nT, const TH2
     double r = sB/sT;
     double rel = TMath::Sqrt(eB2/(sB*sB) + eT2/(sT*sT));
     int n = g->GetN();
-    g->SetPoint(n, x, r);
-    g->SetPointError(n, 0.5*ayT->GetBinWidth(j), r*rel);
+    double xx, ex; XPoint(ayT->GetBinLowEdge(j), ayT->GetBinUpEdge(j), xx, ex);
+    g->SetPoint(n, xx, r);
+    g->SetPointError(n, ex, r*rel);
   }
   g->SetMarkerColor(color); g->SetLineColor(color); g->SetMarkerStyle(marker); g->SetMarkerSize(0.8);
   return g;
@@ -238,7 +255,11 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
                             const char* spectraFile = "spectra_OO200_Pion_Merged.root",
                             const char* yieldFile = "yieldHistos_OO200_pion.root",
                             double yMax = 0.25,
-                            const char* outPrefix = "TpcBtof_OO200")
+                            const char* outPrefix = "TpcBtof_OO200",
+                            const char* xVar = "mTm0",
+                            double xSwitch = -1)
+// xVar: "mTm0" (default) or "pT" for the x axis. xSwitch >= 0 draws a dashed vertical line there
+// (in the chosen x variable), e.g. a TPC-to-TOF switching point.
 {
   using namespace TpcBtof;
   gStyle->SetOptStat(0); gStyle->SetOptTitle(0);
@@ -247,6 +268,8 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
   const char* pm[2] = {"Plus","Minus"};
   const char* sym[2] = {"+","-"};
   TString symName = sp == "Pion" ? "#pi" : (sp == "Kaon" ? "K" : "p");
+  gUsePt = (TString(xVar) == "pT");
+  gMass  = Mass(sp);
 
   TFile* fs = TFile::Open(spectraFile);
   TFile* fy = TFile::Open(yieldFile);
@@ -298,7 +321,7 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
   c1->Divide(2, 1);
   for(int q = 0; q < 2; q++){
     c1->cd(q+1); gPad->SetLeftMargin(0.12); gPad->SetBottomMargin(0.12); gPad->SetGridy();
-    TH1D* fr = new TH1D(Form("fr1_%d", q), Form(";m_{T}-m_{0} (GeV/c^{2});BTOF matching efficiency (%s^{%s}, |y| #leq %.2f)", symName.Data(), sym[q], yMax), 10, 0, 3);
+    TH1D* fr = new TH1D(Form("fr1_%d", q), Form(";%s;BTOF matching efficiency (%s^{%s}, |y| #leq %.2f)", XTitle(), symName.Data(), sym[q], yMax), 10, 0, XV(3.0));
     fr->SetDirectory(0); fr->SetMinimum(0); fr->SetMaximum(1.0); fr->Draw();
     TLegend* lg = new TLegend(0.62, 0.15, 0.88, 0.45); lg->SetBorderSize(0); lg->SetFillStyle(0);
     for(int c = 0; c < nCent; c++){
@@ -334,7 +357,7 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
       // x range: up to where both detectors have points, plus some BTOF reach
       double xMax = 0;
       for(int j = tof[q][c]->GetNbinsX(); j >= 1; j--) if(tof[q][c]->GetBinContent(j) > 0){ xMax = tof[q][c]->GetBinLowEdge(j+1); break; }
-      xMax = TMath::Min(TMath::Max(xMax, 0.5), 2.5);
+      xMax = XV(TMath::Min(TMath::Max(xMax, 0.5), 2.5));
 
       up->cd();
       TGraphErrors* gT = ToGraph(tpc[q][c], 1, 20);
@@ -356,12 +379,13 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
 
       dn->cd();
       TGraphErrors* gR = CommonRatio(h2T[q][c], h2B[q][c], n2T[q][c], n2B[q][c], yMax, 632+1, 25);
-      TH1D* fr2 = new TH1D(Form("fr3_%d_%d", q, c), ";m_{T}-m_{0} (GeV/c^{2});BTOF_{corr} / TPC", 10, 0, xMax);
+      TH1D* fr2 = new TH1D(Form("fr3_%d_%d", q, c), Form(";%s;BTOF_{corr} / TPC", XTitle()), 10, 0, xMax);
       fr2->SetDirectory(0); fr2->SetMinimum(0.5); fr2->SetMaximum(1.5);
       fr2->GetXaxis()->SetTitleSize(0.1); fr2->GetXaxis()->SetLabelSize(0.09); fr2->GetYaxis()->SetTitleSize(0.085);
       fr2->GetYaxis()->SetLabelSize(0.08); fr2->GetYaxis()->SetTitleOffset(0.75); fr2->GetYaxis()->SetNdivisions(505);
       fr2->Draw();
       TLine* l1 = new TLine(0, 1, xMax, 1); l1->SetLineStyle(2); l1->Draw();
+      if(xSwitch >= 0 && xSwitch < xMax){ TLine* ls = new TLine(xSwitch, 0.5, xSwitch, 1.5); ls->SetLineStyle(2); ls->SetLineColor(600); ls->Draw(); }
       gR->Draw("P same");
 
       double mean, err, chi2; WeightedMean(gR, mean, err, chi2);
@@ -382,12 +406,13 @@ void PlotTpcBtofMatch_OO200(const char* species = "Pion",
     c4->cd(c+1); gPad->SetLeftMargin(0.14); gPad->SetBottomMargin(0.13); gPad->SetGridy();
     TGraphErrors* rT = RatioAtCentres(tpc[1][c], tpc[0][c], 1, 20);
     TGraphErrors* rB = RatioAtCentres(tofC[1][c], tofC[0][c], 632+1, 25);
-    TH1D* fr = new TH1D(Form("fr4_%d", c), Form(";m_{T}-m_{0} (GeV/c^{2});%s^{-}/%s^{+} (raw)", symName.Data(), symName.Data()), 10, 0, 2.5);
+    TH1D* fr = new TH1D(Form("fr4_%d", c), Form(";%s;%s^{-}/%s^{+} (raw)", XTitle(), symName.Data(), symName.Data()), 10, 0, XV(2.5));
     fr->SetDirectory(0);
     double lo = sp == "Proton" ? 0.4 : 0.7, hi = sp == "Proton" ? 1.2 : 1.3;
     fr->SetMinimum(lo); fr->SetMaximum(hi);
     fr->GetXaxis()->SetTitleSize(0.05); fr->GetYaxis()->SetTitleSize(0.05); fr->Draw();
     rT->Draw("P same"); rB->Draw("P same");
+    if(xSwitch >= 0){ TLine* ls = new TLine(xSwitch, lo, xSwitch, hi); ls->SetLineStyle(2); ls->SetLineColor(600); ls->Draw(); }
     TLatex t; t.SetNDC(); t.SetTextSize(0.055); t.DrawLatex(0.18, 0.85, kCentLabel[c]);
     if(c == 0){
       TLegend* lg = new TLegend(0.5, 0.72, 0.88, 0.88); lg->SetBorderSize(0); lg->SetFillStyle(0);

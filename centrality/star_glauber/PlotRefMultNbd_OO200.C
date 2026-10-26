@@ -38,20 +38,24 @@ void PlotRefMultNbd_OO200(const char* ratioFile, double multCut = 15, const char
   hD->GetXaxis()->SetRangeUser(0, xmax);
   hD->SetMarkerStyle(20); hD->SetMarkerSize(0.6); hD->SetMarkerColor(1); hD->SetLineColor(1);
   hD->GetYaxis()->SetTitle("Events"); hD->GetYaxis()->SetTitleSize(0.05); hD->GetXaxis()->SetLabelSize(0);
+  hD->SetMinimum(10); hD->SetMaximum(5*hD->GetMaximum());
   hD->Draw("P");
   hM->SetLineColor(632+1); hM->SetLineWidth(2); hM->Draw("hist same");
   up->Update();
   double yLo = TMath::Power(10, up->GetUymin()), yHi = TMath::Power(10, up->GetUymax());
   TLine* lc = new TLine(multCut, yLo, multCut, yHi); lc->SetLineStyle(2); lc->SetLineColor(600); lc->Draw();
   TObjArray* tok = TString(edges).Tokenize(",");
+  TLine* lEdge = 0;
   for(int i = 0; i < tok->GetEntries(); i++){
     double e = ((TObjString*) tok->At(i))->GetString().Atof();
-    TLine* l = new TLine(e, yLo, e, yHi); l->SetLineStyle(3); l->SetLineColor(920+2); l->Draw();
+    TLine* l = new TLine(e, yLo, e, yHi); l->SetLineStyle(3); l->SetLineColor(920+2); l->SetLineWidth(2); l->Draw();
+    lEdge = l;
   }
   TLegend* lg = new TLegend(0.55, 0.72, 0.88, 0.88); lg->SetBorderSize(0); lg->SetFillStyle(0);
   lg->AddEntry(hD, "corrected refMult, minbias-bbc_etof", "p");
   lg->AddEntry(hM, "Glauber #times NBD", "l");
   lg->AddEntry(lc, Form("fit range starts (refMult = %.0f)", multCut), "l");
+  if(lEdge) lg->AddEntry(lEdge, Form("class edges (%s)", edges), "l");
   lg->Draw();
 
   dn->cd();
