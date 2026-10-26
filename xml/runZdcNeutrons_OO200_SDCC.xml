@@ -1,16 +1,18 @@
 <!--
   runZdcNeutrons_OO200_SDCC.xml - lightflavorspectra_OO200
+  (Oct 26 2026: output to ZdcNeutrons_OO200_Oct2026 for the EPD-class version of the macro, which
+  includes headers/EpdCentrality_OO200.h, so headers/ is now packaged too.)
 
   star-submit job for macros/MakeZdcSpectatorNeutrons_OO200.C: ZDC (unattenuated) ADC per side
   for trigger-860003 events after the analysis event cuts, by centrality, refMult and run.
   Same catalog query, 56-run list (the trigger-860003 runs, 22133032-22136010, minus 22134014, which has no P24iy picoDsts, and minus 22133032, 22133037, 22133038 and 22135039, which are on the official O+O bad-run list in StRefMultCorr/BadRun.h; also in runlists/OO200_860003_runs.txt), and job layout as xml/runCutFlow_OO200_SDCC.xml
   (copyInputLocally off, 12 files per job). Reads only the Event branch, so jobs are short.
   Merge, then fit/plot on the laptop or in the container:
-    hadd -f zdc_OO200_all.root /star/data03/pwg/liggett/ZdcNeutrons_OO200/*_zdc.root
+    hadd -f zdc_OO200_all.root /star/data03/pwg/liggett/ZdcNeutrons_OO200_Oct2026/*_zdc.root
     root -l -b -q 'macros/PlotZdcSpectatorNeutrons_OO200.C+("zdc_OO200_all.root")'
 
   Before submitting (RCF host, repo root):
-    mkdir -p /star/data03/pwg/liggett/ZdcNeutrons_OO200 /star/data03/scratch/liggett/schedFiles/zdcNeutrons_OO200 /star/data03/scratch/liggett/zdcNeutrons_OO200/stdout_stderr
+    mkdir -p /star/data03/pwg/liggett/ZdcNeutrons_OO200_Oct2026 /star/data03/scratch/liggett/schedFiles/zdcNeutrons_OO200 /star/data03/scratch/liggett/zdcNeutrons_OO200/stdout_stderr
   Submit with:  rm -f ZdcNeutrons_OO200.zip; star-submit xml/runZdcNeutrons_OO200_SDCC.xml
   (SUMS reuses an existing sandbox zip without repacking it: delete it after any code change.)
 -->
@@ -32,6 +34,7 @@
     <Package name="ZdcNeutrons_OO200">
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/bin</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/macros</File>
+      <File>file:/star/u/liggett2820/lightflavorspectra_OO200/headers</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/scripts</File>
       <File>file:/star/u/liggett2820/lightflavorspectra_OO200/submodule/PicoDstReader_SL24y</File>
     </Package>
@@ -43,5 +46,5 @@
     ./scripts/run_cutflow_sdcc.bash ${JOBID}.list ${SCRATCH}/${JOBID}_zdc.root MakeZdcSpectatorNeutrons_OO200.C
   </command>
 
-  <output fromScratch="*_zdc.root" toURL="file:/star/data03/pwg/liggett/ZdcNeutrons_OO200/" />
+  <output fromScratch="*_zdc.root" toURL="file:/star/data03/pwg/liggett/ZdcNeutrons_OO200_Oct2026/" />
 </job>
