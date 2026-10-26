@@ -1270,21 +1270,21 @@ bool CutClass::isGoodEvent(StPicoEvent* a_event){
 
     if(!foundInTriggers) goodEvent = false;
   }
-  #ifdef _CUTCLASS_DEBUG_
-  if(!goodEvent) {
+  // FIX 2026-10-26: the trigger-rejection Fill(4.5) sat inside #ifdef _CUTCLASS_DEBUG_, and
+  // Fill(8.5) "Passed" ran for trigger-rejected events too, so rejectedEventCuts showed
+  // Triggers = 0 and counted those events as Passed. Event selection is unchanged.
+  if(!goodEvent){
     #ifdef _CUTCLASS_DEBUG_
      cout << " Rejected because of Triggers " << endl;
     #endif
     m_rejectedEvents->Fill(4.5);
-
-  }else{
-    #ifdef _CUTCLASS_DEBUG_
-      cout << "Passed Triggers" << endl;
-    #endif
+    return false;
   }
+  #ifdef _CUTCLASS_DEBUG_
+    cout << "Passed Triggers" << endl;
   #endif
   m_rejectedEvents->Fill(8.5);
-  return goodEvent;
+  return true;
 }
 
 #ifdef _HAS_ETOF_
