@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cstdio>
+#include <unistd.h>
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH2F.h"
@@ -190,4 +192,9 @@ void MakeZdcSpectatorNeutrons_OO200(const char* fileList, const char* outName = 
   std::cout << Form("Unattenuated ADC == 0: East %.0f, West %.0f, both %.0f", hEvents->GetBinContent(2), hEvents->GetBinContent(3), hEvents->GetBinContent(4)) << std::endl;
   out->Close();
   std::cout << "Wrote " << outName << std::endl;
+  // The output file is already closed here. Batch use only (root -b -q): this ends the session.
+  // ROOT aborts or hangs at teardown (double-registered PicoDst dictionaries), which kept SUMS
+  // from copying the output back; same fix as MakeEpdCentInputs_OO200.C.
+  std::cout.flush(); fflush(stdout); fflush(stderr);
+  _exit(0);
 }
