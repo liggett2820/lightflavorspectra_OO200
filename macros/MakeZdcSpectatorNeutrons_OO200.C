@@ -23,8 +23,24 @@
 // Histogram names of the six classes are unchanged, so macros/PlotZdcSpectatorNeutrons_OO200.C reads
 // the output as before.
 //
+// ZDC shower-max detector (SMD), added Oct 28 2026 as a first look at spectator-neutron p_T:
+// the picoDst keeps 8 vertical (x) and 8 horizontal (y) strip ADCs per side (StPicoEvent::ZdcSmd*).
+// Events are split per side by the unattenuated ADC in units of the 1n peak (kAdc1n, Oct 2026 global
+// fit): "0n" below 0.3, "1n" 0.6-1.4, "2n+" above 1.7. Stored per side:
+//   - strip x ADC for each plane and gate (0n gives the pedestals; whether the picoDst values are
+//     pedestal-subtracted is not known yet)                                              [TH2F x 2 x 3]
+//   - 1n: shower centroid (ADC-weighted strip index, raw ADC, no pedestal subtraction) x vs y,
+//     per class; the same for 2n+; x and y vs run (beam-centre stability)                 [TH2F]
+//   - SMD ADC sum vs unattenuated ZDC ADC                                                 [TH2F]
+// Optional (5th argument true): a tree "smd" with all 32 strip ADCs for events with 1n on at least one
+// side, for pedestal-subtracted centroids offline. Meant for test runs on a few files: in the full
+// production it would be large.
+// Strip index -> position needs the SMD geometry (strip pitch, which vertical strips are used); not
+// applied here, everything is in strip units.
+//
 // Usage (repo root, RCF, inside the SL7 container, SL24y):
 //   root -l -b -q macros/LoadCutFlowLibs.C 'macros/MakeZdcSpectatorNeutrons_OO200.C+("files.list","zdc_part0.root")'
+//   root -l -b -q macros/LoadCutFlowLibs.C 'macros/MakeZdcSpectatorNeutrons_OO200.C+("files.list","zdc_smdtest.root",-1,true)'
 // The output is additive (hadd).
 
 #include <cmath>
@@ -37,6 +53,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH2F.h"
+#include "TTree.h"
 #include "TProfile.h"
 #include "TMath.h"
 #include "TVector3.h"
@@ -77,9 +94,26 @@ namespace {
   int runIndex(int runId){ int day = (runId % 1000000) / 1000; return (day - 130) * 100 + (runId % 1000); }
   int centClass(double m){ for(int i = 0; i < kNCent; i++) if(m >= kCentEdge[i]) return i; return -1; }
   int subClass(double m){ if(m >= kCentEdge[3]) return -1; for(int i = 0; i < kNSub; i++) if(m >= kSubEdge[i]) return i; return -1; }
+
+  // SMD: neutron-number gates from the unattenuated ADC, in units of the 1n peak
+  const double kAdc1n[2] = {140.8, 129.3};   // East, West: Oct 2026 global fit (PlotZdcSpectatorNeutrons_OO200.C)
+  const double kGate0nHi = 0.3, kGate1nLo = 0.6, kGate1nHi = 1.4, kGate2nLo = 1.7;
+  const char*  kGateLab[3] = {"0n", "1n", "2n+"};
+  const char*  kPlane[2]   = {"Vertical", "Horizontal"};   // vertical strips measure x, horizontal y
+  int nGate(int s, double ua){
+    const double r = ua / kAdc1n[s];
+    if(r < kGate0nHi) return 0;
+    if(r >= kGate1nLo && r <= kGate1nHi) return 1;
+    if(r > kGate2nLo) return 2;
+    return -1;
+  }
+  double smdAdc(StPicoEvent* ev, int side, int plane, int strip){
+    if(side == 0) return plane == 0 ? ev->ZdcSmdEastVertical(strip) : ev->ZdcSmdEastHorizontal(strip);
+    return plane == 0 ? ev->ZdcSmdWestVertical(strip) : ev->ZdcSmdWestHorizontal(strip);
+  }
 }
 
-void MakeZdcSpectatorNeutrons_OO200(const char* fileList, const char* outName = "zdc_OO200.root", int maxFiles = -1){
+void MakeZdcSpectatorNeutrons_OO200(const char* fileList, const char* outName = "zdc_OO200.root", int maxFiles = -1, bool smdTree = false){
   std::vector<std::string> files; std::ifstream in(fileList); std::string line;
   while(std::getline(in, line)){
     std::string f = line.substr(0, line.find_first_of(" \t"));
@@ -122,6 +156,35 @@ void MakeZdcSpectatorNeutrons_OO200(const char* fileList, const char* outName = 
       hUASub[s][c] = new TH1D(Form("hZdcUA%s_sub%d", kSide[s], c), Form("ZDC %s unattenuated ADC, %s;ADC;Events", kSide[s], kSubLab[c]), kAdcBins, 0, kAdcMax);
   }
   TH2F* hEW = new TH2F("hZdcUA_EastVsWest_peripheral", "ZDC unattenuated ADC, 80-100%;East ADC;West ADC", 250, 0, 1000, 250, 0, 1000);
+
+  // SMD
+  TH2F* hSmdAdc[2][2][3]; TH2F* hSmdXY[2][kNCent]; TH2F* hSmdXY2n[2]; TH2F* hSmdXvsRun[2]; TH2F* hSmdYvsRun[2]; TH2F* hSmdSumVsUA[2];
+  for(int s = 0; s < 2; s++){
+    for(int p = 0; p < 2; p++)
+      for(int g = 0; g < 3; g++)
+        hSmdAdc[s][p][g] = new TH2F(Form("hSmd%s%s_%s", kSide[s], kPlane[p], g == 0 ? "0n" : (g == 1 ? "1n" : "2n")),
+                                    Form("ZDC-SMD %s %s strips, %s events;strip;ADC", kSide[s], kPlane[p], kGateLab[g]), 8, -0.5, 7.5, 512, 0, 1024);
+    for(int c = 0; c < kNCent; c++)
+      hSmdXY[s][c] = new TH2F(Form("hSmdXY%s_1n_cent%d", kSide[s], c), Form("ZDC-SMD %s centroid, 1n, %s;x (vertical strip index);y (horizontal strip index)", kSide[s], kCentLab[c]),
+                              80, -0.5, 7.5, 80, -0.5, 7.5);
+    hSmdXY2n[s]    = new TH2F(Form("hSmdXY%s_2n", kSide[s]), Form("ZDC-SMD %s centroid, 2n+, all classes;x (vertical strip index);y (horizontal strip index)", kSide[s]),
+                              80, -0.5, 7.5, 80, -0.5, 7.5);
+    hSmdXvsRun[s]  = new TH2F(Form("hSmdX%s_vs_run_1n", kSide[s]), Form("ZDC-SMD %s centroid x, 1n;run index = (day-130)*100 + run-in-day;x (strip index)", kSide[s]), 700, 0, 700, 80, -0.5, 7.5);
+    hSmdYvsRun[s]  = new TH2F(Form("hSmdY%s_vs_run_1n", kSide[s]), Form("ZDC-SMD %s centroid y, 1n;run index = (day-130)*100 + run-in-day;y (strip index)", kSide[s]), 700, 0, 700, 80, -0.5, 7.5);
+    hSmdSumVsUA[s] = new TH2F(Form("hSmd%s_sum_vs_UA", kSide[s]), Form("ZDC-SMD %s ADC sum (16 strips) vs unattenuated ZDC ADC;ZDC %s unattenuated ADC;SMD ADC sum", kSide[s], kSide[s]),
+                              250, 0, 1000, 400, 0, 8000);
+  }
+  TTree* tSmd = 0;
+  Int_t tRun = 0, tEvt = 0, tCls = 0; Float_t tUA[2] = {0, 0}, tMip = 0; UShort_t tStrip[2][2][8];
+  if(smdTree){
+    tSmd = new TTree("smd", "ZDC-SMD strips, events with 1n on at least one side");
+    tSmd->Branch("run", &tRun, "run/I");
+    tSmd->Branch("evt", &tEvt, "evt/I");
+    tSmd->Branch("cls", &tCls, "cls/I");
+    tSmd->Branch("mip", &tMip, "mip/F");
+    tSmd->Branch("ua",  tUA,   "ua[2]/F");
+    tSmd->Branch("smd", tStrip, "smd[2][2][8]/s");   // [side E,W][plane V,H][strip]
+  }
 
   long long nPass = 0;
   for(size_t f = 0; f < files.size(); f++){
@@ -177,6 +240,33 @@ void MakeZdcSpectatorNeutrons_OO200(const char* fileList, const char* outName = 
         if(c == kNCent - 1) hUAvsRun[s]->Fill(runIndex(ev->runId()), ua[s]);
       }
       if(c == kNCent - 1) hEW->Fill(ua[0], ua[1]);
+
+      // SMD
+      const int ri = runIndex(ev->runId());
+      int gate[2];
+      for(int s = 0; s < 2; s++){
+        gate[s] = nGate(s, ua[s]);
+        double sumA[2] = {0, 0}, mom[2] = {0, 0};
+        for(int p = 0; p < 2; p++){
+          for(int k = 0; k < 8; k++){
+            const double a = smdAdc(ev, s, p, k);
+            sumA[p] += a; mom[p] += k * a;
+            if(gate[s] >= 0) hSmdAdc[s][p][gate[s]]->Fill(k, a);
+          }
+        }
+        hSmdSumVsUA[s]->Fill(ua[s], sumA[0] + sumA[1]);
+        if(sumA[0] > 0 && sumA[1] > 0){
+          const double x = mom[0] / sumA[0], y = mom[1] / sumA[1];
+          if(gate[s] == 1){ hSmdXY[s][c]->Fill(x, y); hSmdXvsRun[s]->Fill(ri, x); hSmdYvsRun[s]->Fill(ri, y); }
+          if(gate[s] == 2) hSmdXY2n[s]->Fill(x, y);
+        }
+      }
+      if(tSmd && (gate[0] == 1 || gate[1] == 1)){
+        tRun = ev->runId(); tEvt = ev->eventId(); tCls = c; tMip = mip; tUA[0] = ua[0]; tUA[1] = ua[1];
+        for(int s = 0; s < 2; s++) for(int p = 0; p < 2; p++) for(int k = 0; k < 8; k++)
+          tStrip[s][p][k] = (UShort_t) smdAdc(ev, s, p, k);
+        tSmd->Fill();
+      }
     }
     reader->Finish();
     delete reader;
