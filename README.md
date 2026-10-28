@@ -176,9 +176,7 @@ links.
    root -l -q -b macros/makeLibs_SL24y.C
    ```
    (Renamed 2026-08-24 from `macros/makeLibs.C` -- this is the SL24y-STAR_LEVEL build
-   macro, used both here on a laptop and on SDCC for stage-1 PicoBinner batch jobs. The
-   embedding pipeline's RCF-side build macro is the separate `macros/makeLibs_SL23c.C`,
-   run under `starver SL23c` -- see that file's own header comment.)
+   macro, used both here on a laptop and on SDCC for stage-1 PicoBinner batch jobs.)
    This compiles, in dependency order: `namespaces.cxx` (Helix/PhysMath/HistogramUtilities/
    PhysMathHistogramUtilities combined, matching the original's own build), `ParticleInfo.cxx`,
    `CutClass.cxx`, `CalibrationClass.cxx`, `PicoBinner.cxx`, `SetCutClass.C`, `GausMixModel.cxx`

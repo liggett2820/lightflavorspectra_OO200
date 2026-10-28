@@ -35,18 +35,8 @@
 //     run whitelist (the 56 good trigger-860003 runs since Oct 2026). That's recorded in compile.bash's own header for whoever
 //     needs it later -- it's just not what this build uses, per the two points above.)
 //
-//   _PICO_READER_SL23c_ -- matches compile.bash's actual `cp -r
-//     ../../submodule/PicoDstReader_SL23c ./submodule/` (NOT PicoDstReader_SL24y, the
-//     local/Mac build's reader -- see compile.bash's own header comment for why they
-//     differ). NOTE: as of this writing, headers/CutClass.h has NO include branch for
-//     _PICO_READER_SL23c_ at all -- its "#ifndef _MAC_OSX_" block only knows about
-//     _PICO_READER_, _PICO_READER_SL22b_, _PICO_READER_SL22c_, _PICO_READER_SL23a_
-//     (which, confusingly, actually points at PicoDstReader_SL24y/ -- a leftover from
-//     when that macro was renamed but the #include paths under it were not), and
-//     _PICO_READER_SL23d_/_PICO_READER_SL19b_. None of those point at
-//     PicoDstReader_SL23c. Left defined here anyway (rather than silently substituting a
-//     wrong existing toggle) so the mismatch is visible/greppable -- see compile.bash's
-//     header for the flagged follow-up this needs before it will actually compile.
+//   _PICO_READER_SL24y_ -- matches compile.bash's `cp -r ../../submodule/PicoDstReader_SL24y
+//     ./submodule/`; selects the SL24y include branch in headers/CutClass.h's RCF block.
 //
 //   _ETOF_GOOD_EVENT_FLAG_, _HAS_ETOF_ -- kept on, matching both this repo's local build
 //     and the reference repo's real _OO_200_COL_ RCF block (both need eTOF for O+O).
@@ -65,7 +55,7 @@
 
 // _MAC_OSX_ intentionally NOT defined -- this is the RCF/SDCC branch.
 
-#define _PICO_READER_SL23c_
+#define _PICO_READER_SL24y_
 #define _ETOF_GOOD_EVENT_FLAG_
 #define _HAS_ETOF_
 #define _PICO_READER_FINISH_BYPASS_

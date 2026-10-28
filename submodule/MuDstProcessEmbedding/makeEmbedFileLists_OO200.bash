@@ -4,27 +4,21 @@
 # Ported from lightflavorspectra_etof/submodule/MuDstProcessEmbedding/makeEmbedFileLists_19p6.bash,
 # which is itself the README's own worked example of "how to make a filelist" for a new energy.
 #
-# REAL VALUES CONFIRMED (per Andrew, 2026-08-05+08-06), replacing all earlier placeholders:
-#   - RequestID: 20232003 (single combined ID, not one per species)
-#   - Production directory: production_OO_200GeV_2021
-#   - RCF root: /star/data105/embedding (confirmed present; identical content also exists
-#     under /sdcc/lustre02/star/data105/embedding -- same lustre storage under two mount
-#     paths, use whichever is reachable from wherever this actually runs)
+# Changed 2026-10-28: SL24y only. Set REQ to the P24iy embedding RequestID once it exists.
+# Production directory: production_OO_200GeV_2021 under /star/data105/embedding (also
+# mounted as /sdcc/lustre02/star/data105/embedding).
 #
-# NAMING CONVENTION IS DIFFERENT FROM THE 19.6 GeV REFERENCE SCRIPT: this production
-# doesn't use simple `Species_*_RequestID` directories -- confirmed via `find
-# -ipath "*production_OO_200GeV_2021*20232003*"` that each species has an "RFF" tag plus
-# a large number of numbered sub-requests (e.g. PiplusRFF_20232003, PiplusRFF_100_20232003,
-# PiplusRFF_101_20232003, ... PiplusRFF_202_20232003 -- 12 directories for pi+ alone, all
-# under the SAME RequestID 20232003, presumably split by momentum/eta sub-range at request
-# time). The `Species*_20232003` glob below (no underscore between the species tag and the
-# wildcard) matches ALL of them at once -- both the bare/base directory and every numbered
-# variant -- since `find` expands a multi-directory glob into separate search roots.
-#
-# PROTON HAS TWO TAG FAMILIES: the find output shows BOTH `Proton_*_20232003` (4 dirs)
-# AND `ProtonRFF_*_20232003` (5 dirs) -- every other species only has the RFF-tagged
-# family. Confirmed with Andrew (2026-08-06): only ProtonRFF* should be used, matching
-# every other species -- the plain Proton_* set is deliberately excluded below.
+# The directory globs below follow the earlier P23ic request (20232003; in git history):
+# each species was split into many numbered sub-directories with an "RFF" tag
+# (PiplusRFF_20232003, PiplusRFF_100_20232003, ...), and protons also had an untagged
+# Proton_* family that was excluded. CHECK the P24iy directory names with
+#   find /star/data105/embedding/production_OO_200GeV_2021 -maxdepth 1 -name "*_$REQ"
+# and adjust the species tags before using the lists.
+
+REQ=SET_P24IY_REQUEST_ID
+if [ "$REQ" = "SET_P24IY_REQUEST_ID" ]; then
+  echo "makeEmbedFileLists_OO200.bash: set REQ to the P24iy embedding RequestID first"; exit 1
+fi
 
 echo Removing old 200GeV Embedding Filelists...
 mkdir -p ./fileLists/200GeV_OO200/full/
@@ -33,38 +27,38 @@ echo Making new 200GeV Embedding Filelists...
 EMBDIR=/star/data105/embedding/production_OO_200GeV_2021
 
 echo Starting PionPlus...
-find $EMBDIR/PiplusRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pip_20232003.list
+find $EMBDIR/PiplusRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pip_${REQ}.list
 
 echo Starting PionMinus...
-find $EMBDIR/PiminusRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pim_20232003.list
+find $EMBDIR/PiminusRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pim_${REQ}.list
 
 echo Starting KaonPlus...
-find $EMBDIR/KplusRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_Kp_20232003.list
+find $EMBDIR/KplusRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_Kp_${REQ}.list
 
 echo Starting KaonMinus...
-find $EMBDIR/KminusRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_Km_20232003.list
+find $EMBDIR/KminusRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_Km_${REQ}.list
 
 echo Starting ProtonPlus...
-find $EMBDIR/ProtonRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pro_20232003.list
+find $EMBDIR/ProtonRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pro_${REQ}.list
 
 echo Starting ProtonMinus...
-find $EMBDIR/AntiProtonRFF*_20232003 -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pbar_20232003.list
+find $EMBDIR/AntiProtonRFF*_${REQ} -print | grep -i MuDst.root | awk '{print $0}' > ./fileLists/200GeV_OO200/full/200GeV_pbar_${REQ}.list
 
 
 echo Number of pip embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_pip_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_pip_${REQ}.list | wc -l
 
 echo Number of pim embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_pim_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_pim_${REQ}.list | wc -l
 
 echo Number of Kp embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_Kp_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_Kp_${REQ}.list | wc -l
 
 echo Number of Km embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_Km_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_Km_${REQ}.list | wc -l
 
 echo Number of pro embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_pro_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_pro_${REQ}.list | wc -l
 
 echo Number of pbar embedding files:
-cat ./fileLists/200GeV_OO200/full/200GeV_pbar_20232003.list | wc -l
+cat ./fileLists/200GeV_OO200/full/200GeV_pbar_${REQ}.list | wc -l

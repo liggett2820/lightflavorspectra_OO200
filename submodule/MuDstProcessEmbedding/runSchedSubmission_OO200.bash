@@ -2,7 +2,7 @@
 # runSchedSubmission_OO200.bash -- lightflavorspectra_OO200/submodule/MuDstProcessEmbedding
 #
 # Ported from lightflavorspectra_etof/submodule/MuDstProcessEmbedding/runSchedSubmission_Collider.bash.
-# Usage: runSchedSubmission_OO200.bash <partIndex 0=pi/1=K/2=p> <charge +1/-1> <requestID> <energy tag, e.g. 200> <starver, e.g. SL23c>
+# Usage: runSchedSubmission_OO200.bash <partIndex 0=pi/1=K/2=p> <charge +1/-1> <requestID> <energy tag, e.g. 200> <starver: SL24y>
 #
 # WHAT CHANGED FROM THE ORIGINAL, AND WHY:
 #   - $OutputDir and FileListDir below were the ORIGINAL AUTHOR's (harasty's) personal

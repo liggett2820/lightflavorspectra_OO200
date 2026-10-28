@@ -4,6 +4,6 @@
 // (Same split as LoadPicoBinnerLibs.C: the library must be loaded before the display
 //  macro is compiled.)
 void LoadEventDisplayLibs(){
-  gSystem->Load("./bin/libStPicoDst_SL23c.so");
-  gSystem->AddIncludePath("-I./submodule/PicoDstReader_SL23c");
+  gSystem->Load("./bin/libStPicoDst.so");
+  gSystem->AddIncludePath("-I./submodule/PicoDstReader_SL24y");
 }

@@ -1,15 +1,7 @@
 // makeLibs_SL24y.C -- lightflavorspectra_OO200
 //
-// Renamed 2026-08-24 from macros/makeLibs.C, in step with adding a dedicated
-// macros/makeLibs_SL23c.C (the RCF-side build macro, formerly macros/makeLibs_RCF.C) --
-// "RCF" wasn't actually the meaningful distinction between the two build macros
-// (this one also runs at RCF/SDCC for stage-1 PicoBinner batch jobs -- see the README's
-// "One-time build setup" section), the STAR_LEVEL each one builds against is. Naming
-// both by STAR_LEVEL instead matches the submodule/PicoDstReader_SL24y vs
-// submodule/PicoDstReader_SL23c split made the same day, for the same reason: makes
-// which STAR_LEVEL each build targets explicit instead of implied by a "local vs RCF"
-// label that doesn't actually hold (this one runs in both places; only the STAR_LEVEL
-// it's built against is fixed).
+// Renamed 2026-08-24 from macros/makeLibs.C to name the build by the STAR_LEVEL it
+// targets (SL24y, the production picoDsts); runs both locally and at RCF/SDCC.
 //
 // Simplified build macro. Compiles PicoBinner and ZFitter plus their dependencies.
 // As RawSpectraModifier/SpectraFitter get ported, add their CompileMacro lines here

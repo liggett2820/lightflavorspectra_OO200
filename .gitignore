@@ -85,8 +85,4 @@ centrality/star_glauber/figure
 centrality/star_glauber/table
 centrality/star_glauber/RatioChi2Files
 centrality/star_glauber/glauber_OO200
-# Locally built SL23c reader (embedding) and generated dictionary headers
-submodule/PicoDstReader_SL23c/libStPicoDst.so
-submodule/PicoDstReader_SL23c/StPicoDst_Dict.C
-submodule/PicoDstReader_SL23c/StPicoDst_Dict.h
 submodule/PicoDstReader_SL24y/StPicoDst_Dict.h

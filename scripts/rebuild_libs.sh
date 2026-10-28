@@ -19,10 +19,7 @@
 # not exist".
 #
 # NOTE (2026-08-24): this script is SL24y-specific (renamed from macros/makeLibs.C to
-# macros/makeLibs_SL24y.C the same day, alongside a new macros/makeLibs_SL23c.C for the
-# RCF embedding pipeline -- see that file's own header comment). There is no equivalent
-# rebuild_libs script for SL23c yet; that build is currently driven by hand via the
-# steps in macros/makeLibs_SL23c.C's own header comment.
+# macros/makeLibs_SL24y.C the same day).
 #
 # That submodule's own Makefile only tracks libStPicoDst.so as a target -- if it's
 # already sitting in submodule/PicoDstReader_SL24y/ from a previous build, plain `make`

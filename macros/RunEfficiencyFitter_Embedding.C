@@ -2,7 +2,7 @@
 //
 // Stage 4 of the embedding pipeline (StMuAnalysisMaker at RCF -> hadd -> RunEmbeddingBinner.C
 // locally -> THIS macro -> RawSpectraModifier). Fits TPC efficiency and energy loss from
-// the P23ic/SL23c embedding sample (already reprocessed by RunEmbeddingBinner.C) using
+// the P24iy/SL24y O+O embedding sample (already reprocessed by RunEmbeddingBinner.C) using
 // EfficiencyFitter's already-ported fitEfficiency(doTPCEff=true)/fitEnergyLoss() -- these
 // are NOT new code, they're the same class RunEfficiencyFitter.C (the existing BTOF-only
 // driver in this repo) already uses for the data-driven BTOF path; this macro just calls

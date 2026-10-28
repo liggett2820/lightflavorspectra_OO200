@@ -2,26 +2,26 @@
 # runBatchSpecificRequest_OO200GeV.bash -- lightflavorspectra_OO200/submodule/MuDstProcessEmbedding
 #
 # Ported from lightflavorspectra_etof/submodule/MuDstProcessEmbedding/runBatchSpecificRequest_19p6GeV.bash.
-# Dispatches runSchedSubmission_OO200.bash once per (species, charge, RequestID) --
-# add one line per RequestID your P23ic embedding request actually has (some requests
-# split a species/charge across more than one RequestID, e.g. a normal-pT sample plus
-# a separate high-pT sample -- see the original 19.6 GeV example for that shape).
+# Dispatches runSchedSubmission_OO200.bash once per (species, charge, RequestID) for the
+# P24iy/SL24y O+O embedding. Add one line per RequestID if the request is split (e.g. a
+# separate high-pT sample; see the 19.6 GeV example in the sibling etof repo).
 #
-# RequestID filled in as 20232003 (per Andrew, 2026-08-05) -- ASSUMED to be a single
-# combined RequestID covering all 6 species/charges rather than one per species. If your
-# P23ic request actually split species across separate RequestIDs, or split normal-pT vs
-# a separate high-pT sample, update the relevant line(s) below and add extra lines the
-# same way (see runBatchSpecificRequest_19p6GeV.bash in the sibling etof repo for that
-# shape). library=SL23c below matches what you told me your P23ic embedding was produced
-# with -- change it if that's wrong.
+# Changed 2026-10-28: SL24y only. Set REQ to the P24iy request's RequestID once it exists.
+# (The earlier P23ic request, 20232003, is in git history.)
 
-./runSchedSubmission_OO200.bash 0  1 20232003 200 SL23c   # pi+
-./runSchedSubmission_OO200.bash 0 -1 20232003 200 SL23c   # pi-
+REQ=SET_P24IY_REQUEST_ID
+LIB=SL24y
+if [ "$REQ" = "SET_P24IY_REQUEST_ID" ]; then
+  echo "runBatchSpecificRequest_OO200GeV.bash: set REQ to the P24iy embedding RequestID first"; exit 1
+fi
 
-./runSchedSubmission_OO200.bash 1  1 20232003 200 SL23c   # K+
-./runSchedSubmission_OO200.bash 1 -1 20232003 200 SL23c   # K-
+./runSchedSubmission_OO200.bash 0  1 $REQ 200 $LIB   # pi+
+./runSchedSubmission_OO200.bash 0 -1 $REQ 200 $LIB   # pi-
 
-./runSchedSubmission_OO200.bash 2  1 20232003 200 SL23c   # proton
-./runSchedSubmission_OO200.bash 2 -1 20232003 200 SL23c   # antiproton
+./runSchedSubmission_OO200.bash 1  1 $REQ 200 $LIB   # K+
+./runSchedSubmission_OO200.bash 1 -1 $REQ 200 $LIB   # K-
+
+./runSchedSubmission_OO200.bash 2  1 $REQ 200 $LIB   # proton
+./runSchedSubmission_OO200.bash 2 -1 $REQ 200 $LIB   # antiproton
 
 exit
