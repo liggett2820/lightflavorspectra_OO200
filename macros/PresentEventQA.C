@@ -42,6 +42,8 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
   TH1* dca       = (TH1*) inFile->Get("dca");
   TH2* xyHisto   = (TH2*) inFile->Get("xyHisto");
   TH1* refMult   = (TH1*) inFile->Get("refMult");
+  // Oct 2026 productions: corrected EPD totnMIP (the centrality variable since then), name has the species suffix
+  TH1* totnMIP   = (TH1*) inFile->Get(("totnMIPCorr"+a_speciesSuffix).c_str());
   TH1* centEvents = (TH1*) inFile->Get(("centEvents"+a_speciesSuffix).c_str());
   if(!centEvents) centEvents = (TH1*) inFile->Get("centEvents"); // try the no-suffix name too
 
@@ -88,23 +90,19 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     }
   }
 
-  // Display range capped at 140 -- refMult is booked 0-1000 in PicoBinner.cxx; this
-  // just clips the plotted range, doesn't rebin or drop any underlying entries.
+  // Centrality variable with the class edges. Files with totnMIPCorr<Species> (Oct 2026 on) use the EPD
+  // classes of SetCutClass.C, totnMIP_corr >= {364,310,234,130,36} at 5/10/20/40/80% (the 80-100% edge, 0,
+  // sits on the axis). Older files: raw refMult with {44,37,28,17,5}. Note totnMIPCorr is filled for every
+  // event passing the vertex cuts, before the pile-up and centrality selections.
   c->cd(3); gPad->SetLogy();
-  if(refMult){
-    refMult->SetTitle("refMult");
-    refMult->GetXaxis()->SetRangeUser(0, 140);
-    refMult->Draw();
-
-    // Overlay the official centrality cuts from SetCutClass.C (2026-07-09:
-    // {44,37,28,17,5} at the 5/10/20/40/80% boundaries). The 80-100% bin's own 0 edge
-    // (see SetCutClass.C's comment on why it's added so peripheral events aren't
-    // dropped) isn't drawn here -- it sits right at the refMult=0 axis edge, so its
-    // line/label added no information beyond "everything left of the 80% line is the
-    // 80-100% bin." These are the values that actually produced this file's centIndex,
-    // NOT re-derived here.
+  TH1* centVar = totnMIP ? totnMIP : refMult;
+  if(centVar){
     double centCuts[5]     = {44, 37, 28, 17, 5};
+    if(totnMIP){ centCuts[0] = 364; centCuts[1] = 310; centCuts[2] = 234; centCuts[3] = 130; centCuts[4] = 36; }
     int    centPercents[5] = {5, 10, 20, 40, 80};
+    centVar->SetTitle(totnMIP ? "Corrected EPD totnMIP" : "refMult");
+    centVar->GetXaxis()->SetRangeUser(0, totnMIP ? 650 : 140);
+    centVar->Draw();
     gPad->Update();
     double yMin = TMath::Power(10, gPad->GetUymin());
     double yMax = TMath::Power(10, gPad->GetUymax());
@@ -130,6 +128,11 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     // lowest bin content, which zero-suppresses the axis and exaggerates bin-to-bin
     // differences that are actually small relative to the total.
     centEvents->SetMinimum(0);
+    if(centEvents->GetNbinsX() == 6){
+      const char* lab[6] = {"0-5%", "5-10%", "10-20%", "20-40%", "40-80%", "80-100%"};
+      for(int iii = 0; iii < 6; iii++) centEvents->GetXaxis()->SetBinLabel(iii+1, lab[iii]);
+      centEvents->GetXaxis()->SetTitle("");
+    }
     centEvents->Draw();
   }
 
