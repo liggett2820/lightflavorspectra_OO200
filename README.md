@@ -38,8 +38,9 @@ All of this is in `macros/SetCutClass.C`, the one place the event and track cuts
 The **October 2026 PicoBinner production** with this configuration has 225,273,772 events
 after all event cuts, the same in all three species files. Its merged yield files on RCF are
 `/star/data03/pwg/liggett/PicoBinner_OO200/yieldHistos_OO200_{pion,kaon,proton}_Oct2026.root`.
-In the |Vz| < 2 cm window it has 30.53M events, 1.1% fewer than the July production (30.86M);
-the difference is the pile-up band added in October.
+In the |Vz| < 2 cm window it has 30.53M events, about 0.1% fewer than the July cut flow over
+the same 56 runs (30.57M), which is what the pile-up band added in October removes. (The July
+yield files hold 30.86M because they also include the four runs later dropped as bad.)
 
 The July 2026 yield files, and anything made from them, used |Vz| ≤ 2 cm and raw-refMult
 classes {44,37,28,17,5,0}. They are not compatible with the October files class by class.
