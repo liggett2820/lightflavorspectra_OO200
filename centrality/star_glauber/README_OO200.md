@@ -1,4 +1,4 @@
-# STAR Glauber + NBD centrality for O+O 200 GeV (Run 21, raw refMult)
+# STAR Glauber + NBD centrality for O+O 200 GeV (Run 21: refMult and EPD totnMIP)
 
 This is STAR's own centrality package (`star-sw/StRoot/PWGTools/CentralityCalibration/Glauber/star_glauber`, last upstream change 9319c7f9be, Apr 2023) with O+O added. Everything else in the chain (StFastGlauberMcMaker, StNbdFitMaker, StGlauberAnalysisMaker, the condor scripts) is the upstream code and runs exactly as the upstream README describes. `star_glauber_OO200.patch` is the full diff against upstream.
 
@@ -16,7 +16,7 @@ STAR's code only had 2pF Woods–Saxon, so `GlauberUtilities::WoodsSaxon3pF` was
 
 **Systematic types.** `large`/`small` follow the convention already documented in `Print("type")` and `submit_glauber.pl`: R ±2% with d ∓10%. For a nucleus this light, d dominates, so `large` is the more compact one (rms 2.64 fm) and `small` the more extended one (2.82 fm).
 
-**StCentrality.** `Init_OO200GeV()` (system `OO_200GeV`) holds placeholders until Step 3. It warns while they are placeholders.
+**StCentrality.** `Init_OO200GeV()` (system `OO_200GeV`) holds the raw-refMult NBD fit and edges from Step 3 (filled Oct 7 2026, commit 7ab3afa). The analysis now uses the EPD totnMIP classes of Step 5, which are applied in the main repo (`headers/EpdCentrality_OO200.h`, `macros/SetCutClass.C`), not through StCentrality.
 
 **Centrality edge convention.** `StNbdFitMaker` prints, for each class, the lowest refMult *included* in it (class = refMult ≥ printed value). This is also what StRefMultCorr's `> cut` selects after its [0,1) smearing. `StCentrality::GetCentrality()` uses a strict `>` on the integer MC multiplicity, so `Init_OO200GeV()` subtracts 1 from the pasted values. This is the same "− 1" as the Run 4 Au+Au table in that file.
 
@@ -155,10 +155,78 @@ To use the weights in the Glauber tables, put the form-(1 - exp) parameters into
 `Init_OO200GeV()` (`mParReweighting`) and run `all_doAnalysisMaker.csh OO_200GeV kTRUE kFALSE`
 with `lowrw`/`highrw` added to its list.
 
+### Step 5: EPD totnMIP centrality (Oct 2026, in use)
+
+This is the centrality the spectra use. refMult cannot resolve O+O beyond about 75%, while the
+EPD (2.1 < |η| < 5.1) can, and it is away from the mid-rapidity tracks the spectra are
+measured with.
+
+**Input.** The input is corrected totnMIP for trigger 860003 at |Vz| ≤ 30 cm, from the main
+repo:
+1. `macros/MakeEpdCentInputs_OO200.C` (SDCC job `xml/runEpdCentInputs_OO200_SDCC.xml`).
+2. `macros/FitEpdCent_OO200.C`, which writes `hTotnMIPCorr_OO200.root`.
+
+Copy that file here before scanning.
+
+**1. Scan, on the host.** `-totnmip` reads `hTotnMIPCorr_OO200.root` and fits totnMIP ≥ 200;
+logs go to `LOG_Scan_totnmip_mc200`. Run the coarse pass first, then the fine pass around its
+minimum:
+```csh
+./submit_doScan_OO200.pl -totnmip -run
+python3 find_best_nbd_OO200.py LOG_Scan_totnmip_mc200
+./submit_doScan_OO200.pl -totnmip -fine -run
+python3 find_best_nbd_OO200.py LOG_Scan_totnmip_mc200_fine
+```
+
+**2. Fit-range check.** Add `-multcut 150` or `-multcut 250` to the scan command.
+
+**3. Glauber variations.** First make `ncoll_npart_<TYPE>.root` with `addNcollVsNpart.C`
+for each TYPE (small, large, smallXsec, largeXsec, gauss). Then run
+`./submit_doScan_OO200.pl -glauber TYPE -run` for each one. Each variation runs in its own
+`glauber_TYPE/` directory.
+
+**4. Cuts, 0–100%.** `CentCuts_OO200.C` replaces `StNbdFitMaker::CalculateCentrality`, which
+stops at 80%:
+```csh
+root -l -b -q 'CentCuts_OO200.C("RatioChi2Files/Ratio_<best point>.root", 200)'
+```
+It takes the data above the fit range and the MC below it. It prints the class edges for
+N_tot and for N_tot × 0.95 and × 1.05, and the 860003 efficiency (data/MC) vs totnMIP and per
+class. Output: `OO200_NBD_totnMIP_cuts.txt`, `OO200_NBD_totnMIP_fit.png`.
+
+**5. ⟨Npart⟩, ⟨Ncoll⟩, ⟨Nspec⟩ per class**, nominal and for each Glauber variation. This runs
+inside the container:
+```csh
+root -l -b -q 'NpartPerClass_OO200.C+'
+```
+
+**Result.** The fine scan's best point is npp = 24, k = 6, x = 0.20, d = 0, with χ²/ndf = 0.94
+for totnMIP ≥ 200. This gives edges 364/310/234/130/36/0 for 0–5, 5–10, 10–20, 20–40,
+40–80 and 80–100%.
+
+**Fit-range check result.** Refits to totnMIP ≥ 150 and ≥ 250 give 365/311/235/130/36 and
+364/310/233/130/36. The per-class 860003 efficiencies agree within 0.02.
+
+**Comparison with the official table.** The official StRefMultCorr totnMIP edges (triggers
+860001/2/11/12) agree with this fit's −5% σ_tot edges within 3 units for 0–75%.
+
+**Cross-checks** in the main repo: `macros/PlotTrigRatio_OO200.C` (860003 relative to 860001|860002
+vs totnMIP) and `macros/CompareVzCent_OO200.C` (class fractions at |Vz| ≤ 30 vs ≤ 2 cm).
+
+**Open:**
+- Below 50%, the 860003 efficiency from the fit is 4–21% below the PlotTrigRatio-based
+  estimate.
+- The refit with the official normalisation is still to do.
+- Approval by the centrality group.
+
+**Note on the NBD model.** StNbdFitMaker generates integer NBD multiplicities, whereas totnMIP
+is a continuous sum of truncated nMIP. The fit quality above suggests the NBD describes it
+over the fit range.
+
 ## Things to keep in mind for O+O
 
 **Multiplicity granularity.** refMult is a small integer here, so a 5% class cannot be exactly 5%. The printed edge is the integer whose cumulative fraction is closest. Quote the actual fraction each class selects, from the data histogram above the fit range and from the MC below it.
 
-**refMult corrections.** STAR's procedure expects luminosity- and Vz-corrected refMult. The raw-refMult fit above uses |Vz| ≤ 2 cm, where the Vz dependence is small. The corrections are being derived in Step 4 (Oct 2026); until the rescan on corrected refMult is done, the table above is for raw refMult.
+**refMult corrections.** STAR's procedure expects luminosity- and Vz-corrected refMult. The raw-refMult fit in Steps 2–3 uses |Vz| ≤ 2 cm, where the Vz dependence is small; Step 4 derives the corrections for |Vz| ≤ 30 cm. The analysis itself now uses the EPD totnMIP classes of Step 5.
 
 **Nuclear structure.** ¹⁶O is generated spherical with uncorrelated nucleons. α-clustering and short-range correlations are not in STAR's model.
