@@ -101,7 +101,7 @@ void PresentEventQA(string a_inputFile, string a_speciesSuffix = "Proton", strin
     if(totnMIP){ centCuts[0] = 364; centCuts[1] = 310; centCuts[2] = 234; centCuts[3] = 130; centCuts[4] = 36; }
     int    centPercents[5] = {5, 10, 20, 40, 80};
     centVar->SetTitle(totnMIP ? "Corrected EPD totnMIP" : "refMult");
-    centVar->GetXaxis()->SetRangeUser(0, totnMIP ? 650 : 140);
+    centVar->GetXaxis()->SetRangeUser(0, totnMIP ? 1000 : 140);
     centVar->Draw();
     gPad->Update();
     double yMin = TMath::Power(10, gPad->GetUymin());

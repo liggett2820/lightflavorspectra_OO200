@@ -7,8 +7,11 @@
 //   2. repeats a 1n Gaussian fit run by run (80-100%) to check gain stability;
 //   3. converts <ADC> per centrality class into an approximate <free neutrons> per side,
 //      <N_n> ~ <ADC> / ADC_1n (approximate: the ZDC response is not linear at high signal);
-//   4. draws the per-class ADC spectra with lines at n x ADC_1n.
-// Outputs: OO200_ZdcNeutrons.txt, OO200_Zdc_1nFit.png, OO200_Zdc_1nVsRun.png, OO200_Zdc_SpectraByClass.png
+//   4. draws the per-class ADC spectra with lines at n x ADC_1n;
+//   5. draws the same spectra converted to neutron multiplicity, N_n = ADC / ADC_1n per side
+//      (normalized per unit N_n; dotted lines at integer N_n, dashed line at 8 = neutrons in one 16O).
+// Outputs: OO200_ZdcNeutrons.txt, OO200_Zdc_1nFit.png, OO200_Zdc_1nVsRun.png, OO200_Zdc_SpectraByClass.png,
+//          OO200_Zdc_NnByClass.png
 //
 // Usage: root -l -b -q 'macros/PlotZdcSpectatorNeutrons_OO200.C+("zdc_OO200_all.root")'
 //   useReference = true skips the fit and uses the reference 1n positions for step 3.
@@ -164,5 +167,46 @@ void PlotZdcSpectatorNeutrons_OO200(const char* inName = "zdc_OO200_all.root", b
     lg->Draw();
   }
   c3->SaveAs("OO200_Zdc_SpectraByClass.png");
-  std::cout << "Wrote OO200_ZdcNeutrons.txt and OO200_Zdc_{1nFit,1nVsRun,SpectraByClass}.png" << std::endl;
+
+  // ---- 5. neutron multiplicity by class: same spectra with x = N_n = ADC / ADC_1n (step 1's 1n peak per side)
+  TCanvas* c4 = new TCanvas("c4", "", 1400, 600); c4->Divide(2, 1);
+  const double nnMax = 15.;
+  for(int s = 0; s < 2; s++){
+    c4->cd(s+1); gPad->SetLogy();
+    TLegend* lg = new TLegend(0.62, 0.55, 0.89, 0.89); lg->SetBorderSize(0);
+    double ymax = 0, ymin = 1e30;
+    std::vector<TH1D*> hs;
+    for(int c = 0; c < kNCent; c++){
+      TH1D* h = (TH1D*)f->Get(Form("hZdcUA%s_cent%d", kSide[s], c));
+      if(!h || h->Integral() <= 0){ hs.push_back(0); continue; }
+      TH1D* hr = (TH1D*)h->Clone(Form("r%s%d", kSide[s], c)); hr->Rebin(4);
+      const int nb = hr->GetNbinsX();
+      std::vector<double> edges(nb + 1);
+      for(int b = 1; b <= nb + 1; b++) edges[b-1] = hr->GetXaxis()->GetBinLowEdge(b) / adc1n[s];
+      TH1D* hn = new TH1D(Form("nn%s%d", kSide[s], c), "", nb, &edges[0]);
+      for(int b = 1; b <= nb; b++){ hn->SetBinContent(b, hr->GetBinContent(b)); hn->SetBinError(b, hr->GetBinError(b)); }
+      hn->Scale(1.0 / hn->Integral()); hn->Scale(1.0, "width");   // probability per unit N_n
+      ymax = TMath::Max(ymax, hn->GetMaximum());
+      for(int b = 1; b <= nb; b++) if(hn->GetBinContent(b) > 0 && hn->GetXaxis()->GetBinCenter(b) < nnMax) ymin = TMath::Min(ymin, hn->GetBinContent(b));
+      hs.push_back(hn); delete hr;
+    }
+    if(ymin > ymax) ymin = 1e-6 * ymax;
+    bool drawn = false;
+    for(int c = 0; c < kNCent; c++){
+      if(!hs[c]) continue;
+      hs[c]->SetLineColor(kColor[c]); hs[c]->SetLineWidth(2);
+      hs[c]->SetTitle(Form("ZDC %s: neutron multiplicity, N_{n} = ADC / %.0f;N_{n};probability per unit N_{n}", kSide[s], adc1n[s]));
+      hs[c]->SetMaximum(2*ymax); hs[c]->SetMinimum(0.5*ymin); hs[c]->GetXaxis()->SetRangeUser(0, nnMax);
+      hs[c]->Draw(drawn ? "hist same" : "hist"); drawn = true;
+      lg->AddEntry(hs[c], kCentLab[c], "l");
+    }
+    for(int k = 1; k <= (int)nnMax; k++){
+      TLine* l = new TLine(k, 0.5*ymin, k, 2*ymax);
+      if(k == 8){ l->SetLineStyle(2); l->SetLineColor(kRed+1); l->SetLineWidth(2); } else { l->SetLineStyle(3); l->SetLineColor(kGray); }
+      l->Draw();
+    }
+    lg->Draw();
+  }
+  c4->SaveAs("OO200_Zdc_NnByClass.png");
+  std::cout << "Wrote OO200_ZdcNeutrons.txt and OO200_Zdc_{1nFit,1nVsRun,SpectraByClass,NnByClass}.png" << std::endl;
 }
