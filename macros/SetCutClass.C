@@ -161,8 +161,13 @@ void SetCutClass(CutClass *cuts){
   // Class = totnMIP_corr >= edge. Fit-range checks done 2026-10-26: refits to totnMIP >= 150 and >= 250
   // give edges 365/311/235/130/36 and 364/310/233/130/36, and per-class 860003 efficiencies within 0.02.
   // To go back to the raw-refMult classes: setUseEpdCentrality(false) and the refMult edges below.
+  // Nov 10 2026: the centrality group asked for the OFFICIAL min-bias totnMIP classes (StRefMultCorr
+  // "totnmip", Run 21 O+O, triggers 860001/2/11/12) instead of my own 860003 fit. PicoBinner now applies
+  // the official correction (headers/OfficialTotnMIP_OO200.h) and these are the official 5/10/20/40/80%
+  // lower edges; 80-100% (below 37) is kept with a floor at 0, though the official table stops at 80%.
+  // My own 860003 edges were {364,310,234,130,36,0} with headers/EpdCentrality_OO200.h's correction.
   cuts->setUseEpdCentrality(true);
-  double centCutsArray[6] = {364,310,234,130,36,0};
+  double centCutsArray[6] = {367,315,242,141,37,0};
   int percents[6] = {5,10,20,40,80,100};
   cuts->setCentralities(6, &centCutsArray[0], &percents[0]);
   // raw-refMult edges used until Oct 2026 (same six classes):

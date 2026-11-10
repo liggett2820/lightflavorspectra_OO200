@@ -98,6 +98,7 @@
 #include "../headers/PhysMath.h"
 #include "../headers/CutClass.h"
 #include "../headers/EpdCentrality_OO200.h"
+#include "../headers/OfficialTotnMIP_OO200.h"
 #include "../headers/CalibrationClass.h"
 using namespace std;
 
@@ -1468,14 +1469,16 @@ void PicoBinner(string    a_filelist,
     if(a_cutClass->getVertexConfig() == "Center")     centVariable = refMultVar;
     if(a_cutClass->getVertexConfig() == "OffsetLow")  centVariable = refMultLowVar;
     if(a_cutClass->getVertexConfig() == "OffsetHigh") centVariable = refMultHighVar;
-    // corrected EPD totnMIP (same definition as the NBD-Glauber fit input)
+    // EPD totnMIP with the official StRefMultCorr("totnmip") correction (headers/OfficialTotnMIP_OO200.h),
+    // so it can be cut on the official min-bias class edges (centrality group, Nov 10 2026). Until then
+    // this was EpdCentOO200::correct(totnMIPRaw, vz, ZDCx), the input of my own 860003 NBD-Glauber fit.
     double totnMIPRaw = 0;
     for(int epdIndex = 0; epdIndex < (int) dst->numberOfEpdHits(); epdIndex++){
       StPicoEpdHit* epdHit = dst->epdHit(epdIndex);
       if(!epdHit) continue;
       totnMIPRaw += EpdCentOO200::truncMip(epdHit->nMIP());
     }
-    const double totnMIPCorr = EpdCentOO200::correct(totnMIPRaw, event->primaryVertex().Z(), event->ZDCx());
+    const double totnMIPCorr = OfficialTotnMIPOO200::correct(totnMIPRaw, event->primaryVertex().Z(), event->runId());
     totnMIPCorrHisto->Fill(totnMIPCorr);
     totnMIPCorrVsRefMult->Fill(refMultVar, totnMIPCorr);
 
